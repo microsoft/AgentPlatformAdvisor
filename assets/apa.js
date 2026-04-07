@@ -201,7 +201,7 @@ const PLATFORM_ICONS = {
   agent_builder:  '../images/copilot.png',
   m365_copilot:   '../images/m365-copilot-logo.png',
   copilot_studio: '../images/copilot-studio.png',
-  foundry:        '../images/ai-foundry.png',
+  foundry:        '../images/foundry.svg',
 };
 
 function badgeClass(label) {
