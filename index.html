@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "vbtabg8kgx");
+</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="thumbnail"
+      property="og:image"
+      content="https://microsoft.github.io/cat/images/powercattools.png"
+    />
+    <meta name="thumbnail" property="og:image:width" content="1200" />
+    <meta name="thumbnail" property="og:image:height" content="1200" />
+    <meta property="og:image:alt" content="CAT Agent Platform Advisor" />
+    <meta
+      name="title"
+      property="og:title"
+      content="CAT Agent Platform Advisor"
+    />
+    <meta
+      name="description"
+      property="og:description"
+      content="Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft agent platform for your scenario."
+    />
+    <meta
+      name="url"
+      property="og:url"
+      content="https://microsoft.github.io/cat/agent-platform-advisor/index.html"
+    />
+    <meta name="type" property="og:type" content="article" />
+    <meta
+      name="site_name"
+      property="og:site_name"
+      content="Microsoft CAT - Agent Platform Advisor"
+    />
+    <meta name="locale" property="og:locale" content="en_US" />
+    <meta name="author" property="og:author" content="Microsoft CAT" />
+    <meta name="publish_date" property="og:publish_date" content="2025-10-31" />
+    <meta name="description" content="Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft agent platform for your scenario." />
+  <title>Agent Platform Advisor — Microsoft CAT</title>
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+    <!-- RTF export for Word document compatibility -->
+    <link rel="stylesheet" href="./assets/apa.css">
+  </head>
+  <body>
+    <!-- Progress bar -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M12 1.5a.75.75 0 0 1 .75.75 8.25 8.25 0 0 0 8.25 8.25.75.75 0 0 1 0 1.5 8.25 8.25 0 0 0-8.25 8.25.75.75 0 0 1-1.5 0 8.25 8.25 0 0 0-8.25-8.25.75.75 0 0 1 0-1.5 8.25 8.25 0 0 0 8.25-8.25A.75.75 0 0 1 12 1.5zM5.625 15a.375.375 0 0 1 .375.375 3.375 3.375 0 0 0 3.375 3.375.375.375 0 0 1 0 .75A3.375 3.375 0 0 0 6 22.875a.375.375 0 0 1-.75 0A3.375 3.375 0 0 0 1.875 19.5a.375.375 0 0 1 0-.75A3.375 3.375 0 0 0 5.25 15.375.375.375 0 0 1 5.625 15z"/>
+              </svg>
+            </div>
+            <span class="logo-text">Agent Platform Advisor</span>
+          </div>
+          <div id="progress-bar"><!-- rendered by JS --></div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="container main-container">
+        <div id="loading-section"  class="fade-in">
+          <div class="status-section">
+            <div class="status-icon">⏳</div>
+            <p class="status-text">Loading advisor data…</p>
+          </div>
+        </div>
+        <div id="error-section"    class="fade-in hidden">
+          <div class="card">
+            <div class="card-content error-content">
+              <div class="status-icon">⚠️</div>
+              <h2 class="error-heading">Unable to load advisor</h2>
+              <p id="error-message" class="error-message"></p>
+              <button class="btn btn-primary" onclick="boot()">Try Again</button>
+            </div>
+          </div>
+        </div>
+        <div id="welcome-section"  class="fade-in hidden"><div class="card">
+  <div class="card-content card-content--centered">
+    <div class="welcome-icon-wrapper">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="var(--primary)" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 1.5a.75.75 0 0 1 .75.75 8.25 8.25 0 0 0 8.25 8.25.75.75 0 0 1 0 1.5 8.25 8.25 0 0 0-8.25 8.25.75.75 0 0 1-1.5 0 8.25 8.25 0 0 0-8.25-8.25.75.75 0 0 1 0-1.5 8.25 8.25 0 0 0 8.25-8.25A.75.75 0 0 1 12 1.5zM5.625 15a.375.375 0 0 1 .375.375 3.375 3.375 0 0 0 3.375 3.375.375.375 0 0 1 0 .75A3.375 3.375 0 0 0 6 22.875a.375.375 0 0 1-.75 0A3.375 3.375 0 0 0 1.875 19.5a.375.375 0 0 1 0-.75A3.375 3.375 0 0 0 5.25 15.375.375.375 0 0 1 5.625 15z"/>
+      </svg>
+    </div>
+    <h1 class="welcome-heading">
+      Agent Platform Advisor
+    </h1>
+    <p class="welcome-description">
+      Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft platform to build it on.
+    </p>
+    <div class="platform-grid">
+      <div class="platform-preview">
+        <div class="platform-preview-icon">
+          <img src="../images/m365-copilot-logo.png" alt="Microsoft 365 Copilot" class="platform-preview-img">
+        </div>
+        <h3 class="platform-preview-title">Microsoft 365 Copilot</h3>
+        <p class="platform-preview-desc">AI assistants already built into Microsoft 365 apps like Teams, Outlook, and SharePoint — ready to use today</p>
+      </div>
+      <div class="platform-preview">
+        <div class="platform-preview-icon">
+          <img src="../images/copilot.png" alt="Agent Builder" class="platform-preview-img">
+        </div>
+        <h3 class="platform-preview-title">Agent Builder</h3>
+        <p class="platform-preview-desc">Create simple agents in minutes without writing code, using your existing Microsoft 365 files and data</p>
+      </div>
+      <div class="platform-preview">
+        <div class="platform-preview-icon">
+          <img src="../images/copilot-studio.png" alt="Copilot Studio" class="platform-preview-img">
+        </div>
+        <h3 class="platform-preview-title">Copilot Studio</h3>
+        <p class="platform-preview-desc">Build agents that connect to other business systems, automate processes, and work across websites, Teams, and more</p>
+      </div>
+      <div class="platform-preview">
+        <div class="platform-preview-icon">
+          <img src="../images/foundry.svg" alt="Microsoft Foundry" class="platform-preview-img">
+        </div>
+        <h3 class="platform-preview-title">Microsoft Foundry</h3>
+        <p class="platform-preview-desc">A developer platform for building highly customized agents with your own AI models and full control over the technology stack</p>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-lg" id="start-btn">
+      Get Started <span class="icon icon-chevron-right"></span>
+    </button>
+  </div>
+</div></div>
+        <div id="prescreen-section" class="fade-in hidden"><div class="card">
+  <div class="card-content card-content--centered">
+    <h2 class="prescreen-heading">
+      Where would you like to begin?
+    </h2>
+    <p class="prescreen-description">
+      Choose a starting point. This helps us tailor the best recommendation for you.
+    </p>
+    <div class="options-list">
+      <div class="option-card" id="prescreen-yes" role="button" tabindex="0" onclick="handlePrescreenYes()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenYes()}">
+        <div class="option-content">
+          <div class="option-label">
+            I'd like to start with a built-in Microsoft 365 Copilot experience
+          </div>
+          <div class="option-description">
+            Explore what's available out of the box within Microsoft 365
+          </div>
+        </div>
+      </div>
+      <div class="option-card" id="prescreen-no" role="button" tabindex="0" onclick="handlePrescreenNo()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenNo()}">
+        <div class="option-content">
+          <div class="option-label">
+            I'd like to build a custom agent with specific requirements
+          </div>
+          <div class="option-description">
+            Answer a few quick questions so we can recommend the right agent approach for your scenario
+          </div>
+        </div>
+      </div>
+      <div class="option-card" id="prescreen-explore" role="button" tabindex="0" onclick="handlePrescreenExplore()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenExplore()}">
+        <div class="option-content">
+          <div class="option-label">
+            I'm exploring what's possible with agents
+          </div>
+          <div class="option-description">
+            Browse all four platforms and learn which scenarios each one is designed for
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+        <div id="exploration-section" class="fade-in hidden"><div class="card">
+  <div class="card-content card-content--centered">
+    <a href="#" class="exploration-back" onclick="showSection('prescreen-section');pushState('prescreen-section');return false">← Back to options</a>
+    <h2 class="welcome-heading" style="font-size:32px">Explore Microsoft Agent Platforms</h2>
+    <p class="welcome-description">See what each platform offers before deciding which fits your scenario.</p>
+    <div class="exploration-grid" id="exploration-grid"></div>
+    <div class="exploration-cta">
+      <h3 class="exploration-cta-heading">Not sure which fits? Let the assessment guide you</h3>
+      <button class="btn btn-primary btn-lg" onclick="handlePrescreenNo()">Start the Assessment →</button>
+    </div>
+  </div>
+</div></div>
+        <div id="assessment-section" class="fade-in hidden"><div class="card">
+  <div class="card-content">
+    <div id="question-counter" class="question-counter"></div>
+    <h2 class="question-title" id="question-title"></h2>
+    <p class="question-subtitle" id="question-subtitle"></p>
+    <div class="options-list" id="options-list"></div>
+    <div class="center assessment-nav">
+      <button class="btn btn-ghost" id="prev-btn">
+        <span class="icon icon-chevron-left"></span> Back
+      </button>
+      <button class="btn btn-primary" id="next-btn" disabled>
+        Next <span class="icon icon-chevron-right"></span>
+      </button>
+    </div>
+  </div>
+</div></div>
+        <div id="recommendation-section" class="fade-in hidden">
+          <nav id="rec-nav" class="rec-nav" style="display:none">
+            <a href="javascript:void(0)" onclick="document.getElementById('rec-primary-card').scrollIntoView({behavior:'smooth',block:'start'})">Recommendation</a>
+            <span class="rec-nav-sep">·</span>
+            <a href="javascript:void(0)" id="rec-nav-also" style="display:none" onclick="document.getElementById('rec-second-card').scrollIntoView({behavior:'smooth',block:'start'})">Also Consider</a>
+            <span class="rec-nav-sep" id="rec-nav-also-sep" style="display:none">·</span>
+            <a href="javascript:void(0)" id="rec-nav-scores" onclick="document.getElementById('rec-score-comparison').scrollIntoView({behavior:'smooth',block:'start'})">Score Breakdown</a>
+          </nav>
+          <div id="rec-cross-notes" class="cross-notes hidden"></div>
+          <div id="rec-primary-card"></div>
+          <div id="rec-share-anchor" class="rec-share-anchor" style="display:none">
+            <a href="javascript:void(0)" onclick="document.getElementById('decision-card').scrollIntoView({behavior:'smooth',block:'start'})">📋 Share this recommendation</a>
+          </div>
+          <div id="rec-pair-banner" class="pair-banner hidden"></div>
+          <div id="rec-second-label" class="second-label hidden"></div>
+          <div id="rec-second-card"></div>
+          <div class="center">
+            <button id="rec-score-toggle" class="btn btn-ghost score-toggle hidden" onclick="toggleScoreComparison()">
+              See how we scored this <span class="score-toggle-chevron">▾</span>
+            </button>
+          </div>
+          <div id="rec-score-comparison" class="score-comparison hidden"></div>
+
+          <div id="rec-fasttrack-prompt" class="hidden fasttrack-prompt">
+            <p class="fasttrack-text">
+              If you need more customization, try the full assessment
+            </p>
+            <button class="btn btn-secondary" onclick="startFullAssessment()">
+              Take the Full Assessment
+            </button>
+          </div>
+          <div class="decision-card-divider" id="decision-card-divider" style="display:none"></div>
+          <div id="decision-card" class="decision-card fade-in" style="display:none" role="region" aria-label="Recommendation summary">
+            <h3 class="decision-card-heading">Share Your Results</h3>
+            <p id="decision-card-context" class="decision-card-context" style="display:none">
+              This recommendation was generated by the Agent Platform Advisor based on specific scenario answers.
+              <a href="javascript:void(0)" onclick="restart()">Take your own assessment →</a>
+            </p>
+            <div id="decision-card-banner" class="decision-card-banner" style="display:none" role="status" aria-live="polite"></div>
+            <div class="decision-card-platform">
+              <span id="decision-card-chip" class="decision-card-chip"></span>
+              <span class="decision-card-platform-label">Your recommended platform</span>
+              <span id="decision-card-score" class="decision-card-score"></span>
+            </div>
+            <div id="decision-card-factors" class="decision-card-factors" style="display:none">
+              <div class="decision-card-factors-heading">Key factors</div>
+              <ul id="decision-card-factors-list" class="decision-card-factors-list"></ul>
+            </div>
+            <div class="decision-card-actions">
+              <button id="decision-card-share" class="btn-decision btn-decision-primary" aria-label="Copy shareable link to clipboard" onclick="copyShareLink()">
+                📋 Share link
+              </button>
+            </div>
+            <div id="decision-card-drift" class="decision-card-drift" style="display:none"></div>
+            <div class="decision-card-meta">
+              <span id="decision-card-date" class="decision-card-date"></span>
+              <span id="decision-card-links" class="decision-card-links">
+                <a href="javascript:void(0)" id="decision-card-reevaluate" class="decision-card-link" style="display:none">Re-evaluate</a>
+                <span id="decision-card-links-sep" style="display:none"> · </span>
+                <a href="javascript:void(0)" onclick="restart()" class="decision-card-link">Retake assessment</a>
+              </span>
+            </div>
+          </div>
+          <div class="center rec-actions">
+            <button class="btn btn-ghost" onclick="restart()">
+              ↩ Start Over
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer">
+      Created by
+      <a href="https://www.linkedin.com/in/rstandefer/">Robert Standefer</a> &amp;
+      the <a href="https://aka.ms/wearecat">Microsoft Copilot Acceleration Team</a>
+      <p>If you encounter a problem, please
+        <a href="https://github.com/microsoft/cat/issues/new">create an issue</a>.
+      </p>
+    </div>
+
+    <!-- CDN + scripts here -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="./assets/apa.js"></script>
+  </body>
+</html>
