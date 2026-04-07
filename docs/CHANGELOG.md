@@ -15,6 +15,7 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 - Much, much more!
 
 ### Added
+
 - **Persona-based tiebreakers** — when two platforms score equally, a `tiebreakers` section in `apa.yaml scoring.tie_handling` picks the better fit based on the user's answers (e.g., professional developer + equal score → Copilot Studio preferred over Agent Builder). Applied in `rankPlatforms()` before falling back to `valid_pairs`.
 - **FLOWCHART.md** — decision-tree flowchart documenting the full scoring pipeline from question answers through hard rules, raw score, tiebreakers, and final recommendation.
 - **Docs subfolder** — CHANGELOG.md, DESIGN.md, and SCORING.md moved to `docs/` to keep the project root clean.
@@ -53,6 +54,7 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 - **Accordion controls** — 1st Party Copilot Agents and Available Templates lists are now wrapped in collapsible `<details>` accordions with item counts, keeping recommendation cards compact by default.
 
 ### Changed
+
 - **6 Agent Builder hard rules** — zeroes Agent Builder for q1c (professional developer), q2b (custom app), q2c (background), q3b (external systems), q3c (advanced data), q4c (multi-step tasks). Professional developers should be directed to Copilot Studio or Foundry, not a no-code tool.
 - **Copilot Studio score for pro dev (q1c)** — 0 → 1. CS supports professional developers via YAML authoring and VS Code extension; a weak signal is more accurate than zero.
 - **Foundry score for M365 deployment (q2a)** — 0 → 1. Foundry agents can be surfaced in Teams via custom bot frameworks.
@@ -90,6 +92,7 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 - Progress bar updated to 5 steps: Welcome → Assessment → Recommendation → Structure → Implementation
 
 ### Fixed
+
 - **Platform grid mobile stacking** — `.platform-grid` on the welcome screen now stacks to single column at ≤480px, matching the exploration grid's responsive behavior. Previously forced 2 columns at all widths below 768px, causing cramped ~170px cards on phones.
 - **q8c dead reference** — removed non-existent `q8c` option from `hard_rules` condition in apa.yaml.
 - **Platform chip label** — Decision Card now shows the human-readable platform name (e.g., "Copilot Studio") instead of the raw ID (`COPILOT_STUDIO`).
@@ -115,6 +118,7 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 - CSS variable system rebuilt and aligned with DESIGN.md tokens (FINDING-001–006, prior review)
 
 ### Removed
+
 - **Maturity guidance section** — "Your platform choice will evolve" section removed entirely.
 - **PNG download** — html2canvas produced low-quality output with washed-out colors; removed in favor of the shareable URL.
 - **Dead code cleanup** — removed ICON_PATHS (38 lines), getIcon(), 244 lines of dead v1 CSS (checklist, structure, component, agent-types selectors), duplicate .question-subtitle selector, stale `meta.scale_max` and `meta.questions_count` from YAML, and `index-old.html` (2,875 lines).
@@ -124,8 +128,6 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 ---
 
 ## v1 — Initial release and iterative updates
-
-### Added
 
 - **Initial release** of the Agent Platform Advisor as a single-page HTML app with an interactive questionnaire, platform recommendation engine, agent structure planning, and implementation checklists
 - **Deployment options question** — new 5th assessment question: "Where and how do you want users to access your AI agent?" with four deployment channel options and corresponding scoring logic
