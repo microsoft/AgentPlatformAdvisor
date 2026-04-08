@@ -996,16 +996,23 @@ body {
 .rec-resources-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-size: 14px;
-  font-weight: 500;
-  color: var(--primary);
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
   text-decoration: none;
   margin-bottom: 20px;
-  transition: color 0.2s;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  transition: background 0.2s, box-shadow 0.2s;
 }
 .rec-resources-link:hover {
-  color: var(--primary-hover);
-  text-decoration: underline;
+  background: var(--primary-hover);
+  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.25);
+  text-decoration: none;
+  color: #fff;
 }
 .rec-section-title {
   font-size: 14px;
