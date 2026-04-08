@@ -135,7 +135,7 @@ function rankPlatforms(answersMap) {
 
   const tiebreakers = apa.scoring.tie_handling.tiebreakers || [];
 
-  return apa.meta.platforms
+  const ranked = apa.meta.platforms
     .map(p => ({
       id: p.id,
       score: Math.round(final[p.id]),
@@ -154,11 +154,39 @@ function rankPlatforms(answersMap) {
       }
       return 0;
     });
+
+  // Persona preferences: soft overrides that force ranking regardless of score
+  const prefs = apa.scoring.persona_preferences || [];
+  prefs.forEach(pref => {
+    const match = Object.entries(pref.when).every(
+      ([qId, optId]) => answersMap[qId] === optId
+    );
+    if (!match) return;
+    const preferIdx = ranked.findIndex(r => r.id === pref.prefer);
+    const overIdx = ranked.findIndex(r => r.id === pref.over);
+    if (preferIdx > overIdx && preferIdx >= 0 && overIdx >= 0) {
+      // Move the preferred platform just above the "over" platform
+      const [preferred] = ranked.splice(preferIdx, 1);
+      ranked.splice(overIdx, 0, preferred);
+    }
+  });
+
+  return ranked;
 }
 
 // Returns up to 3 bullet strings summarising key scoring factors (or disqualifying rules) for the given platform
 function getKeyFactors(platformId, answersMap) {
   const factors = [];
+
+  // 0. Persona preference override rationale (if this platform was boosted)
+  const prefs = apa.scoring.persona_preferences || [];
+  prefs.forEach(pref => {
+    if (pref.prefer !== platformId) return;
+    const match = Object.entries(pref.when).every(
+      ([qId, optId]) => answersMap[qId] === optId
+    );
+    if (match) factors.push(`💡 ${pref.rationale.trim()}`);
+  });
 
   // 1. All hard rules that zeroed this platform
   getHardRuleLabels(platformId, answersMap).forEach(label => {
@@ -311,6 +339,11 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
       </details>` : ''}
       ${firstPartyHtml}
       ${templatesHtml}
+      ${isPrimary ? `<div class="rec-card-share">
+        <button id="decision-card-share" class="btn-decision btn-decision-primary" aria-label="Copy shareable link to clipboard" onclick="copyShareLink()">
+          📋 Share your results
+        </button>
+      </div>` : ''}
     </div>`;
 }
 
@@ -699,8 +732,8 @@ function buildScoreComparison(ranked, answersMap) {
   const second = ranked[1];
   let closeCallout = '';
   if (top && second && !zeroed[second.id] && (top.score - second.score) <= 2 && second.score > 0) {
-    const gap = top.score - second.score;
-    const gapText = gap === 0 ? 'Zero points separate' : `Only ${gap} point${gap === 1 ? '' : 's'} separate${gap === 1 ? 's' : ''}`;
+    const gap = Math.abs(top.score - second.score);
+    const gapText = gap === 0 ? 'Zero points separate' : `Only ${gap} point${gap !== 1 ? 's' : ''} separate${gap === 1 ? 's' : ''}`;
     closeCallout = `<p class="sc-close-callout">📊 ${gapText} the top two platforms — your choice may come down to team skills and existing tooling.</p>`;
   }
 
@@ -1044,41 +1077,7 @@ function computeWhyNot(winner, runner, answersMap) {
 
 function renderDecisionCard() {
   const card = document.getElementById('decision-card');
-  const divider = document.getElementById('decision-card-divider');
   if (!card || !recommendedPlatformId) return;
-
-  // Platform chip
-  const platformMeta = apa.meta.platforms.find(p => p.id === recommendedPlatformId);
-  const chipLabel = platformMeta ? platformMeta.label : recommendedPlatformId;
-  document.getElementById('decision-card-chip').textContent = chipLabel;
-
-  // Score
-  const scoreEl = document.getElementById('decision-card-score');
-  if (fastTrack) {
-    scoreEl.textContent = '';
-  } else {
-    const ranked = rankPlatforms(answers);
-    const entry = ranked.find(r => r.id === recommendedPlatformId);
-    if (entry) {
-      const maxScore = apa.scoring.raw_score_max || 15;
-      const thresholdClass = entry.label.startsWith('Strong') ? 'threshold-strong'
-        : entry.label.startsWith('Good') ? 'threshold-good' : 'threshold-possible';
-      scoreEl.innerHTML = `${entry.score}/${maxScore} <span class="threshold-label ${thresholdClass}">— ${entry.label}</span>`;
-    }
-  }
-
-  // Key factors
-  const factors = computeDecisionKeyFactors();
-  const factorsContainer = document.getElementById('decision-card-factors');
-  const factorsList = document.getElementById('decision-card-factors-list');
-  if (factors.length > 0) {
-    factorsList.innerHTML = factors.map(f =>
-      `<li>"${f.questionLabel}" → ${f.optionLabel}</li>`
-    ).join('');
-    factorsContainer.style.display = '';
-  } else {
-    factorsContainer.style.display = 'none';
-  }
 
   // Recipient context (URL-loaded only)
   const contextEl = document.getElementById('decision-card-context');
@@ -1104,29 +1103,11 @@ function renderDecisionCard() {
     driftEl.style.display = 'none';
   }
 
-  // Date
-  const dateEl = document.getElementById('decision-card-date');
-  const now = new Date();
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  dateEl.textContent = `Generated ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
-
-  // Re-evaluate link (URL-loaded only)
-  const reevalLink = document.getElementById('decision-card-reevaluate');
-  const linksSep = document.getElementById('decision-card-links-sep');
-  if (isURLLoaded) {
-    reevalLink.style.display = '';
-    linksSep.style.display = '';
-    reevalLink.onclick = () => { window.location.href = buildShareableURL(); };
-  } else {
-    reevalLink.style.display = 'none';
-    linksSep.style.display = 'none';
-  }
-
-  // Show card + divider + share anchor
-  divider.style.display = '';
-  card.style.display = '';
-  const shareAnchor = document.getElementById('rec-share-anchor');
-  if (shareAnchor) shareAnchor.style.display = '';
+  // Only show card if there's visible content (URL-loaded scenarios)
+  const hasVisibleContent = contextEl.style.display !== 'none'
+    || bannerEl.style.display !== 'none'
+    || driftEl.style.display !== 'none';
+  card.style.display = hasVisibleContent ? '' : 'none';
 }
 
 // === SHARE & DOWNLOAD ===
