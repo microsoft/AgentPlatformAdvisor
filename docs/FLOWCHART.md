@@ -37,7 +37,7 @@ flowchart TD
     Q3 -->|Microsoft 365 content| Q3A["AB:3 · CS:2 · Foundry:0"]
     Q3 -->|"Other business systems"| Q3B["AB:1 · CS:3 · Foundry:2"]
     Q3 -->|"⚠️ Advanced / private data sources"| Q3C["AB:0 · CS:1 · Foundry:3\n→ HARD RULE: AB=0"]
-    Q3 -->|Mix of M365 + other systems| Q3D["AB:0 · CS:3 · Foundry:2"]
+    Q3 -->|Mix of M365 + other systems| Q3D["AB:1 · CS:3 · Foundry:2"]
 
     Q3A & Q3B & Q3C & Q3D --> SCORE
 

@@ -75,7 +75,7 @@ Data source requirements. Agent Builder is the most limited in terms of data acc
 | Microsoft 365 data | q3a | **3** | 2 | 0 | — |
 | Business systems (CRM, etc.) | q3b | 1 | **3** | 2 | — |
 | Advanced / private data | q3c | 0 | 1 | **3** | Zeros AB |
-| Mixed sources | q3d | 0 | **3** | 2 | — |
+| Mixed sources | q3d | 1 | **3** | 2 | — |
 
 ## Scoring Pipeline
 

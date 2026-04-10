@@ -192,7 +192,7 @@ questions:
       - id: q3d
         label: A mix — some data in Microsoft 365, some in other systems
         scores:
-          agent_builder: 0
+          agent_builder: 1
           copilot_studio: 3
           foundry: 2
 
