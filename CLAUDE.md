@@ -25,4 +25,4 @@ Key constraints from DESIGN.md:
 
 ## Key actions
 
-Always update CHANGELOG.md after making changes.
+Always update `docs/CHANGELOG.md` after making changes.

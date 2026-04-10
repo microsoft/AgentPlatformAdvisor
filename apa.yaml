@@ -178,7 +178,7 @@ questions:
       - id: q3b
         label: Other business systems — like Salesforce, SAP, ServiceNow, or your own databases
         scores:
-          agent_builder: 0
+          agent_builder: 1
           copilot_studio: 3
           foundry: 2
 
@@ -222,9 +222,6 @@ scoring:
     q2c:
       zero: [agent_builder]
       label: "Background execution — Agent Builder has no event-driven or autonomous capabilities"
-    q3b:
-      zero: [agent_builder]
-      label: "External business systems — Agent Builder can only access Microsoft 365 data"
     q3c:
       zero: [agent_builder]
       label: "Advanced data sources — Agent Builder can only access Microsoft 365 data"

@@ -73,7 +73,7 @@ Data source requirements. Agent Builder can only access Microsoft 365 data.
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
 | Microsoft 365 data | q3a | **3** | 2 | 0 | — |
-| Business systems (CRM, etc.) | q3b | 0 | **3** | 2 | Zeros AB |
+| Business systems (CRM, etc.) | q3b | 1 | **3** | 2 | — |
 | Advanced / private data | q3c | 0 | 1 | **3** | Zeros AB |
 | Mixed sources | q3d | 0 | **3** | 2 | — |
 
@@ -90,7 +90,6 @@ Hard rules zero out platforms before scores are summed. They represent real plat
 | q4c (multi-step tasks) | AB | Cannot follow processes or take actions |
 | q2b (custom app) | AB | Can only run inside Microsoft 365 |
 | q2c (background) | AB | No event-driven capabilities |
-| q3b (business systems) | AB | Can only access Microsoft 365 data |
 | q3c (advanced data) | AB | Can only access Microsoft 365 data |
 
 Additionally, M365 Copilot is always zeroed in the full assessment (hard-coded in JS).

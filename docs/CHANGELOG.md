@@ -16,6 +16,8 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 
 ### Changed
 
+- **Single CHANGELOG** — removed duplicate `CHANGELOG.md` from project root; `docs/CHANGELOG.md` is now the sole source of truth. Updated `CLAUDE.md` reference.
+- **Q3b hard rule removed** — Agent Builder is no longer zeroed when the user selects "Other business systems" (q3b). Scores changed from AB=0/CS=3/F=2 to AB=1/CS=3/F=2, reflecting that Agent Builder has limited but non-zero capability with external systems via connectors.
 - **Accordion for Best For & Considerations** — "Best For" and "Important Considerations" in recommendation cards are now collapsible accordions, matching the existing pattern used for first-party agents and templates. Each shows an item count badge.
 - **Prominent resources link** — the "Explore resources" link in recommendation cards is now styled as a filled button (primary blue background, white text) instead of a plain text link.
 - **Share button moved to rec card** — "Share your results" button is now inside the primary recommendation card. The separate "Share Your Results" card has been fully removed (platform chip, score, date, retake link, key factors). Only conditional URL-loaded elements remain (shared context, temporal change banner, schema drift note).
