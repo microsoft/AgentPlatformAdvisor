@@ -68,7 +68,7 @@ Foundry gets 1 for q4a because Foundry can do Q&A via prompt flow.
 
 ### Q3 — What information does this agent need to access?
 
-Data source requirements. Agent Builder can only access Microsoft 365 data.
+Data source requirements. Agent Builder is the most limited in terms of data access.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|

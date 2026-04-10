@@ -26,3 +26,4 @@ Key constraints from DESIGN.md:
 ## Key actions
 
 Always update `docs/CHANGELOG.md` after making changes.
+Always update `docs/FLOWCHART.md` and `docs/SCORING.md` after making changes that affect user flow or scoring logic.
