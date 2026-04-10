@@ -35,7 +35,7 @@ flowchart TD
 
     Q3["**Q3: What information does the agent need?**"]
     Q3 -->|Microsoft 365 content| Q3A["AB:3 · CS:2 · Foundry:0"]
-    Q3 -->|"⚠️ Other business systems"| Q3B["AB:0 · CS:3 · Foundry:2\n→ HARD RULE: AB=0"]
+    Q3 -->|"Other business systems"| Q3B["AB:1 · CS:3 · Foundry:2"]
     Q3 -->|"⚠️ Advanced / private data sources"| Q3C["AB:0 · CS:1 · Foundry:3\n→ HARD RULE: AB=0"]
     Q3 -->|Mix of M365 + other systems| Q3D["AB:0 · CS:3 · Foundry:2"]
 
@@ -56,7 +56,6 @@ flowchart TD
     style Q2C fill:#fff3cd,stroke:#ffc107
     style Q4C fill:#fff3cd,stroke:#ffc107
     style Q4D fill:#fff3cd,stroke:#ffc107
-    style Q3B fill:#fff3cd,stroke:#ffc107
     style Q3C fill:#fff3cd,stroke:#ffc107
     style SCORE fill:#e8f4fd,stroke:#0078D4
     style PREF fill:#e8f0fe,stroke:#4a86e8
