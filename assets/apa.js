@@ -1190,5 +1190,33 @@ function initThemeToggle() {
   });
 }
 
+// === NAV MENU (hamburger) ===
+function initNavMenu() {
+  const menu = document.getElementById('nav-menu');
+  const toggle = document.getElementById('nav-menu-toggle');
+  if (!menu || !toggle) return;
+
+  toggle.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target)) {
+      menu.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', boot);
 document.addEventListener('DOMContentLoaded', initThemeToggle);
+document.addEventListener('DOMContentLoaded', initNavMenu);

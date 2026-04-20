@@ -2,7 +2,7 @@
 
 All notable changes to the Agent Platform Advisor are documented here.
 
-## v2 — Complete redesign from the ground up
+## Introducing V2 of Agent Platform Advisor
 
 We have completely redesigned Agent Platform Advisor for the ground up, based on feedback and product changes. Highlights of the new version include:
 
@@ -14,20 +14,14 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 - Dark mode
 - Much, much more!
 
-### Changed
+### Added
 
+- **Hamburger documentation menu** — header now includes a hamburger menu (top right, next to the theme toggle) with links to README, Changelog, Flowchart, and Scoring docs on GitHub. Dropdown closes on outside click or Escape key. Fully keyboard-accessible with `aria-expanded` and `role="menu"`.
 - **Single CHANGELOG** — removed duplicate `CHANGELOG.md` from project root; `docs/CHANGELOG.md` is now the sole source of truth. Updated `CLAUDE.md` reference.
 - **Q3b hard rule removed** — Agent Builder is no longer zeroed when the user selects "Other business systems" (q3b). Scores changed from AB=0/CS=3/F=2 to AB=1/CS=3/F=2, reflecting that Agent Builder has limited but non-zero capability with external systems via connectors.
 - **Accordion for Best For & Considerations** — "Best For" and "Important Considerations" in recommendation cards are now collapsible accordions, matching the existing pattern used for first-party agents and templates. Each shows an item count badge.
 - **Prominent resources link** — the "Explore resources" link in recommendation cards is now styled as a filled button (primary blue background, white text) instead of a plain text link.
 - **Share button moved to rec card** — "Share your results" button is now inside the primary recommendation card. The separate "Share Your Results" card has been fully removed (platform chip, score, date, retake link, key factors). Only conditional URL-loaded elements remain (shared context, temporal change banner, schema drift note).
-
-### Fixed
-
-- **Score breakdown gap text** — fixed negative number showing ("Only -1 points separate") when persona preferences reorder platforms past the score leader. Uses `Math.abs()` now. Also fixed grammar: "1 point separates" instead of "1 points separate".
-
-### Added
-
 - **Data scientist persona preference** — selecting "Data scientist or AI/ML engineer" (q1d) now ensures Copilot Studio is always recommended over Agent Builder via a soft ranking override (`persona_preferences` in `apa.yaml`). Unlike hard rules, Agent Builder's scores are preserved. The override rationale is shown as a 💡 key factor on the recommendation card. Also adds a tiebreaker preferring Copilot Studio over Foundry when scores are equal.
 - **Logo link to Get Started** — the "Agent Platform Advisor" header text is now a link that navigates back to the Get Started (welcome) screen from any point in the flow.
 - **Persona-based tiebreakers** — when two platforms score equally, a `tiebreakers` section in `apa.yaml scoring.tie_handling` picks the better fit based on the user's answers (e.g., professional developer + equal score → Copilot Studio preferred over Agent Builder). Applied in `rankPlatforms()` before falling back to `valid_pairs`.
@@ -142,8 +136,6 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 ---
 
 ## v1 — Initial release and iterative updates
-
-### Added
 
 - **Initial release** of the Agent Platform Advisor as a single-page HTML app with an interactive questionnaire, platform recommendation engine, agent structure planning, and implementation checklists
 - **Deployment options question** — new 5th assessment question: "Where and how do you want users to access your AI agent?" with four deployment channel options and corresponding scoring logic

@@ -2,7 +2,7 @@
 
 Answer a few questions about what you're trying to build, and get a recommendation for the best Microsoft agent platform for your scenario.
 
-[Try it out](https://microsoft.github.io/AgentPlatformAdvisor/index.html)
+The live tool is at [https://microsoft.github.io/AgentPlatformAdvisor/index.html](https://microsoft.github.io/AgentPlatformAdvisor/index.html).
 
 ---
 
@@ -67,6 +67,12 @@ See [docs/SCORING.md](docs/SCORING.md) for the full reference and [docs/FLOWCHAR
 
 Microsoft 365 Copilot is only recommended via the prescreen fast-track path, never through the scored wizard.
 
+## Sharing results
+
+After completing the assessment, a **Share link** button copies a URL encoding your answers and the recommendation date. Recipients can view the recommendation directly or retake the assessment with your answers pre-filled (`?mode=wizard`).
+
+If `apa.yaml` is updated after a link was shared and the recommendation has changed, the app shows a temporal change banner explaining what shifted. If the schema itself has changed (questions added or removed), a schema drift note explains that criteria have been updated.
+
 ## Running the tests
 
 The project uses [Playwright](https://playwright.dev/) for end-to-end tests. Tests run against a local static file server on port 4173.
@@ -78,12 +84,6 @@ npm run test:headed   # with browser visible
 ```
 
 25 tests across 5 spec files cover wizard completion, shared link loading, temporal change detection, the M365 fast-track path, and share button behavior. CI runs automatically on push and pull request via GitHub Actions.
-
-## Sharing results
-
-After completing the assessment, a **Share link** button copies a URL encoding your answers and the recommendation date. Recipients can view the recommendation directly or retake the assessment with your answers pre-filled (`?mode=wizard`).
-
-If `apa.yaml` is updated after a link was shared and the recommendation has changed, the app shows a temporal change banner explaining what shifted. If the schema itself has changed (questions added or removed), a schema drift note explains that criteria have been updated.
 
 ## Contributing
 
