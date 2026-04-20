@@ -439,14 +439,63 @@ body {
 
 /* Prescreen */
 .prescreen-heading {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 32px;
+  font-weight: 700;
   margin-bottom: 8px;
 }
 
 .prescreen-description {
   color: var(--muted-foreground);
   margin-bottom: 32px;
+}
+
+/* Prescreen option cards */
+.prescreen-option {
+  border-left: 3px solid transparent;
+  padding: 20px;
+  align-items: center;
+}
+
+.prescreen-option-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.prescreen-option-icon--builtin {
+  background: var(--primary-xlight);
+  color: var(--primary);
+}
+.prescreen-option--builtin {
+  border-left-color: var(--primary);
+}
+
+.prescreen-option-icon--custom {
+  background: #DFF6DD;
+  color: var(--success);
+}
+.prescreen-option--custom {
+  border-left-color: var(--success);
+}
+
+.prescreen-option-icon--explore {
+  background: #FFF4CE;
+  color: #8A6914;
+}
+.prescreen-option--explore {
+  border-left-color: var(--warning);
+}
+
+[data-theme="dark"] .prescreen-option-icon--custom {
+  background: rgba(16, 124, 16, 0.15);
+}
+[data-theme="dark"] .prescreen-option-icon--explore {
+  background: rgba(193, 156, 0, 0.15);
+  color: #E8C839;
 }
 
 /* Assessment navigation */

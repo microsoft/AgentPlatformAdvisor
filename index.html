@@ -180,7 +180,10 @@
       Choose a starting point. This helps us tailor the best recommendation for you.
     </p>
     <div class="options-list">
-      <div class="option-card" id="prescreen-yes" role="button" tabindex="0" onclick="handlePrescreenYes()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenYes()}">
+      <div class="option-card prescreen-option prescreen-option--builtin" id="prescreen-yes" role="button" tabindex="0" onclick="handlePrescreenYes()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenYes()}">
+        <div class="prescreen-option-icon prescreen-option-icon--builtin">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
         <div class="option-content">
           <div class="option-label">
             I'd like to start with a built-in Microsoft 365 Copilot experience
@@ -190,7 +193,10 @@
           </div>
         </div>
       </div>
-      <div class="option-card" id="prescreen-no" role="button" tabindex="0" onclick="handlePrescreenNo()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenNo()}">
+      <div class="option-card prescreen-option prescreen-option--custom" id="prescreen-no" role="button" tabindex="0" onclick="handlePrescreenNo()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenNo()}">
+        <div class="prescreen-option-icon prescreen-option-icon--custom">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
         <div class="option-content">
           <div class="option-label">
             I'd like to build a custom agent with specific requirements
@@ -200,7 +206,10 @@
           </div>
         </div>
       </div>
-      <div class="option-card" id="prescreen-explore" role="button" tabindex="0" onclick="handlePrescreenExplore()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenExplore()}">
+      <div class="option-card prescreen-option prescreen-option--explore" id="prescreen-explore" role="button" tabindex="0" onclick="handlePrescreenExplore()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenExplore()}">
+        <div class="prescreen-option-icon prescreen-option-icon--explore">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        </div>
         <div class="option-content">
           <div class="option-label">
             I'm exploring what's possible with agents
