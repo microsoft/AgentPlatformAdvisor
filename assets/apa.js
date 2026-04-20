@@ -307,6 +307,10 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
     }).join('')}</ul>
     </details>` : '';
 
+  const descriptionHtml = rec.description
+    ? `<p class="rec-description">${rec.description}</p>`
+    : '';
+
   return `
     <div class="rec-card ${isPrimary ? 'primary' : 'secondary'}">
       <div class="rec-header">
@@ -315,6 +319,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
           <div class="rec-platform-name">${rec.headline}${badgeHtml}</div>
         </div>
       </div>
+      ${descriptionHtml}
       <p class="rec-summary">${rec.summary}</p>
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`

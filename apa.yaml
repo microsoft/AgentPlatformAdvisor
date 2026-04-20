@@ -341,6 +341,7 @@ recommendations:
 
   agent_builder:
     headline: Agent Builder
+    description: Create simple agents in minutes without writing code, using your existing Microsoft 365 files and data
     resources_url: https://microsoft.github.io/agent-resources/m365-copilot/#agent-builder
     scoring_summary: Best suited for no-code scenarios entirely within Microsoft 365.
     exploration_best_for: No-code agents within Microsoft 365
@@ -405,6 +406,7 @@ recommendations:
 
   m365_copilot:
     headline: Microsoft 365 Copilot
+    description: AI assistants already built into Microsoft 365 apps like Teams, Outlook, and SharePoint — ready to use today
     resources_url: https://microsoft.github.io/agent-resources/m365-copilot/
     scoring_summary: Fits scenarios where built-in Copilot features in Microsoft 365 cover most of the need.
     exploration_best_for: Extending built-in Copilot in Microsoft 365
@@ -463,6 +465,7 @@ recommendations:
 
   copilot_studio:
     headline: Copilot Studio
+    description: Build agents that connect to other business systems, automate processes, and work across websites, Teams, and more
     resources_url: https://microsoft.github.io/agent-resources/copilot-studio/
     scoring_summary: The most flexible low-code option for agents that connect to external systems.
     exploration_best_for: Low-code agents connecting to external systems
@@ -493,6 +496,7 @@ recommendations:
 
   foundry:
     headline: Microsoft Foundry
+    description: A developer platform for building highly customized agents with your own AI models and full control over the technology stack
     resources_url: https://microsoft.github.io/agent-resources/microsoft-foundry/
     scoring_summary: The right choice when full technical control, custom models, or strict compliance is required.
     exploration_best_for: Full-code agents with custom AI models

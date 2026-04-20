@@ -16,6 +16,7 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 
 ### Added/changed
 
+- **Platform descriptions moved to recommendation cards** — the short product descriptions previously shown under each platform on the landing page are now displayed on the recommendation cards. Landing page previews now show only icons and names for a cleaner look. Descriptions are stored in `apa.yaml` as `description` fields.
 - **Hamburger documentation menu** — header now includes a hamburger menu (top right, next to the theme toggle) with links to README, Changelog, Flowchart, and Scoring docs on GitHub. Dropdown closes on outside click or Escape key. Fully keyboard-accessible with `aria-expanded` and `role="menu"`.
 - **Single CHANGELOG** — removed duplicate `CHANGELOG.md` from project root; `docs/CHANGELOG.md` is now the sole source of truth. Updated `CLAUDE.md` reference.
 - **Q3b hard rule removed** — Agent Builder is no longer zeroed when the user selects "Other business systems" (q3b). Scores changed from AB=0/CS=3/F=2 to AB=1/CS=3/F=2, reflecting that Agent Builder has limited but non-zero capability with external systems via connectors.

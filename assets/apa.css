@@ -519,11 +519,6 @@ body {
   margin-bottom: 4px;
 }
 
-.platform-preview-desc {
-  font-size: 14px;
-  color: var(--muted-foreground);
-}
-
 /* Question Styles */
 .question-title {
   font-size: 32px;
@@ -1068,6 +1063,14 @@ body {
 .badge-good     { background: var(--primary-xlight); color: var(--primary); }
 .badge-possible { background: var(--warning-bg); color: var(--warning); }
 .badge-not      { background: var(--muted); color: var(--muted-foreground); }
+.rec-description {
+  font-size: 15px;
+  color: var(--foreground);
+  margin-bottom: 8px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
 .rec-summary {
   color: var(--muted-foreground);
   margin-bottom: 20px;
