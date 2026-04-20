@@ -14,7 +14,7 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 - Dark mode
 - Much, much more!
 
-### Added
+### Added/changed
 
 - **Hamburger documentation menu** — header now includes a hamburger menu (top right, next to the theme toggle) with links to README, Changelog, Flowchart, and Scoring docs on GitHub. Dropdown closes on outside click or Escape key. Fully keyboard-accessible with `aria-expanded` and `role="menu"`.
 - **Single CHANGELOG** — removed duplicate `CHANGELOG.md` from project root; `docs/CHANGELOG.md` is now the sole source of truth. Updated `CLAUDE.md` reference.
@@ -60,9 +60,6 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 - **Platform resource links** — each recommendation card now links to the corresponding page on microsoft.github.io/agent-resources (Copilot Studio, Foundry, M365 Copilot, Agent Builder). URLs are driven by `resources_url` in apa.yaml.
 - **Score comparison panel** — "See how we scored this" toggle reveals animated score bars, fit badges, and a per-platform explanation of why it scored how it did. Shows Agent Builder, Copilot Studio, and Foundry (M365 Copilot excluded since it's only available via the shortcut path). Hidden on M365 fast-track path.
 - **Accordion controls** — 1st Party Copilot Agents and Available Templates lists are now wrapped in collapsible `<details>` accordions with item counts, keeping recommendation cards compact by default.
-
-### Changed
-
 - **6 Agent Builder hard rules** — zeroes Agent Builder for q1c (professional developer), q2b (custom app), q2c (background), q3b (external systems), q3c (advanced data), q4c (multi-step tasks). Professional developers should be directed to Copilot Studio or Foundry, not a no-code tool.
 - **Copilot Studio score for pro dev (q1c)** — 0 → 1. CS supports professional developers via YAML authoring and VS Code extension; a weak signal is more accurate than zero.
 - **Foundry score for M365 deployment (q2a)** — 0 → 1. Foundry agents can be surfaced in Teams via custom bot frameworks.
