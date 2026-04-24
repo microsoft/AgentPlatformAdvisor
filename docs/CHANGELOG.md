@@ -16,7 +16,11 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 
 ### Added/changed
 
-- **Platform descriptions moved to recommendation cards** — the short product descriptions previously shown under each platform on the landing page are now displayed on the recommendation cards. Landing page previews now show only icons and names for a cleaner look. Descriptions are stored in `apa.yaml` as `description` fields.
+- **M365 Copilot accordions auto-expand** — when Microsoft 365 Copilot is recommended via the fast-track path, all accordion sections (Best For, Important Considerations, First-Party Agents, Templates) are now expanded by default so users can see the full recommendation without extra clicks.
+- **Copilot Cowork added to M365 Copilot recommendation** — Copilot Cowork is now featured prominently: updated description, summary, exploration text, a new Best For item, and a top-listed first-party agent entry linking to official docs.
+- **M365 Copilot start page text updated** — the "Explore platforms" card now leads with Copilot Cowork and first-party agents (Researcher, Analyst, Facilitator, Interpreter) instead of generic guidance.
+- **Removed Best For and Important Considerations from M365 Copilot card** — these accordion sections were removed from the M365 Copilot recommendation to streamline the card.
+- **Platform descriptions moved to recommendation cards**— the short product descriptions previously shown under each platform on the landing page are now displayed on the recommendation cards. Landing page previews now show only icons and names for a cleaner look. Descriptions are stored in `apa.yaml` as `description` fields.
 - **Prescreen section visual refresh** — the "Where would you like to begin?" screen now features distinct icons (monitor, wrench, compass) and colored left-border accents (blue/green/amber) on each option card, plus a larger 32px/700-weight heading to match the welcome page. Dark mode colors included.
 - **Hamburger documentation menu** — header now includes a hamburger menu (top right, next to the theme toggle) with links to README, Changelog, Flowchart, and Scoring docs on GitHub. Dropdown closes on outside click or Escape key. Fully keyboard-accessible with `aria-expanded` and `role="menu"`.
 - **Single CHANGELOG** — removed duplicate `CHANGELOG.md` from project root; `docs/CHANGELOG.md` is now the sole source of truth. Updated `CLAUDE.md` reference.

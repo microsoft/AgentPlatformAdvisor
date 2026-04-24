@@ -406,26 +406,23 @@ recommendations:
 
   m365_copilot:
     headline: Microsoft 365 Copilot
-    description: AI assistants already built into Microsoft 365 apps like Teams, Outlook, and SharePoint — ready to use today
+    description: AI assistants built into Microsoft 365 apps like Teams, Outlook, and SharePoint — now with Copilot Cowork for autonomous, multi-step task automation
     resources_url: https://microsoft.github.io/agent-resources/m365-copilot/
     scoring_summary: Fits scenarios where built-in Copilot features in Microsoft 365 cover most of the need.
-    exploration_best_for: Extending built-in Copilot in Microsoft 365
+    exploration_best_for: Built-in AI across Microsoft 365 + Copilot Cowork
     exploration_summary: >
-      Choose Microsoft 365 Copilot when the built-in AI capabilities across Teams,
-      Outlook, and SharePoint already cover most of your needs. First-party agents
-      like Researcher, Analyst, and Facilitator handle common scenarios out of the box.
+      Includes Copilot Cowork for autonomous multi-step task execution,
+      plus first-party agents like Researcher, Analyst, Facilitator, and Interpreter —
+      all built into Teams, Outlook, SharePoint, and other Microsoft 365 apps.
+      Ideal when built-in capabilities already cover most of your needs.
     summary: >
       Best when the built-in Microsoft 365 Copilot capabilities already meet most
-      of what you need, with some customization.
-    best_for:
-      - Extending Copilot within Teams, Outlook, SharePoint, and other Microsoft 365 apps
-      - Scenarios grounded in Microsoft 365 data and content
-      - IT pros and makers comfortable with Microsoft 365 admin
-    watch_out_for:
-      - Available only within your organization — can't be shared externally
-      - Limited customization compared to Copilot Studio
-      - Not suited for complex multi-step workflows
+      of what you need. Copilot Cowork takes it further — delegating multi-step
+      tasks that span Outlook, Teams, Word, and more.
     first_party_agents:
+      - label: Copilot Cowork
+        description: Autonomous multi-step task execution across Microsoft 365 — delegates work like meeting prep, calendar management, status reports, and cross-app workflows (Frontier preview)
+        url: https://learn.microsoft.com/microsoft-365/copilot/cowork/
       - label: Copilot for Sales
         description: Seller productivity in Teams, Outlook, and CRM apps
         url: https://learn.microsoft.com/microsoft-sales-copilot/

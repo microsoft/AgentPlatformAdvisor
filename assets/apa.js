@@ -258,6 +258,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
   const rec = apa.recommendations[platformId];
   if (!rec) return `<div class="rec-card"><p>Platform data unavailable.</p></div>`;
   const rankEntry = ranked.find(r => r.id === platformId);
+  const detailsOpen = platformId === 'm365_copilot' ? ' open' : '';
   // showBadge is true only for scored primary cards; key factors are only meaningful in that same context
   const factors = isPrimary && showBadge ? getKeyFactors(platformId, answersMap) : [];
   const icon = PLATFORM_ICONS[platformId] || '';
@@ -278,7 +279,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
   const bestFor = (rec.best_for || []).map(f => `<li>${f}</li>`).join('');
   const watchOut = (rec.watch_out_for || []).map(f => `<li>${f}</li>`).join('');
   const firstPartyHtml = (rec.first_party_agents || []).length > 0 ? `
-    <details class="rec-accordion">
+    <details class="rec-accordion"${detailsOpen}>
       <summary class="rec-accordion-trigger">
         <span class="rec-section-title">Available First-Party Copilot Agents</span>
         <span class="rec-accordion-count">${rec.first_party_agents.length}</span>
@@ -293,7 +294,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
     </details>` : '';
 
   const templatesHtml = (rec.templates || []).length > 0 ? `
-    <details class="rec-accordion">
+    <details class="rec-accordion"${detailsOpen}>
       <summary class="rec-accordion-trigger">
         <span class="rec-section-title">Available Templates</span>
         <span class="rec-accordion-count">${rec.templates.length}</span>
@@ -326,7 +327,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
         : ''}
       ${resourcesHtml}
       ${factorsHtml}
-      ${bestFor ? `<details class="rec-accordion">
+      ${bestFor ? `<details class="rec-accordion"${detailsOpen}>
         <summary class="rec-accordion-trigger">
           <span class="rec-section-title">Best For</span>
           <span class="rec-accordion-count">${(rec.best_for || []).length}</span>
@@ -334,7 +335,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
         </summary>
         <ul class="rec-list">${bestFor}</ul>
       </details>` : ''}
-      ${watchOut ? `<details class="rec-accordion">
+      ${watchOut ? `<details class="rec-accordion"${detailsOpen}>
         <summary class="rec-accordion-trigger">
           <span class="rec-section-title">Important Considerations</span>
           <span class="rec-accordion-count">${(rec.watch_out_for || []).length}</span>

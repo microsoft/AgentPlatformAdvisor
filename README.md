@@ -89,4 +89,4 @@ npm run test:headed   # with browser visible
 
 Content changes (question text, scores, platform descriptions, hard rules) go in `apa.yaml`. UI changes go in `assets/apa.css` and `assets/apa.js`. Read [docs/DESIGN.md](docs/DESIGN.md) before making any visual changes — colors, spacing, typography, and component specs are all defined there.
 
-Always update [docs/CHANGELOG.md](docs/CHANGELOG.md) after making changes. Update [docs/FLOWCHART.md](docs/FLOWCHART.md) and [docs/SCORING.md](docs/SCORING.md) if changes affect the scoring pipeline or user flow.
+Always update [docs/CHANGELOG.md](docs/CHANGELOG.md) after making changes. Update [docs/FLOWCHART.md](docs/FLOWCHART.md) and [docs/SCORING.md](docs/SCORING.md) if changes affect the scoring pipeline or user flow. 
