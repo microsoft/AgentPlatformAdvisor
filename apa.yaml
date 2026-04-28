@@ -423,13 +423,13 @@ recommendations:
       - label: Copilot Cowork
         description: Autonomous multi-step task execution across Microsoft 365 — delegates work like meeting prep, calendar management, status reports, and cross-app workflows (Frontier preview)
         url: https://learn.microsoft.com/microsoft-365/copilot/cowork/
-      - label: Copilot for Sales
+      - label: Sales Agent
         description: Seller productivity in Teams, Outlook, and CRM apps
         url: https://learn.microsoft.com/microsoft-sales-copilot/
-      - label: Copilot for Service
+      - label: Service Agent
         description: Customer service agent assistance across support channels
         url: https://learn.microsoft.com/microsoft-copilot-service/
-      - label: Copilot for Finance
+      - label: Finance Agent
         description: Financial workflows, analysis, and reconciliation in Excel and Outlook
         url: https://learn.microsoft.com/copilot/finance/
       - label: Employee Self-Service Agent

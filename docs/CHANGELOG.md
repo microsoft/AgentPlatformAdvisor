@@ -16,7 +16,8 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 
 ### Added/changed
 
-- **M365 Copilot accordions auto-expand** — when Microsoft 365 Copilot is recommended via the fast-track path, all accordion sections (Best For, Important Considerations, First-Party Agents, Templates) are now expanded by default so users can see the full recommendation without extra clicks.
+- **Renamed M365 first-party agents** — "Copilot for Sales", "Copilot for Service", and "Copilot for Finance" are now "Sales Agent", "Service Agent", and "Finance Agent" to match current Microsoft branding.
+- **M365 Copilot accordions auto-expand**— when Microsoft 365 Copilot is recommended via the fast-track path, all accordion sections (Best For, Important Considerations, First-Party Agents, Templates) are now expanded by default so users can see the full recommendation without extra clicks.
 - **Copilot Cowork added to M365 Copilot recommendation** — Copilot Cowork is now featured prominently: updated description, summary, exploration text, a new Best For item, and a top-listed first-party agent entry linking to official docs.
 - **M365 Copilot start page text updated** — the "Explore platforms" card now leads with Copilot Cowork and first-party agents (Researcher, Analyst, Facilitator, Interpreter) instead of generic guidance.
 - **Removed Best For and Important Considerations from M365 Copilot card** — these accordion sections were removed from the M365 Copilot recommendation to streamline the card.
