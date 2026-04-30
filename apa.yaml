@@ -344,7 +344,7 @@ recommendations:
     description: Create simple agents in minutes without writing code, using your existing Microsoft 365 files and data
     resources_url: https://microsoft.github.io/agent-resources/m365-copilot/#agent-builder
     scoring_summary: Best suited for no-code scenarios entirely within Microsoft 365.
-    exploration_best_for: No-code agents within Microsoft 365
+    exploration_best_for: Create agents using your Microsoft 365 data
     exploration_summary: >
       Choose Agent Builder when you want to create agents without writing any code,
       using data already in SharePoint or OneDrive. Ideal for business users who need
@@ -409,7 +409,7 @@ recommendations:
     description: AI assistants built into Microsoft 365 apps like Teams, Outlook, and SharePoint — now with Copilot Cowork for autonomous, multi-step task automation
     resources_url: https://microsoft.github.io/agent-resources/m365-copilot/
     scoring_summary: Fits scenarios where built-in Copilot features in Microsoft 365 cover most of the need.
-    exploration_best_for: Built-in AI across Microsoft 365 + Copilot Cowork
+    exploration_best_for: Use AI built into your Microsoft 365 apps
     exploration_summary: >
       Includes Copilot Cowork for autonomous multi-step task execution,
       plus first-party agents like Researcher, Analyst, Facilitator, and Interpreter —
@@ -423,13 +423,13 @@ recommendations:
       - label: Copilot Cowork
         description: Autonomous multi-step task execution across Microsoft 365 — delegates work like meeting prep, calendar management, status reports, and cross-app workflows (Frontier preview)
         url: https://learn.microsoft.com/microsoft-365/copilot/cowork/
-      - label: Copilot for Sales
+      - label: Sales agent
         description: Seller productivity in Teams, Outlook, and CRM apps
         url: https://learn.microsoft.com/microsoft-sales-copilot/
-      - label: Copilot for Service
+      - label: Service agent
         description: Customer service agent assistance across support channels
         url: https://learn.microsoft.com/microsoft-copilot-service/
-      - label: Copilot for Finance
+      - label: Finance agent
         description: Financial workflows, analysis, and reconciliation in Excel and Outlook
         url: https://learn.microsoft.com/copilot/finance/
       - label: Employee Self-Service Agent
@@ -465,7 +465,7 @@ recommendations:
     description: Build agents that connect to other business systems, automate processes, and work across websites, Teams, and more
     resources_url: https://microsoft.github.io/agent-resources/copilot-studio/
     scoring_summary: The most flexible low-code option for agents that connect to external systems.
-    exploration_best_for: Low-code agents connecting to external systems
+    exploration_best_for: Extend agents across business systems and workflows
     exploration_summary: >
       Choose Copilot Studio when you need agents that go beyond Microsoft 365 —
       connecting to CRMs, databases, or external APIs with 1,400+ pre-built connectors.
@@ -496,7 +496,7 @@ recommendations:
     description: A developer platform for building highly customized agents with your own AI models and full control over the technology stack
     resources_url: https://microsoft.github.io/agent-resources/microsoft-foundry/
     scoring_summary: The right choice when full technical control, custom models, or strict compliance is required.
-    exploration_best_for: Full-code agents with custom AI models
+    exploration_best_for: Build fully customizable agentic systems
     exploration_summary: >
       Choose Microsoft Foundry when your team needs full technical control — bring
       your own AI models, manage complex multi-agent systems, or meet strict

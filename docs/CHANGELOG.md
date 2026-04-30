@@ -16,6 +16,8 @@ We have completely redesigned Agent Platform Advisor for the ground up, based on
 
 ### Added/changed
 
+- **First-party agent labels renamed** — "Copilot for Sales" → "Sales agent", "Copilot for Service" → "Service agent", and "Copilot for Finance" → "Finance agent" in the M365 Copilot first-party agents list.
+- **Explore page eyebrow labels updated** — the small uppercase label above each platform tile on the "Explore Microsoft Agent Platforms" page now describes what each platform enables. M365 Copilot shows "Use AI built into your Microsoft 365 apps", Agent Builder shows "Create agents using your Microsoft 365 data", Copilot Studio shows "Extend agents across business systems and workflows", and Foundry shows "Build fully customizable agentic systems". The H3 platform name (Agent Builder / Copilot Studio / Microsoft Foundry) is unchanged.
 - **M365 Copilot accordions auto-expand** — when Microsoft 365 Copilot is recommended via the fast-track path, all accordion sections (Best For, Important Considerations, First-Party Agents, Templates) are now expanded by default so users can see the full recommendation without extra clicks.
 - **Copilot Cowork added to M365 Copilot recommendation** — Copilot Cowork is now featured prominently: updated description, summary, exploration text, a new Best For item, and a top-listed first-party agent entry linking to official docs.
 - **M365 Copilot start page text updated** — the "Explore platforms" card now leads with Copilot Cowork and first-party agents (Researcher, Analyst, Facilitator, Interpreter) instead of generic guidance.
