@@ -278,6 +278,19 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
 
   const bestFor = (rec.best_for || []).map(f => `<li>${f}</li>`).join('');
   const watchOut = (rec.watch_out_for || []).map(f => `<li>${f}</li>`).join('');
+  const spotlightHtml = rec.spotlight ? (() => {
+    const nameHtml = rec.spotlight.url
+      ? `<a href="${rec.spotlight.url}" target="_blank" rel="noopener noreferrer">${rec.spotlight.label}</a>`
+      : rec.spotlight.label;
+    return `
+    <div class="rec-spotlight">
+      <div class="rec-spotlight-eyebrow">Featured Capability</div>
+      <div class="rec-spotlight-name">${nameHtml}</div>
+      <div class="rec-spotlight-tagline">${rec.spotlight.tagline}</div>
+      <p class="rec-spotlight-description">${rec.spotlight.description}</p>
+    </div>`;
+  })() : '';
+
   const firstPartyHtml = (rec.first_party_agents || []).length > 0 ? `
     <details class="rec-accordion"${detailsOpen}>
       <summary class="rec-accordion-trigger">
@@ -322,6 +335,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
       </div>
       ${descriptionHtml}
       <p class="rec-summary">${rec.summary}</p>
+      ${spotlightHtml}
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
         : ''}
@@ -491,11 +505,22 @@ function renderExploration() {
     const bestFor = rec.exploration_best_for || rec.scoring_summary;
     const summary = (rec.exploration_summary || rec.summary || '').trim();
     const url = rec.resources_url || '#';
+    const spotlightChip = rec.spotlight ? (() => {
+      const nameHtml = rec.spotlight.url
+        ? `<a href="${rec.spotlight.url}" target="_blank" rel="noopener noreferrer">${rec.spotlight.label}</a>`
+        : rec.spotlight.label;
+      return `<div class="exploration-card-spotlight">
+        <span class="exploration-card-spotlight-eyebrow">Featured</span>
+        <span class="exploration-card-spotlight-name">${nameHtml}</span>
+        <span class="exploration-card-spotlight-tagline">${rec.spotlight.tagline}</span>
+      </div>`;
+    })() : '';
     return `
       <div class="exploration-card">
         <div class="exploration-card-label">${bestFor}</div>
         <h3 class="exploration-card-title">${rec.headline}</h3>
         <p class="exploration-card-summary">${summary}</p>
+        ${spotlightChip}
         <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Explore resources →</a>
       </div>`;
   }).join('');

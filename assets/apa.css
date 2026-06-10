@@ -658,6 +658,14 @@ body {
   font-size: 14px;
   color: var(--muted-foreground);
 }
+.option-description a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+.option-description a:hover {
+  text-decoration: underline;
+}
 
 .question-counter {
   font-size: 12px;
@@ -829,6 +837,45 @@ body {
 
 .exploration-card-link:hover {
   text-decoration: underline;
+}
+
+/* ── Compact spotlight chip on exploration cards ── */
+.exploration-card-spotlight {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--primary-xlight);
+  border: 1px solid var(--primary-light);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+.exploration-card-spotlight-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.exploration-card-spotlight-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.exploration-card-spotlight-name a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+.exploration-card-spotlight-name a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.exploration-card-spotlight-tagline {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.4;
 }
 
 .exploration-cta {
@@ -1461,6 +1508,51 @@ body {
 .rec-dev-note a {
   color: var(--primary);
   font-weight: 500;
+}
+
+/* ── Platform spotlight (featured capability callout) ── */
+.rec-spotlight {
+  background: var(--primary-xlight);
+  border: 1px solid var(--primary-light);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 16px 0 20px;
+}
+.rec-spotlight-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+.rec-spotlight-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+.rec-spotlight-name a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+.rec-spotlight-name a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.rec-spotlight-tagline {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.rec-spotlight-description {
+  font-size: 14px;
+  color: var(--foreground);
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* Recommendation section navigation */
