@@ -417,15 +417,6 @@ recommendations:
     summary: >
       Best when the built-in Microsoft 365 Copilot capabilities already meet most
       of what you need.
-    spotlight:
-      label: Copilot Cowork
-      tagline: Autonomous multi-step task execution across Microsoft 365
-      description: >
-        Cowork acts as your AI delegate, independently completing multi-step workflows
-        like meeting prep, status reports, calendar management, and cross-app tasks
-        across Outlook, Teams, Word, and more. It goes beyond answering questions to
-        taking action on your behalf. Currently available as a Frontier preview.
-      url: https://learn.microsoft.com/microsoft-365/copilot/cowork/
     first_party_agents:
       - label: Sales agent
         description: Seller productivity in Teams, Outlook, and CRM apps
@@ -525,5 +516,67 @@ recommendations:
       - Higher implementation complexity and time-to-value
       - Requires Azure expertise and development resources
       - Overkill for standard Microsoft 365-native or low-code scenarios
+
+  # ---------------------------------------------------------------------------
+  # Personal agents (delegate path only) — Cowork and Scout are ready-made
+  # agents you delegate work to and extend with skills/plugins, rather than
+  # platforms you build agents on. They are NOT part of the scored wizard and
+  # never appear in meta.platforms. They are reached only via the prescreen
+  # "Delegate work to a personal agent" path.
+  # ---------------------------------------------------------------------------
+
+  cowork:
+    headline: Copilot Cowork
+    description: A ready-made agent inside Microsoft 365 Copilot that plans and completes multi-step work on your behalf — and can be extended with custom skills and plugins
+    resources_url: https://learn.microsoft.com/microsoft-365/copilot/cowork/
+    scoring_summary: Best for delegating a bounded, multi-step Microsoft 365 deliverable on demand.
+    exploration_best_for: Delegate multi-step Microsoft 365 work on demand
+    exploration_summary: >
+      Cowork acts as your AI delegate inside Microsoft 365 Copilot — you describe an
+      outcome, it creates a plan, works through the steps, and pauses for approval
+      before sensitive actions. Ideal for meeting prep, inbox and calendar cleanup,
+      deep research, and coordinated document sets, with human-in-the-loop checkpoints.
+    summary: >
+      Delegate a defined, multi-step outcome across Microsoft 365 and get the work
+      package completed — with approvals and checkpoints before sensitive actions.
+    best_for:
+      - Handing off a bounded, multi-step Microsoft 365 deliverable on demand
+      - Meeting packets, inbox and calendar cleanup, deep research, coordinated document sets
+      - Human-in-the-loop control — progress updates, approval checkpoints, pause/resume/cancel
+      - Grounded in your Microsoft 365 context (email, meetings, files, messages) via Work IQ
+      - Extending the experience with custom skills and plugins
+    watch_out_for:
+      - On demand and user-initiated — not always-on or proactively monitoring
+      - Centered on Microsoft 365 — no desktop, shell, browser, or local-file runtime
+      - Usage-based billing through Copilot Credits
+      - Take actions like sending email or posting in Teams require explicit approval
+
+  scout:
+    headline: Microsoft Scout
+    description: An always-on personal Autopilot desktop app that works autonomously across your files, shell, browser, and Microsoft 365 — and can be extended with custom skills and plugins
+    resources_url: https://learn.microsoft.com/microsoft-scout/overview
+    scoring_summary: Best for always-on, proactive follow-through across desktop, browser, and Microsoft 365.
+    exploration_best_for: An always-on agent across desktop, browser, and Microsoft 365
+    exploration_summary: >
+      Scout is Microsoft's first Autopilot — an always-on personal agent with its own
+      identity that works autonomously across files, shell, browser, and Microsoft 365,
+      including in the background on schedules or triggers. Ideal for proactive
+      monitoring, coordination, and follow-through that spans local and cloud
+      environments. Currently a Frontier preview.
+    summary: >
+      An always-on Autopilot that proactively keeps work moving across desktop,
+      browser, local files, and Microsoft 365 — even when you are not prompting it.
+    best_for:
+      - Continuous, proactive follow-through rather than one-time tasks
+      - Scheduled or condition-triggered work via heartbeat mode and automations
+      - Acting across local files, shell commands, browser automation, code, and Microsoft 365
+      - Delegating work to specialized sub-agents
+      - Monitoring for risks like stalled decisions and upcoming deliverables
+      - Extending the experience with custom skills and plugins
+    watch_out_for:
+      - Frontier preview — capabilities, access, and commercialization details can change
+      - Gated through Frontier enrollment, Intune policy, attestation, and GitHub Copilot licensing
+      - Desktop application for Windows and macOS
+      - Sensitive actions (sending email, writing files, running commands) require approval
 
 ################################################################################
