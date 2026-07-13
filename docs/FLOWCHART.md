@@ -1,6 +1,15 @@
 ```mermaid
 flowchart TD
-    START([Start]) --> Q1
+    START([Start]) --> PRESCREEN{"**Prescreen: Where would you like to begin?**"}
+
+    PRESCREEN -->|Built-in M365 Copilot experience| M365FT["Fast-track → Microsoft 365 Copilot\n(non-scored)"]
+    PRESCREEN -->|Ready-made agent to do work for me| DELEGATE{"**Delegate micro-decision**\n(non-scored)"}
+    PRESCREEN -->|Explore what's possible| EXPLORE["Explore grid\n(all platforms + Cowork + Scout)"]
+    PRESCREEN -->|Build a custom agent| Q1
+
+    DELEGATE -->|"Cadence: continuous OR Reach: cross-environment"| SCOUT["**Microsoft Scout**\nAlways-on Autopilot across desktop, browser, M365\n(Frontier preview)"]
+    DELEGATE -->|"Cadence: on-demand AND Reach: Microsoft 365"| COWORK["**Copilot Cowork**\nOn-demand multi-step M365 deliverables"]
+    DELEGATE -->|"Undecided signals"| BOTH["**Both** — complementary pair\nScout monitors · Cowork delivers"]
 
     Q1["**Q1: Who is building this agent?**"]
     Q1 -->|Business user / no code| Q1A["AB:3 · CS:1 · Foundry:0"]
@@ -51,6 +60,11 @@ flowchart TD
 
     style Q1C fill:#e8f0fe,stroke:#4a86e8
     style Q1D fill:#e8f0fe,stroke:#4a86e8
+    style SCOUT fill:#ECEBFB,stroke:#5B5FC7
+    style COWORK fill:#ECEBFB,stroke:#5B5FC7
+    style BOTH fill:#ECEBFB,stroke:#5B5FC7
+    style DELEGATE fill:#ECEBFB,stroke:#5B5FC7
+    style M365FT fill:#e8f4fd,stroke:#0078D4
     style Q8B fill:#fff3cd,stroke:#ffc107
     style Q2B fill:#fff3cd,stroke:#ffc107
     style Q2C fill:#fff3cd,stroke:#ffc107

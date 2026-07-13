@@ -13,6 +13,26 @@ Reference document for how the APA scoring engine works. All data driven from `a
 
 M365 Copilot is excluded from the scored assessment. It is only recommended via the prescreen fast-track path ("I want to enhance Microsoft 365 Copilot"). In the full wizard, `m365_copilot` is always zeroed.
 
+## Non-scored destinations: personal agents (Cowork & Scout)
+
+Cowork and Scout are **not** build platforms — they are ready-made personal agents you delegate work to (and can extend with skills/plugins). They are **not** part of the scored wizard, are **not** in `meta.platforms`, and never enter the 0–15 sum. They are reached only via the prescreen path **"I'd like a ready-made agent to do work for me,"** which opens a two-question micro-decision:
+
+| Question | Options |
+|---|---|
+| **Cadence** — how should the agent work? | On-demand (defined task now) · Continuous (always-on monitoring) · Not sure |
+| **Reach** — where does it need to reach? | Microsoft 365 only · Also desktop/browser/local/CLI · Not sure |
+
+**Routing rule** (`resolveDelegateResult` in `apa.js`):
+
+| Condition | Result |
+|---|---|
+| Cadence = continuous | **Scout** |
+| Reach = cross-environment | **Scout** |
+| Cadence = on-demand **and** Reach = Microsoft 365 | **Cowork** |
+| Otherwise (undecided signals) | **Both**, shown as a complementary pair |
+
+So Scout wins if the work is continuous *or* spans beyond Microsoft 365; Cowork wins only when the work is on-demand *and* Microsoft 365-scoped. Results are shareable via a `dt=cowork|scout|both` URL parameter. Scout is documented as a Frontier preview and carries a caveat on its card.
+
 ## Questions and Scoring Matrix
 
 Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3).
