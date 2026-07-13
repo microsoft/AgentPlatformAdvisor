@@ -2,6 +2,8 @@
 let apa = null; // populated from YAML
 let answers = {}; // { q1: 'q1a', q2: 'q2b', ... }
 let fastTrack = false;
+let delegateResult = null; // 'cowork' | 'scout' | 'both' — set on the delegate path
+let delegateAnswers = {}; // { cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
 let currentQuestionIndex = 0;
 let listenersReady = false;
 let recommendedPlatformId = null;
@@ -12,7 +14,7 @@ let originalDate = null; // from &d= URL param
 // === UTILITIES ===
 function showSection(id) {
   ['loading-section','error-section','welcome-section','prescreen-section',
-   'exploration-section','assessment-section','recommendation-section'].forEach(s => {
+   'delegate-section','exploration-section','assessment-section','recommendation-section'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.toggle('hidden', s !== id);
   });
@@ -49,6 +51,7 @@ function updateProgressBar(sectionId) {
     'error-section': 0,
     'welcome-section': 0,
     'prescreen-section': 0,
+    'delegate-section': 1,
     'assessment-section': 1,
     'recommendation-section': 2,
   }[sectionId] ?? 0;
@@ -244,6 +247,8 @@ const PLATFORM_ICONS = {
   m365_copilot:   'images/m365-copilot-logo.png',
   copilot_studio: 'images/copilot-studio.png',
   foundry:        'images/foundry.svg',
+  cowork:         'images/cowork.png',
+  scout:          'images/scout.svg',
 };
 
 function badgeClass(label) {
@@ -472,6 +477,7 @@ function setupListeners() {
 
 function handlePrescreenYes() {
   fastTrack = true;
+  delegateResult = null;
   answers = {};
   if (typeof clarity === 'function') clarity('set', 'fast_track', 'true');
   renderRecommendation();
@@ -481,6 +487,7 @@ function handlePrescreenYes() {
 
 function handlePrescreenNo() {
   fastTrack = false;
+  delegateResult = null;
   if (Object.keys(answers).length === 0) {
     currentQuestionIndex = 0;
   }
@@ -493,6 +500,47 @@ function handlePrescreenExplore() {
   renderExploration();
   showSection('exploration-section');
   pushState('exploration-section');
+}
+
+function handlePrescreenDelegate() {
+  fastTrack = false;
+  delegateResult = null;
+  delegateAnswers = {};
+  // Reset any prior selections in the static delegate section
+  document.querySelectorAll('#delegate-section .delegate-option').forEach(el => el.classList.remove('selected'));
+  const btn = document.getElementById('delegate-next-btn');
+  if (btn) btn.disabled = true;
+  if (typeof clarity === 'function') clarity('set', 'delegate_path', 'true');
+  showSection('delegate-section');
+  pushState('delegate-section');
+}
+
+function selectDelegateOption(el, group, value) {
+  delegateAnswers[group] = value;
+  document.querySelectorAll(`#delegate-section .delegate-option[data-group="${group}"]`)
+    .forEach(o => o.classList.toggle('selected', o === el));
+  const ready = delegateAnswers.cadence && delegateAnswers.reach;
+  const btn = document.getElementById('delegate-next-btn');
+  if (btn) btn.disabled = !ready;
+}
+
+// Routing rule from the Cowork vs Scout decision framework:
+// Scout wins if the work is continuous OR reaches beyond Microsoft 365;
+// Cowork wins only when the work is on demand AND scoped to Microsoft 365;
+// otherwise (undecided signals) present both as a complementary pair.
+function resolveDelegateResult(cadence, reach) {
+  if (cadence === 'continuous') return 'scout';
+  if (reach === 'cross') return 'scout';
+  if (cadence === 'ondemand' && reach === 'm365') return 'cowork';
+  return 'both';
+}
+
+function finishDelegate() {
+  if (!delegateAnswers.cadence || !delegateAnswers.reach) return;
+  delegateResult = resolveDelegateResult(delegateAnswers.cadence, delegateAnswers.reach);
+  renderRecommendation();
+  showSection('recommendation-section');
+  pushState('recommendation-section');
 }
 
 function renderExploration() {
@@ -812,8 +860,49 @@ function showRecNav(hasSecondary) {
   alsoSep.style.display = hasSecondary ? '' : 'none';
 }
 
+// Renders the Cowork/Scout delegate result. Non-scored: no score breakdown,
+// no cross-question notes, no decision card — mirrors the fast-track branch.
+function renderDelegateRecommendation() {
+  const ids = delegateResult === 'both' ? ['cowork', 'scout'] : [delegateResult];
+  recommendedPlatformId = ids[0];
+
+  document.getElementById('rec-primary-card').innerHTML =
+    buildPlatformCard(ids[0], [], {}, true, false);
+
+  const pairBanner = document.getElementById('rec-pair-banner');
+  const secondLabel = document.getElementById('rec-second-label');
+  if (ids.length > 1) {
+    pairBanner.innerHTML =
+      '<strong>Consider both.</strong> Scout can be the always-on layer that monitors and coordinates, ' +
+      'while Cowork assembles the Microsoft 365 deliverables on demand.';
+    pairBanner.classList.remove('hidden');
+    secondLabel.textContent = 'Also consider';
+    secondLabel.classList.remove('hidden');
+    document.getElementById('rec-second-card').innerHTML =
+      buildPlatformCard(ids[1], [], {}, false, false);
+  } else {
+    pairBanner.classList.add('hidden');
+    secondLabel.classList.add('hidden');
+    document.getElementById('rec-second-card').innerHTML = '';
+  }
+
+  document.getElementById('rec-fasttrack-prompt').classList.add('hidden');
+  document.getElementById('rec-score-toggle').classList.add('hidden');
+  document.getElementById('rec-score-comparison').classList.add('hidden');
+  document.getElementById('rec-cross-notes').classList.add('hidden');
+  document.getElementById('rec-nav').style.display = 'none';
+  document.getElementById('decision-card').style.display = 'none';
+
+  updateTabTitle();
+  if (typeof clarity === 'function') clarity('set', 'platform', recommendedPlatformId);
+}
+
 function renderRecommendation() {
   clearAnswersFromStorage();
+  if (delegateResult) {
+    renderDelegateRecommendation();
+    return;
+  }
   if (fastTrack) {
     recommendedPlatformId = 'm365_copilot';
     document.getElementById('rec-primary-card').innerHTML =
@@ -935,12 +1024,16 @@ function updateTabTitle() {
   const platformMeta = (apa.meta.platforms || []).find(p => p.id === recommendedPlatformId);
   if (platformMeta) {
     document.title = `APA: ${platformMeta.label} recommended`;
+  } else if (apa.recommendations[recommendedPlatformId]) {
+    document.title = `APA: ${apa.recommendations[recommendedPlatformId].headline} recommended`;
   }
 }
 
 function restart() {
   answers = {};
   fastTrack = false;
+  delegateResult = null;
+  delegateAnswers = {};
   currentQuestionIndex = 0;
   recommendedPlatformId = null;
   isURLLoaded = false;
@@ -958,6 +1051,7 @@ function restart() {
 
 function startFullAssessment() {
   fastTrack = false;
+  delegateResult = null;
   answers = {};
   currentQuestionIndex = 0;
   renderQuestion();
@@ -974,6 +1068,15 @@ function parseURLParams() {
   const mode = params.get('mode') || 'card';
   originalPlatformId = params.get('r') || null;
   originalDate = params.get('d') || null;
+
+  // Delegate-path handling (Cowork / Scout)
+  const dt = params.get('dt');
+  if (dt && ['cowork', 'scout', 'both'].includes(dt)) {
+    delegateResult = dt;
+    fastTrack = false;
+    answers = {};
+    return { mode: 'card' };
+  }
 
   // Fast-track handling
   if (params.get('ft') === '1') {
@@ -1020,7 +1123,9 @@ function buildShareableURL() {
   const base = window.location.origin + window.location.pathname;
   const params = new URLSearchParams();
 
-  if (fastTrack) {
+  if (delegateResult) {
+    params.set('dt', delegateResult);
+  } else if (fastTrack) {
     params.set('ft', '1');
   } else {
     apa.questions.forEach(q => {

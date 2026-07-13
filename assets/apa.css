@@ -498,6 +498,30 @@ body {
   color: #E8C839;
 }
 
+.prescreen-option-icon--delegate {
+  background: #ECEBFB;
+  color: #5B5FC7;
+}
+.prescreen-option--delegate {
+  border-left-color: #5B5FC7;
+}
+[data-theme="dark"] .prescreen-option-icon--delegate {
+  background: rgba(91, 95, 199, 0.18);
+  color: #9EA2F0;
+}
+
+/* Cowork / Scout micro-decision */
+.delegate-question {
+  text-align: left;
+  margin-bottom: 28px;
+}
+.delegate-question-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--foreground);
+}
+
 /* Assessment navigation */
 .question-subtitle {
   color: var(--muted-foreground);
