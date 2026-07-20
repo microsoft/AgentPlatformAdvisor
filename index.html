@@ -26,7 +26,7 @@
     <meta
       name="description"
       property="og:description"
-      content="Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft agent platform for your scenario."
+      content="Answer a few questions about what you're trying to do, and we'll recommend the best Microsoft agent platform for your scenario."
     />
     <meta
       name="url"
@@ -42,7 +42,7 @@
     <meta name="locale" property="og:locale" content="en_US" />
     <meta name="author" property="og:author" content="Microsoft CAT" />
     <meta name="publish_date" property="og:publish_date" content="2025-10-31" />
-    <meta name="description" content="Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft agent platform for your scenario." />
+    <meta name="description" content="Answer a few questions about what you're trying to do, and we'll recommend the best Microsoft agent platform for your scenario." />
   <title>Agent Platform Advisor — Microsoft CAT</title>
   <link href="images/favicon.png" rel="shortcut icon" type="image/x-icon">
 
@@ -138,16 +138,36 @@
       Agent Platform Advisor
     </h1>
     <p class="welcome-description">
-      Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft platform to build it on.
+      Answer a few questions about what you want from agents, and we'll recommend the best Microsoft platform for your agent needs.
     </p>
-    <div class="platform-grid">
-      <div class="platform-preview">
-        <div class="platform-preview-icon">
-          <img src="images/m365-copilot-logo.png" alt="Microsoft 365 Copilot" class="platform-preview-img">
+    <div class="delegate-group">
+      <div class="delegate-group-label">Use agents</div>
+      <div class="platform-grid platform-grid--delegate">
+        <div class="platform-preview">
+          <div class="platform-preview-icon">
+            <img src="images/m365-copilot-logo.png" alt="Microsoft 365 Copilot" class="platform-preview-img">
+          </div>
+          <h3 class="platform-preview-title">Microsoft 365 Copilot</h3>
+          <p class="platform-preview-desc">Get answers, draft content, and surface insights in seconds with secure AI chat</p>
         </div>
-        <h3 class="platform-preview-title">Microsoft 365 Copilot</h3>
-        <p class="platform-preview-desc">Get answers, draft content, and surface insights in seconds with secure AI chat</p>
+        <div class="platform-preview">
+          <div class="platform-preview-icon">
+            <img src="images/cowork.png" alt="Cowork" class="platform-preview-img">
+          </div>
+          <h3 class="platform-preview-title">Cowork</h3>
+          <p class="platform-preview-desc">Describe the outcome you want, grounded in the work in your emails, meetings, messages, files, and data.</p>
+        </div>
+        <div class="platform-preview">
+          <div class="platform-preview-icon">
+            <img src="images/scout.svg" alt="Scout" class="platform-preview-img">
+          </div>
+          <h3 class="platform-preview-title">Scout</h3>
+          <p class="platform-preview-desc">Use always-on agents that work autonomously, with their own identity, grounded in your enterprise data </p>
+        </div>
       </div>
+    </div>
+    <div class="delegate-group-label">Build agents</div>
+    <div class="platform-grid">
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/copilot.png" alt="Agent Builder" class="platform-preview-img">
@@ -168,25 +188,6 @@
         </div>
         <h3 class="platform-preview-title">Microsoft Foundry</h3>
         <p class="platform-preview-desc">Pro-code platform to build, ground, and govern AI apps and agents at scale</p>
-      </div>
-    </div>
-    <div class="delegate-group">
-      <div class="delegate-group-label">Or delegate</div>
-      <div class="platform-grid platform-grid--delegate">
-        <div class="platform-preview">
-          <div class="platform-preview-icon">
-            <img src="images/cowork.png" alt="Cowork" class="platform-preview-img">
-          </div>
-          <h3 class="platform-preview-title">Cowork</h3>
-          <p class="platform-preview-desc">Describe the outcome you want, grounded in the work in your emails, meetings, messages, files, and data.</p>
-        </div>
-        <div class="platform-preview">
-          <div class="platform-preview-icon">
-            <img src="images/scout.svg" alt="Scout" class="platform-preview-img">
-          </div>
-          <h3 class="platform-preview-title">Scout</h3>
-          <p class="platform-preview-desc">Use always-on agents that work autonomously, with their own identity, grounded in your enterprise data </p>
-        </div>
       </div>
     </div>
     <button class="btn btn-primary btn-lg" id="start-btn">

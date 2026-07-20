@@ -546,7 +546,7 @@ function finishDelegate() {
 function renderExploration() {
   const grid = document.getElementById('exploration-grid');
   if (!grid) return;
-  const platformOrder = ['m365_copilot', 'agent_builder', 'copilot_studio', 'foundry'];
+  const platformOrder = ['m365_copilot', 'cowork', 'scout', 'agent_builder', 'copilot_studio', 'foundry'];
   grid.innerHTML = platformOrder.map(pid => {
     const rec = apa.recommendations[pid];
     if (!rec) return '';

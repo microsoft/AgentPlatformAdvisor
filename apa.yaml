@@ -623,7 +623,7 @@ recommendations:
     description: An always-on personal Autopilot desktop app that works autonomously across your files, shell, browser, and Microsoft 365 — and can be extended with custom skills and plugins
     resources_url: https://learn.microsoft.com/microsoft-scout/overview
     scoring_summary: Best for always-on, proactive follow-through across desktop, browser, and Microsoft 365.
-    exploration_best_for: An always-on agent across desktop, browser, and Microsoft 365
+    exploration_best_for: An always-on personal autonomous agent 
     exploration_summary: >
       Scout is Microsoft's first Autopilot — an always-on personal agent with its own
       identity that works autonomously across files, shell, browser, and Microsoft 365,
