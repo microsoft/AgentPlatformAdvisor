@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Updated `README.md` to reflect the current evolution of the tool: built-in Copilot use, personal-agent delegation, six explore destinations, current platform positioning, delegate routing, and the latest test coverage.
+- Updated `README.md` to reflect the current evolution of the tool: built-in Copilot use, personal-agent delegation, ways to use or build agents, current platform positioning, delegate routing, and the latest test coverage.
 - Refreshed Agent Builder guidance and scoring for current capabilities: Microsoft 365 content, scoped web, uploaded files, Teams/Outlook/People knowledge, admin-enabled Microsoft 365 Copilot connectors, code interpreter, and image generation.
 - Repositioned Agent Builder beyond SharePoint/OneDrive-only scenarios and increased scores for small-team no-code knowledge, connector-backed, web/uploaded-file, and lightweight content/data-analysis scenarios.
 - Clarified that Agent Builder remains disqualified for external audiences, custom app deployment, background/event-driven execution, direct business system integrations, custom retrieval architectures, and multi-step action workflows that submit forms or update external systems.
@@ -26,12 +26,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Removed over-specific Foundry memory-positioning language and replaced it with more conservative production-runtime guidance.
 - Refreshed Microsoft 365 Copilot guidance to cover Copilot Chat, Copilot Search, app-native Copilot experiences, Copilot Pages and Notebooks, and Microsoft-built agents as the built-in productivity layer for licensed internal users.
 - Added Copilot Search and Copilot Pages/Notebooks to the Microsoft 365 Copilot recommendation card, updated Researcher to use the official Learn page, and clarified Facilitator and Interpreter capabilities.
-- Added Cowork and Scout as their own cards on the Explore Microsoft Agent Platforms page.
+- Added Cowork and Scout as their own cards on the Explore page.
 - Updated the recommendation-card accordion label so Microsoft 365 Copilot can show built-in capabilities alongside first-party agents.
 - Moved the "Use agents" home-page row above the "Build agents" row, with Microsoft 365 Copilot, Cowork, and Scout shown before Agent Builder, Copilot Studio, and Microsoft Foundry.
-- Reorganized the Explore Microsoft Agent Platforms page into a three-card desktop grid so the six platform cards form two rows of three.
+- Reorganized the Explore page into a three-card desktop grid so the six cards form two rows of three.
 - Moved README, Changelog, Flowchart, and Scoring links from the header hamburger menu into a footer documentation row beneath the "Created by" credit.
-- Corrected the Explore starting-point copy to reference all six agent destinations.
+- Corrected the Explore starting-point copy to use the approved "ways to use or build agents" decision model.
+- Grouped the Explore page into "Use agents" and "Build agents" sections so the page reflects the current decision model instead of a flat gallery.
 - Updated `docs/SCORING.md` and `docs/FLOWCHART.md` to match the current scoring matrix and recommendation guidance.
 
 ## 2026-07-14

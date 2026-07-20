@@ -781,11 +781,45 @@ body {
   color: var(--primary);
 }
 
+.exploration-groups {
+  display: grid;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.exploration-section-group {
+  text-align: left;
+}
+
+.exploration-group-header {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.exploration-group-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.exploration-group-description {
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
 .exploration-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  margin-bottom: 32px;
 }
 
 .exploration-card {

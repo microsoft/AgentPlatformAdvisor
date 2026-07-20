@@ -544,10 +544,21 @@ function finishDelegate() {
 }
 
 function renderExploration() {
-  const grid = document.getElementById('exploration-grid');
-  if (!grid) return;
-  const platformOrder = ['m365_copilot', 'cowork', 'scout', 'agent_builder', 'copilot_studio', 'foundry'];
-  grid.innerHTML = platformOrder.map(pid => {
+  const groupsContainer = document.getElementById('exploration-groups');
+  if (!groupsContainer) return;
+  const explorationGroups = [
+    {
+      title: 'Use agents',
+      description: 'Start with built-in or ready-made agents that work inside Microsoft 365 or across your work environment.',
+      platforms: ['m365_copilot', 'cowork', 'scout']
+    },
+    {
+      title: 'Build agents',
+      description: 'Choose a platform for creating, extending, governing, and operating agents for your scenario.',
+      platforms: ['agent_builder', 'copilot_studio', 'foundry']
+    }
+  ];
+  const renderCard = pid => {
     const rec = apa.recommendations[pid];
     if (!rec) return '';
     const bestFor = rec.exploration_best_for || rec.scoring_summary;
@@ -571,7 +582,18 @@ function renderExploration() {
         ${spotlightChip}
         <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Explore resources →</a>
       </div>`;
-  }).join('');
+  };
+  groupsContainer.innerHTML = explorationGroups.map(group => `
+    <section class="exploration-section-group" aria-labelledby="exploration-${group.title.toLowerCase().replace(/\s+/g, '-')}">
+      <div class="exploration-group-header">
+        <h3 class="exploration-group-title" id="exploration-${group.title.toLowerCase().replace(/\s+/g, '-')}">${group.title}</h3>
+        <p class="exploration-group-description">${group.description}</p>
+      </div>
+      <div class="exploration-grid">
+        ${group.platforms.map(renderCard).join('')}
+      </div>
+    </section>
+  `).join('');
 }
 
 function renderQuestion() {

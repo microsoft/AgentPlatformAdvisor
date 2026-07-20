@@ -14,7 +14,7 @@ The Agent Platform Advisor is a static single-page web app that helps people nav
 2. **Delegate work** — choose between ready-made personal agents, **Copilot Cowork** and **Microsoft Scout**.
 3. **Build agents** — answer a scored assessment that recommends **Agent Builder**, **Copilot Studio**, or **Microsoft Foundry**.
 
-The start page presents six destinations:
+The start page presents six ways to use or build agents:
 
 | Intent | Destination | Best for |
 |---|---|---|
@@ -32,7 +32,7 @@ From **Get Started**, users choose one of four paths:
 1. **Built-in Microsoft 365 Copilot fast-track** — skips the wizard and recommends Microsoft 365 Copilot when first-party Copilot capabilities and agents already solve the scenario.
 2. **Ready-made agent delegation** — asks two routing questions, then recommends Cowork, Scout, or both as a complementary pair.
 3. **Custom agent assessment** — runs the scored 5-question wizard for Agent Builder, Copilot Studio, and Foundry.
-4. **Explore what's possible** — browses all six destinations before deciding whether to take the assessment.
+4. **Explore what's possible** — compares ways to use or build agents before deciding whether to take the assessment.
 
 The custom agent assessment asks about:
 
