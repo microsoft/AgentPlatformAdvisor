@@ -1,17 +1,17 @@
 # Scoring System — Agent Platform Advisor
 
-Reference document for how the APA scoring engine works. All data driven from `apa.yaml`.
+Reference document for how the APA scoring engine works. All data is driven from `apa.yaml`.
 
 ## Platforms
 
 | ID | Label | Description |
 |---|---|---|
-| `agent_builder` | Agent Builder | No-code agents within Microsoft 365 |
+| `agent_builder` | Agent Builder | No-code declarative agents inside Microsoft 365 Copilot |
 | `m365_copilot` | Microsoft 365 Copilot | Built-in Copilot experiences (fast-track path only) |
-| `copilot_studio` | Copilot Studio | Low-code agents connecting to external systems |
-| `foundry` | Microsoft Foundry | Full-code agents with custom AI models |
+| `copilot_studio` | Copilot Studio | Low-code agents with actions, workflows, connectors, governance, and broad publishing |
+| `foundry` | Microsoft Foundry | Full-code agents with custom AI models, orchestration, and Azure-scale engineering controls |
 
-M365 Copilot is excluded from the scored assessment. It is only recommended via the prescreen fast-track path ("I want to enhance Microsoft 365 Copilot"). In the full wizard, `m365_copilot` is always zeroed.
+M365 Copilot is excluded from the scored assessment. It is only recommended via the prescreen fast-track path. In the full wizard, `m365_copilot` is always zeroed.
 
 ## Non-scored destinations: personal agents (Cowork & Scout)
 
@@ -31,15 +31,11 @@ Cowork and Scout are **not** build platforms — they are ready-made personal ag
 | Cadence = on-demand **and** Reach = Microsoft 365 | **Cowork** |
 | Otherwise (undecided signals) | **Both**, shown as a complementary pair |
 
-So Scout wins if the work is continuous *or* spans beyond Microsoft 365; Cowork wins only when the work is on-demand *and* Microsoft 365-scoped. Results are shareable via a `dt=cowork|scout|both` URL parameter. Scout is documented as a Frontier preview and carries a caveat on its card.
-
 ## Questions and Scoring Matrix
 
 Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3).
 
 ### Q1 — Who is building this agent?
-
-Sets persona weight. Determines whether the builder has the skills for each platform.
 
 | Option | ID | Agent Builder | CS | Foundry |
 |---|---|---|---|---|
@@ -48,25 +44,26 @@ Sets persona weight. Determines whether the builder has the skills for each plat
 | Professional developer | q1c | 0 | 2 | **3** |
 | Data scientist / ML engineer | q1d | 0 | 0 | **3** |
 
-CS gets 2 for q1c because it supports pro developers via YAML authoring and VS Code extension.
+CS gets 2 for q1c because it supports pro developers via YAML authoring and the VS Code extension.
 
 ### Q8 — Who will use this agent?
 
-External-facing is a hard constraint that eliminates Agent Builder and M365 Copilot.
+Audience scope separates Agent Builder's quick small-team sweet spot from Copilot Studio's managed deployment model. External-facing remains a hard constraint that eliminates Agent Builder and M365 Copilot.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
-| Internal employees only | q8a | **3** | **3** | 1 | — |
+| Me or a small internal team | q8a | **3** | 2 | 1 | — |
+| Department or broad internal audience | q8c | 1 | **3** | 2 | — |
 | External users | q8b | 0 | **3** | **3** | Zeros AB, M365 |
 | Not decided yet | q8d | 2 | 2 | 1 | — |
 
 ### Q2 — Where will users interact with this agent?
 
-Deployment surface. Agent Builder can only run inside Microsoft 365.
+Deployment surface is still a hard constraint. Agent Builder runs inside Microsoft 365 Copilot chat surfaces, not custom apps or event-driven runtimes.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
-| Inside Microsoft 365 apps | q2a | **3** | **3** | 1 | — |
+| Microsoft 365 Copilot chat | q2a | **3** | **3** | 1 | — |
 | Custom app (website/mobile) | q2b | 0 | **3** | 2 | Zeros AB |
 | Background (event-driven) | q2c | 0 | 2 | **3** | Zeros AB |
 | Multiple / not decided | q2d | 1 | **3** | 2 | — |
@@ -75,27 +72,29 @@ Foundry gets 1 for q2a because Foundry agents can be surfaced in Teams via custo
 
 ### Q4 — What should this agent do?
 
-Single strongest discriminator between Copilot Studio and Foundry.
+Task complexity is the strongest discriminator between Agent Builder, Copilot Studio, and Foundry. Agent Builder now scores well for lightweight content/data-analysis capabilities enabled in declarative agents, but is still zeroed for action workflows.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
 | Simple Q&A / lookups | q4a | **3** | **3** | 1 | — |
 | Conversational (multi-turn) | q4b | 2 | **3** | 2 | — |
-| Multi-step tasks | q4c | 0 | **3** | **3** | Zeros AB |
+| Create/analyze content in Copilot | q4e | **3** | 2 | 1 | — |
+| Multi-step tasks with actions | q4c | 0 | **3** | **3** | Zeros AB |
 | Complex orchestration | q4d | 0 | 1 | **3** | Zeros AB, M365 |
 
-Foundry gets 1 for q4a because Foundry can do Q&A via prompt flow.
+Foundry gets 1 for q4a/q4e because it can do these jobs, but is usually overkill for simple knowledge and content scenarios.
 
 ### Q3 — What information does this agent need to access?
 
-Data source requirements. Agent Builder is the most limited in terms of data access.
+Agent Builder is no longer treated as "Microsoft 365 files only." It can use Microsoft 365 content, scoped web, embedded files, and admin-enabled Microsoft 365 Copilot connectors. It is still not the right platform for direct APIs, Dataverse knowledge, private search indexes, custom databases, or team-managed retrieval systems.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
-| Microsoft 365 data | q3a | **3** | 2 | 0 | — |
-| Business systems (CRM, etc.) | q3b | 1 | **3** | 2 | — |
-| Advanced / private data | q3c | 0 | 1 | **3** | Zeros AB |
-| Mixed sources | q3d | 1 | **3** | 2 | — |
+| Microsoft 365 content | q3a | **3** | 2 | 0 | — |
+| Connector-backed business systems | q3b | 2 | **3** | 2 | — |
+| Direct APIs / private data platforms | q3c | 0 | 1 | **3** | Zeros AB |
+| M365 + connector-backed systems | q3d | 2 | **3** | 2 | — |
+| Public websites or uploaded files | q3e | **3** | 2 | 0 | — |
 
 ## Scoring Pipeline
 
@@ -106,11 +105,11 @@ Hard rules zero out platforms before scores are summed. They represent real plat
 | Trigger | Platforms zeroed | Reason |
 |---|---|---|
 | q8b (external users) | AB, M365 | Cannot publish externally |
-| q4d (complex orchestration) | AB, M365 | Requires Foundry |
-| q4c (multi-step tasks) | AB | Cannot follow processes or take actions |
-| q2b (custom app) | AB | Can only run inside Microsoft 365 |
-| q2c (background) | AB | No event-driven capabilities |
-| q3c (advanced data) | AB | Can only access Microsoft 365 data |
+| q4d (complex orchestration) | AB, M365 | Requires Foundry-style orchestration |
+| q4c (multi-step action workflows) | AB | Cannot submit forms, update records, or take actions across systems |
+| q2b (custom app) | AB | Can only run inside Microsoft 365 Copilot surfaces |
+| q2c (background) | AB | No event-driven or autonomous background runtime |
+| q3c (direct private data integration) | AB | Cannot directly connect to custom APIs, Dataverse, private search indexes, or team-managed data platforms |
 
 Additionally, M365 Copilot is always zeroed in the full assessment (hard-coded in JS).
 
@@ -126,30 +125,28 @@ Persona preferences force one platform above another in ranking regardless of sc
 |---|---|---|---|
 | q1d (data scientist / AI-ML) | Copilot Studio | Agent Builder | CS supports custom AI model integration, code-first development, and flexible orchestration that AB lacks |
 
-This means that when a data scientist selects answers where Agent Builder would otherwise outscore Copilot Studio, CS is still recommended — but AB's actual scores remain visible in the score breakdown.
-
 ### Step 3 — Threshold labels
 
 | Score | Label |
 |---|---|
 | 12–15 | Strong fit |
 | 8–11 | Good fit |
-| 4–7 | Possible fit — review tradeoffs |
+| 4–7 | Partial fit |
 | 0–3 | Not recommended |
 
 ### Step 4 — Rank and recommend
 
-Platforms are sorted by score descending. The highest-scoring platform is the primary recommendation. The second-highest is shown as "Also consider."
+Platforms are sorted by score descending. The highest-scoring platform is the primary recommendation. The second-highest is shown as "Also consider" when it is viable.
 
 ### Step 5 — Tie handling
 
-When the top two platforms score within **2 points**, they're presented as a complementary pair with a rationale banner:
+When the top two platforms score within **2 points**, they're presented as a complementary pair when that pair is listed in `valid_pairs`.
 
 | Pair | Rationale |
 |---|---|
 | Copilot Studio + Foundry | Build in CS, extend with custom code in Foundry |
 | M365 Copilot + Copilot Studio | M365 Copilot for end users, CS for customization |
-| Agent Builder + M365 Copilot | AB for M365-native agents, M365 for extensibility |
+| Agent Builder + M365 Copilot | AB for Microsoft 365-native agents, M365 for extensibility |
 
 **Persona-based tiebreakers** — when two platforms score equally and a specific persona answer is selected, one platform is preferred:
 
@@ -158,8 +155,6 @@ When the top two platforms score within **2 points**, they're presented as a com
 | q1c (professional developer) | AB, CS | CS | CS supports code-first authoring via VS Code extension |
 | q1d (data scientist / AI-ML) | CS, Foundry | CS | CS provides a faster path to production agents |
 
-A "Why not?" explainer identifies the single question where the winner most outscored the runner-up.
-
 ### Step 6 — Cross-question notes
 
 Contextual warning banners when answer combinations are logically contradictory:
@@ -167,9 +162,9 @@ Contextual warning banners when answer combinations are logically contradictory:
 | Condition | Note |
 |---|---|
 | q2c + q4a | Background agent doing simple Q&A — contradictory |
-| q8b + q2a | External users in M365 apps — external users can't access your tenant |
+| q8b + q2a | External users in Microsoft 365 Copilot chat — external users can't access your tenant |
 | q1a + q4d | Business user wants complex orchestration — requires dev skills |
-| q1a + q3c | Business user needs advanced data sources — requires technical expertise |
+| q1a + q3c | Business user needs direct private data integration — requires technical expertise |
 
 ### Step 7 — Winner-persona mismatch
 
@@ -177,63 +172,48 @@ When Foundry wins but the builder is a business user (q1a), a banner advises par
 
 ## Distribution Analysis
 
-Across all 768 possible answer combinations:
+Across all 1,600 possible answer combinations:
 
 | Platform | Wins | % |
-|---|---|---|
-| Copilot Studio | 599 | 78.0% |
-| Foundry | 159 | 20.7% |
-| Agent Builder | 10 | 1.3% |
+|---|---:|---:|
+| Copilot Studio | 1,271 | 79.4% |
+| Foundry | 269 | 16.8% |
+| Agent Builder | 60 | 3.8% |
 
-**Note:** The distribution above reflects raw scoring only. With persona preferences applied, the two MLEng combos where Agent Builder would win are overridden to recommend Copilot Studio instead, reducing AB's effective wins to 8.
-
-**Ties:** 70 combos (9.1%) — 68 are CS/Foundry, 2 are AB/CS.
+**Ties:** 161 combos (10.1%) — 127 are CS/Foundry, 34 are AB/CS. Close-score cases within 2 points are common because Copilot Studio overlaps with both Agent Builder and Foundry.
 
 ### When Agent Builder wins
 
-AB only wins in its narrow sweet spot: **business user or undecided persona, internal audience, M365 deployment, simple Q&A or conversation, M365 data**. All 10 winning combos share this profile.
+AB now wins beyond the old SharePoint/OneDrive-only path. Its sweet spot is: **business user or low-code maker, small team or undecided internal audience, Microsoft 365 Copilot surface, Q&A/conversation/content-analysis, and Microsoft 365, web/uploaded, or connector-backed knowledge**.
 
-| Combo | AB | CS | F | Override? |
-|---|---|---|---|---|
-| BizUser + Internal + M365 + SimpleQA + M365Data | **15** | 12 | 3 | — |
-| BizUser + Internal + M365 + Converse + M365Data | **13** | 12 | 3 | — |
-| BizUser + Internal + Multiple + SimpleQA + M365Data | **13** | 12 | 4 | — |
-| BizUser + Undecided + M365 + SimpleQA + M365Data | **14** | 11 | 3 | — |
-| BizUser + Undecided + M365 + Converse + M365Data | **12** | 11 | 3 | — |
-| BizUser + Undecided + Multiple + SimpleQA + M365Data | **12** | 11 | 4 | — |
-| ProDev + Internal + M365 + SimpleQA + M365Data | **12** | 12 | 6 | — |
-| ProDev + Undecided + M365 + SimpleQA + M365Data | **11** | 11 | 6 | — |
-| MLEng + Internal + M365 + SimpleQA + M365Data | **12** | 11 | 6 | CS via persona pref |
-| MLEng + Undecided + M365 + SimpleQA + M365Data | **11** | 10 | 6 | CS via persona pref |
-
-The ProDev rows are technically correct — even a developer building a simple Q&A bot on SharePoint data should consider Agent Builder. The MLEng rows are overridden by the persona preference: Copilot Studio is recommended instead, with the rationale shown on the card.
+Agent Builder still loses whenever the user needs external publishing, custom app deployment, background execution, direct private data integration, or action workflows that update external systems.
 
 ### When Foundry wins
 
-Foundry wins when answers include any combination of: pro dev or ML persona (q1c/q1d), background deployment (q2c), complex tasks (q4c/q4d), or advanced data (q3c). Its strongest signal comes from persona + task complexity.
+Foundry wins when answers include any combination of: pro dev or ML persona (q1c/q1d), background deployment (q2c), complex tasks (q4c/q4d), or direct private data integration (q3c). Its strongest signal comes from persona + task/runtime complexity.
 
 ### Copilot Studio dominance
 
-CS wins 78% of combinations because it scores 2–3 on almost every option. It's the most versatile platform — usable by low-code makers, deployable anywhere, and capable of multi-step tasks. This distribution is intentional: CS is the default recommendation unless the user's needs clearly require Foundry's full-code capabilities or fit entirely within AB's narrow scope.
+CS remains the default recommendation for most combinations because it bridges Agent Builder's no-code Microsoft 365-native scenarios and Foundry's full-code scenarios. It wins when the user needs broader internal or external deployment, actions, branching workflows, enterprise governance, custom connectors, or a safer path when scope is undecided.
 
 ### Score ranges when winning
 
 | Platform | Min | Max | Avg |
-|---|---|---|---|
-| Agent Builder | 11 | 15 | 12.5 |
-| Copilot Studio | 8 | 15 | 11.9 |
-| Foundry | 9 | 15 | 11.9 |
+|---|---:|---:|---:|
+| Agent Builder | 11 | 15 | 12.8 |
+| Copilot Studio | 8 | 15 | 11.8 |
+| Foundry | 9 | 15 | 11.6 |
 
 No combination produces a "best platform" below 8, so every user gets at least a "Good fit" recommendation.
 
 ## Cross-question note frequency
 
 | Note | Combos | % |
-|---|---|---|
-| Background + SimpleQA | 48 | 6.2% |
-| External + M365Apps | 64 | 8.3% |
-| BizUser + Orchestrate | 48 | 6.2% |
-| BizUser + AdvData | 48 | 6.2% |
-| Foundry + BizUser (persona mismatch) | 12 | 1.6% |
+|---|---:|---:|
+| Background + SimpleQA | 80 | 5.0% |
+| External + M365 Copilot chat | 100 | 6.3% |
+| BizUser + Orchestrate | 80 | 5.0% |
+| BizUser + Direct private data | 80 | 5.0% |
+| Foundry + BizUser (persona mismatch) | 21 | 1.3% |
 
 Notes are not mutually exclusive — a single combo can trigger multiple notes.

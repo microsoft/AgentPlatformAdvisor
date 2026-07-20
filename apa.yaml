@@ -61,7 +61,7 @@ questions:
   - id: q8
     label: Who will use this agent?
     purpose: External-facing is a hard constraint that affects platform eligibility
-    prompt: Will this agent be used by people within your organization, or by external users such as customers or partners?
+    prompt: Will this agent be used by a small internal group, a broad internal audience, or external users such as customers or partners?
     hard_rules:
       - condition: option in [q8b]
         effect: >
@@ -70,11 +70,18 @@ questions:
           Microsoft 365 Copilot is tenant-scoped only.
     options:
       - id: q8a
-        label: Internal employees only — people inside our organization
+        label: Me or a small internal team — quick agent for a bounded group
         scores:
           agent_builder: 3
-          copilot_studio: 3
+          copilot_studio: 2
           foundry: 1
+
+      - id: q8c
+        label: A department or broad internal audience — many employees need a managed agent
+        scores:
+          agent_builder: 1
+          copilot_studio: 3
+          foundry: 2
 
       - id: q8b
         label: External users — customers, partners, or the public
@@ -97,7 +104,7 @@ questions:
     prompt: Think about where people will access or use the agent in their day-to-day work.
     options:
       - id: q2a
-        label: Inside Microsoft 365 apps — Teams, Copilot, SharePoint, or Outlook
+        label: Inside Microsoft 365 Copilot chat — Microsoft365.com, Office.com, or Teams desktop/web
         scores:
           agent_builder: 3
           copilot_studio: 3
@@ -148,6 +155,13 @@ questions:
           copilot_studio: 3
           foundry: 2
 
+      - id: q4e
+        label: Create or analyze content inside Copilot — documents, charts, images, or lightweight data analysis
+        scores:
+          agent_builder: 3
+          copilot_studio: 2
+          foundry: 1
+
       - id: q4c
         label: Complete multi-step tasks — follow a process, check multiple systems, or take actions like submitting forms or updating records
         scores:
@@ -169,32 +183,39 @@ questions:
     prompt: Where does the information this agent needs currently live? Pick the option closest to where the information lives today.
     options:
       - id: q3a
-        label: Content in Microsoft 365 — like SharePoint, OneDrive, Teams, or Outlook
+        label: Microsoft 365 content — SharePoint, OneDrive, Teams, Outlook, or people data
         scores:
           agent_builder: 3
           copilot_studio: 2
           foundry: 0
 
       - id: q3b
-        label: Other business systems — like Salesforce, SAP, ServiceNow, or your own databases
+        label: Business systems already available through Microsoft 365 Copilot connectors — like Jira, ServiceNow, GitHub, or Azure DevOps
         scores:
-          agent_builder: 1
+          agent_builder: 2
           copilot_studio: 3
           foundry: 2
 
       - id: q3c
-        label: Advanced or private data sources — like data warehouses, large data storage, or AI search tools managed by your team
+        label: Direct APIs, Dataverse, custom databases, private search indexes, or data platforms managed by your team
         scores:
           agent_builder: 0
           copilot_studio: 1
           foundry: 3
 
       - id: q3d
-        label: A mix — some data in Microsoft 365, some in other systems
+        label: A mix — Microsoft 365 content plus connector-backed business systems
         scores:
-          agent_builder: 1
+          agent_builder: 2
           copilot_studio: 3
           foundry: 2
+
+      - id: q3e
+        label: Public websites or uploaded files — scoped web sources, PDFs, Office files, or other embedded content
+        scores:
+          agent_builder: 3
+          copilot_studio: 2
+          foundry: 0
 
 ################################################################################
 # SCORING ENGINE
@@ -212,7 +233,7 @@ scoring:
       label: "Complex agent orchestration — this is a hard requirement for Foundry"
     q4c:
       zero: [agent_builder]
-      label: "Multi-step tasks — Agent Builder cannot follow processes or take actions across systems"
+      label: "Multi-step action workflows — Agent Builder cannot submit forms, update records, or take actions across systems"
     q8b:
       zero: [agent_builder, m365_copilot]
       label: "External user audience — Agent Builder and M365 Copilot cannot publish externally"
@@ -224,7 +245,7 @@ scoring:
       label: "Background execution — Agent Builder has no event-driven or autonomous capabilities"
     q3c:
       zero: [agent_builder]
-      label: "Advanced data sources — Agent Builder can only access Microsoft 365 data"
+      label: "Direct private data integration — Agent Builder cannot directly connect to custom APIs, Dataverse, private search indexes, or team-managed data platforms"
   # Step 2 — Sum raw scores across all answered questions.
   raw_score_max: 15  # 5 questions × max score of 3
 
@@ -341,25 +362,29 @@ recommendations:
 
   agent_builder:
     headline: Agent Builder
-    description: Create simple agents in minutes without writing code, using your existing Microsoft 365 files and data
+    description: Create lightweight agents in minutes without writing code, grounded in Microsoft 365 content, scoped web, uploaded files, and admin-enabled Copilot connectors
     resources_url: https://microsoft.github.io/agent-resources/m365-copilot/#agent-builder
-    scoring_summary: Best suited for no-code scenarios entirely within Microsoft 365.
-    exploration_best_for: Create agents using your Microsoft 365 data
+    scoring_summary: Best suited for no-code, small-team declarative agents inside Microsoft 365 Copilot.
+    exploration_best_for: Create no-code agents in Microsoft 365 Copilot
     exploration_summary: >
       Choose Agent Builder when you want to create agents without writing any code,
-      using data already in SharePoint or OneDrive. Ideal for business users who need
-      simple Q&A, summarization, or lookup agents for their team.
+      using Microsoft 365 content, scoped web sources, uploaded files, or business data
+      already exposed through Microsoft 365 Copilot connectors. Ideal for business users
+      who need Q&A, summarization, lookup, or lightweight content and data-analysis
+      helpers for themselves or a small team.
     summary: >
       The right starting point for business users who want to build
-      agents directly inside Microsoft 365 without writing code.
+      lightweight declarative agents directly inside Microsoft 365 Copilot without writing code.
     best_for:
-      - No-code creators working within Microsoft 365
-      - Internal-only agents grounded in SharePoint or OneDrive
-      - Simple Q&A, summarization, or lookup scenarios
+      - No-code creators building for themselves or a small internal team
+      - Agents grounded in Microsoft 365 content, scoped web, uploaded files, or admin-enabled Copilot connectors
+      - Q&A, summarization, lookup, coaching, and lightweight document, chart, image, or data-analysis scenarios
     watch_out_for:
       - Can't be shared with people outside your organization
-      - Can only use data stored in Microsoft 365 (SharePoint, OneDrive, etc.)
-      - Not suitable for custom logic or external system integration
+      - Broad department or organization-wide agents usually need Copilot Studio's deployment and governance controls
+      - External business data must be available through Microsoft 365 Copilot connectors; direct APIs, Dataverse, custom databases, private search indexes, and custom retrieval require Copilot Studio or Foundry
+      - Not suitable for custom action logic, approvals, branching workflows, or external system updates
+      - Copy the agent to Copilot Studio when you outgrow Agent Builder's sharing, integration, lifecycle, or governance limits
       - No evaluation or testing tools — quality assurance is manual
       - No lifecycle management — no versioning, environments, or CI/CD
       - Minimal observability — limited visibility into agent behavior and usage
