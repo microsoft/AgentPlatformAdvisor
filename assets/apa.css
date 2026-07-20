@@ -105,6 +105,13 @@
   box-sizing: border-box;
 }
 
+a {
+  color: var(--link);
+}
+a:hover {
+  color: var(--link-hover);
+}
+
 body {
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -1304,6 +1311,16 @@ body {
 }
 .rec-list li::before { content: "• "; color: var(--primary); }
 .rec-list li { font-size: 14px; color: var(--foreground); }
+.rec-list li a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: var(--primary-light);
+  text-underline-offset: 2px;
+}
+.rec-list li a:hover {
+  color: var(--link-hover);
+  text-decoration-color: var(--link-hover);
+}
 .pair-banner {
   background: var(--primary-xlight);
   border: 1px solid var(--primary-light);
