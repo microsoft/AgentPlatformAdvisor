@@ -108,14 +108,14 @@ questions:
         scores:
           agent_builder: 3
           copilot_studio: 3
-          foundry: 1
+          foundry: 2
 
       - id: q2b
         label: In a custom app — a website or mobile app your team builds
         scores:
           agent_builder: 0
           copilot_studio: 3
-          foundry: 2
+          foundry: 3
 
       - id: q2c
         label: Running automatically in the background — triggered by events, not by a person chatting with it
@@ -129,7 +129,7 @@ questions:
         scores:
           agent_builder: 1
           copilot_studio: 3
-          foundry: 2
+          foundry: 3
 
   - id: q4
     label: What should this agent do?
@@ -160,7 +160,7 @@ questions:
         scores:
           agent_builder: 3
           copilot_studio: 2
-          foundry: 1
+          foundry: 2
 
       - id: q4c
         label: Complete multi-step tasks — follow a process, check multiple systems, or take actions like submitting forms or updating records
@@ -187,7 +187,7 @@ questions:
         scores:
           agent_builder: 3
           copilot_studio: 2
-          foundry: 0
+          foundry: 1
 
       - id: q3b
         label: Business systems already available through Microsoft 365 Copilot connectors — like Jira, ServiceNow, GitHub, or Azure DevOps
@@ -215,7 +215,7 @@ questions:
         scores:
           agent_builder: 3
           copilot_studio: 2
-          foundry: 0
+          foundry: 1
 
       - id: q3f
         label: Custom RAG, Azure AI Search, private indexes, Foundry IQ knowledge bases, or large-scale retrieval managed by engineering
@@ -536,34 +536,39 @@ recommendations:
 
   foundry:
     headline: Microsoft Foundry
-    description: A developer platform for building highly customized agents with your own AI models and full control over the technology stack
+    description: A developer platform and managed agent runtime for building, deploying, evaluating, and operating production-grade agents with full code, model, tool, identity, networking, and observability control
     resources_url: https://microsoft.github.io/agent-resources/microsoft-foundry/
-    scoring_summary: The right choice when full technical control, custom models, or strict compliance is required.
-    exploration_best_for: Build fully customizable agentic systems
+    scoring_summary: The right choice when production agents need code-first control, managed hosting, custom retrieval, advanced tooling, identity, observability, or strict compliance.
+    exploration_best_for: Build and operate production-grade agentic systems
     exploration_summary: >
-      Choose Microsoft Foundry when your team needs full technical control — bring
-      your own AI models, manage complex multi-agent systems, or meet strict
-      regulatory requirements. Built for professional developers and ML engineers.
+      Choose Microsoft Foundry when your team needs a managed agent runtime with
+      full developer control — prompt agents, hosted code agents, custom protocols,
+      Foundry models, toolboxes, MCP, Foundry IQ, private networking, agent identity,
+      tracing, evaluation, monitoring, and publishing to Microsoft 365 or custom apps.
+      Built for professional developers, architects, and ML engineers.
     summary: >
-      The right choice when your team needs full technical control — bring your
-      own AI models, manage complex multi-agent systems, or meet strict
-      regulatory requirements.
+      The right choice when your team needs to build and operate production-grade
+      agents as software — with managed endpoints, versioning, custom code, model
+      catalog access, custom retrieval, agent identity, private networking, tracing,
+      evaluation, and monitoring.
     best_for:
-      - Professional developers and ML engineers
-      - Using your own AI models or fine-tuning existing ones
-      - Memory as a service — per-user long-term personalization with configurable scope (user, team, or org level)
-      - Full evaluation suite — automatic eval, human eval, and adversarial red teaming
-      - Full lifecycle management — git integration, CI/CD pipelines, and native versioning as a first-class primitive
-      - OpenTelemetry and App Insights integration for end-to-end observability
-      - Agent framework that can orchestrate across both Copilot Studio and Foundry agents
-      - AI gateway for granular cost control, rate limiting, and usage policies
-      - Systems where multiple agents work together and need to track shared progress
-      - Strict compliance requirements (e.g., healthcare, government, or data-residency regulations)
-      - Agents embedded in custom-built applications
+      - Professional developers, architects, and ML engineers
+      - Prompt agents when you want Foundry to run the agent without maintaining application code
+      - Hosted agents when you need your own code, Agent Framework, LangGraph, OpenAI Agents SDK, Anthropic Agent SDK, GitHub Copilot SDK, or custom frameworks
+      - Agents embedded in custom-built applications, backend services, APIs, webhooks, voice systems, or custom protocols
+      - Custom RAG and enterprise retrieval with Foundry IQ, Azure AI Search, Azure Blob Storage, SharePoint, OneLake, web sources, citations, ACLs, and Purview sensitivity labels
+      - Foundry Toolboxes and MCP-compatible tool bundles with centralized authentication, versioning, and policy enforcement
+      - Dedicated Microsoft Entra agent identities, RBAC, private networking, content filters, and bring-your-own Azure resources
+      - Full development lifecycle — versioning, stable endpoints, rollback, publishing, tracing, evaluation, optimization, monitoring, and Application Insights integration
+      - Publishing agents to Microsoft 365 Copilot, Teams, custom apps, services, and the Entra Agent Registry
+      - Strict compliance, data residency, private networking, or security requirements
     watch_out_for:
       - Higher implementation complexity and time-to-value
       - Requires Azure expertise and development resources
-      - Overkill for standard Microsoft 365-native or low-code scenarios
+      - Hosted agents add container compute, framework, protocol, and operational responsibilities
+      - Some capabilities, including selected tools, optimizer, A2A, and portions of agentic retrieval, may be preview depending on API version, region, and setup
+      - Use Copilot Studio for low-code departmental workflows, Dataverse/custom connector automations, and fast maker-led delivery
+      - Use Agent Builder for simple no-code Microsoft 365 Copilot knowledge agents
 
   # ---------------------------------------------------------------------------
   # Personal agents (delegate path only) — Cowork and Scout are ready-made

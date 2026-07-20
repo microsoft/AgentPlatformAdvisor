@@ -9,7 +9,7 @@ Reference document for how the APA scoring engine works. All data is driven from
 | `agent_builder` | Agent Builder | No-code declarative agents inside Microsoft 365 Copilot |
 | `m365_copilot` | Microsoft 365 Copilot | Built-in Copilot experiences (fast-track path only) |
 | `copilot_studio` | Copilot Studio | Governed low-code enterprise agents with tools, workflows, triggers, computer use, evaluation, monitoring, and broad publishing |
-| `foundry` | Microsoft Foundry | Full-code agents with custom AI models, orchestration, and Azure-scale engineering controls |
+| `foundry` | Microsoft Foundry | Managed production agent runtime for prompt agents, hosted code agents, custom retrieval, tools, identity, observability, and Azure-scale controls |
 
 M365 Copilot is excluded from the scored assessment. It is only recommended via the prescreen fast-track path. In the full wizard, `m365_copilot` is always zeroed.
 
@@ -63,12 +63,12 @@ Deployment surface is still a hard constraint. Agent Builder runs inside Microso
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
-| Microsoft 365 Copilot chat | q2a | **3** | **3** | 1 | — |
-| Custom app (website/mobile) | q2b | 0 | **3** | 2 | Zeros AB |
+| Microsoft 365 Copilot chat | q2a | **3** | **3** | 2 | — |
+| Custom app (website/mobile) | q2b | 0 | **3** | **3** | Zeros AB |
 | Background (event-driven) | q2c | 0 | **3** | **3** | Zeros AB |
-| Multiple / not decided | q2d | 1 | **3** | 2 | — |
+| Multiple / not decided | q2d | 1 | **3** | **3** | — |
 
-Foundry gets 1 for q2a because Foundry agents can be surfaced in Teams via custom bot frameworks.
+Foundry now scores higher for deployment flexibility because Foundry agents can publish stable endpoints, integrate with custom applications and services, and be published to Microsoft 365 Copilot or Teams. Copilot Studio remains tied or stronger when the target is low-code Microsoft 365 or Power Platform delivery.
 
 ### Q4 — What should this agent do?
 
@@ -78,23 +78,23 @@ Task complexity is the strongest discriminator between Agent Builder, Copilot St
 |---|---|---|---|---|---|
 | Simple Q&A / lookups | q4a | **3** | **3** | 1 | — |
 | Conversational (multi-turn) | q4b | 2 | **3** | 2 | — |
-| Create/analyze content in Copilot | q4e | **3** | 2 | 1 | — |
+| Create/analyze content in Copilot | q4e | **3** | 2 | 2 | — |
 | Multi-step tasks with actions | q4c | 0 | **3** | **3** | Zeros AB |
 | Complex orchestration | q4d | 0 | 2 | **3** | Zeros AB, M365 |
 
-Foundry gets 1 for q4a/q4e because it can do these jobs, but is usually overkill for simple knowledge and content scenarios.
+Foundry gets 1 for q4a because it can do simple Q&A, but is usually overkill for simple knowledge scenarios. It gets 2 for q4e because code interpreter, file search, and hosted agents can support richer content/data-analysis workloads when the team needs developer control.
 
 ### Q3 — What information does this agent need to access?
 
-Agent Builder is no longer treated as "Microsoft 365 files only." It can use Microsoft 365 content, scoped web, embedded files, and admin-enabled Microsoft 365 Copilot connectors. Copilot Studio is the strongest low-code option for Dataverse, custom connectors, business APIs, and Power Platform integration. Foundry remains strongest for custom RAG, Azure AI Search, private indexes, tuned Foundry IQ knowledge bases, and engineering-managed retrieval systems.
+Agent Builder is no longer treated as "Microsoft 365 files only." It can use Microsoft 365 content, scoped web, embedded files, and admin-enabled Microsoft 365 Copilot connectors. Copilot Studio is the strongest low-code option for Dataverse, custom connectors, business APIs, and Power Platform integration. Foundry now gets weak credit for Microsoft 365, web, and file grounding because Foundry tools and Foundry IQ can reach those sources, but it remains strongest for custom RAG, Azure AI Search, private indexes, tuned Foundry IQ knowledge bases, and engineering-managed retrieval systems.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
-| Microsoft 365 content | q3a | **3** | 2 | 0 | — |
+| Microsoft 365 content | q3a | **3** | 2 | 1 | — |
 | Connector-backed business systems | q3b | 2 | **3** | 2 | — |
 | Dataverse / custom connectors / business APIs | q3c | 0 | **3** | 2 | Zeros AB |
 | M365 + connector-backed systems | q3d | 2 | **3** | 2 | — |
-| Public websites or uploaded files | q3e | **3** | 2 | 0 | — |
+| Public websites or uploaded files | q3e | **3** | 2 | 1 | — |
 | Custom RAG / Azure AI Search / private indexes / Foundry IQ | q3f | 0 | 1 | **3** | Zeros AB |
 
 ## Scoring Pipeline
@@ -179,11 +179,11 @@ Across all 1,920 possible answer combinations:
 
 | Platform | Wins | % |
 |---|---:|---:|
-| Copilot Studio | 1,721 | 89.6% |
-| Foundry | 139 | 7.2% |
+| Copilot Studio | 1,590 | 82.8% |
+| Foundry | 270 | 14.1% |
 | Agent Builder | 60 | 3.1% |
 
-**Ties:** 154 combos (8.0%) — 124 are CS/Foundry, 30 are AB/CS. Close-score cases within 2 points are common because Copilot Studio overlaps with both Agent Builder and Foundry.
+**Exact top-score ties:** 283 combos (14.7%) — 253 are CS/Foundry, 30 are AB/CS. **Close-score cases within 2 points:** 1,120 combos (58.3%) — most are CS/Foundry, reflecting the intentional overlap between Copilot Studio's governed low-code runtime and Foundry's developer-controlled runtime.
 
 ### When Agent Builder wins
 
@@ -193,7 +193,7 @@ Agent Builder still loses whenever the user needs external publishing, custom ap
 
 ### When Foundry wins
 
-Foundry wins when answers include strong technical signals: pro dev or ML persona (q1c/q1d), complex or long-running orchestration (q4d), and custom retrieval architecture (q3f). Copilot Studio now ties or beats Foundry for event-triggered workflows and business APIs unless the scenario clearly needs full-code control.
+Foundry wins when answers include strong technical or production-runtime signals: pro dev or ML persona (q1c/q1d), custom app or multi-surface deployment (q2b/q2d), complex or long-running orchestration (q4d), custom retrieval architecture (q3f), external-facing scenarios, or a need for managed endpoints, hosted code agents, private networking, tracing, evaluation, and full Azure control. Copilot Studio still ties or beats Foundry for event-triggered workflows and business APIs unless the scenario clearly needs full-code control.
 
 ### Copilot Studio dominance
 
@@ -204,8 +204,8 @@ CS remains the default recommendation for most combinations because it bridges A
 | Platform | Min | Max | Avg |
 |---|---:|---:|---:|
 | Agent Builder | 11 | 15 | 12.8 |
-| Copilot Studio | 9 | 15 | 12.3 |
-| Foundry | 10 | 15 | 12.5 |
+| Copilot Studio | 9 | 15 | 12.4 |
+| Foundry | 10 | 15 | 12.7 |
 
 No combination produces a "best platform" below 8, so every user gets at least a "Good fit" recommendation.
 
@@ -218,6 +218,6 @@ No combination produces a "best platform" below 8, so every user gets at least a
 | BizUser + Orchestrate | 96 | 5.0% |
 | BizUser + Business APIs | 80 | 4.2% |
 | BizUser + Custom retrieval | 80 | 4.2% |
-| Foundry + BizUser (persona mismatch) | 7 | 0.4% |
+| Foundry + BizUser (persona mismatch) | 19 | 1.0% |
 
 Notes are not mutually exclusive — a single combo can trigger multiple notes.
