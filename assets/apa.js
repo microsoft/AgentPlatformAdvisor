@@ -467,10 +467,12 @@ function setupListeners() {
     showSection('welcome-section');
     pushState('welcome-section');
   });
-  document.getElementById('start-btn').addEventListener('click', () => {
+  const startAssessment = () => {
     showSection('prescreen-section');
     pushState('prescreen-section');
-  });
+  };
+  document.getElementById('start-btn').addEventListener('click', startAssessment);
+  document.getElementById('start-btn-top').addEventListener('click', startAssessment);
   document.getElementById('next-btn').addEventListener('click', handleNext);
   document.getElementById('prev-btn').addEventListener('click', handlePrev);
 }
