@@ -13,6 +13,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **Implemented Graphite Decision Instrument design system** across the entire application:
+  - Dark graphite canvas (`#0C0F14`) with subtle grid texture as default theme
+  - IBM Plex Sans + IBM Plex Mono typography (replacing Segoe UI / Geist Mono)
+  - Azure-cyan `#2BA8FF` accent for all signal colors, progress, and CTAs
+  - Dark-first approach: dark is default, light mode is the alternate
+  - Updated type scale: title 36px, heading 26px, subhead 20px, body 15px
+  - Refined component styling: lit-edge cards, instrument-grade score bars, surface hierarchy
+  - Maintained full WCAG AA contrast compliance
+  - All 32 Playwright tests passing
 - Updated `README.md` to reflect the current evolution of the tool: built-in Copilot use, personal-agent delegation, ways to use or build agents, current platform positioning, delegate routing, and the latest test coverage.
 - Refreshed Agent Builder guidance and scoring for current capabilities: Microsoft 365 content, scoped web, uploaded files, Teams/Outlook/People knowledge, admin-enabled Microsoft 365 Copilot connectors, code interpreter, and image generation.
 - Repositioned Agent Builder beyond SharePoint/OneDrive-only scenarios and increased scores for small-team no-code knowledge, connector-backed, web/uploaded-file, and lightweight content/data-analysis scenarios.
