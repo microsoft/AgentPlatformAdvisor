@@ -40,6 +40,8 @@
   --input: #2A3342;
   --ring: #2BA8FF;
   --ring-focus: rgba(43, 168, 255, 0.25);
+  --link: #58C7FF;
+  --link-hover: #8DD8FF;
 
   --radius-sm: 4px;
   --radius: 8px;
@@ -91,6 +93,8 @@
   --input: #D1D1D1;
   --ring: #0078D4;
   --ring-focus: rgba(0, 120, 212, 0.2);
+  --link: #0078D4;
+  --link-hover: #005A9E;
 
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
@@ -682,11 +686,12 @@ body {
   color: var(--muted-foreground);
 }
 .option-description a {
-  color: var(--primary);
+  color: var(--link);
   text-decoration: none;
   font-weight: 600;
 }
 .option-description a:hover {
+  color: var(--link-hover);
   text-decoration: underline;
 }
 
@@ -806,7 +811,7 @@ body {
 }
 
 .exploration-back:hover {
-  color: var(--primary);
+  color: var(--link);
 }
 
 .exploration-groups {
@@ -893,13 +898,14 @@ body {
   display: inline-flex;
   align-items: center;
   font-size: 14px;
-  color: var(--primary);
+  color: var(--link);
   text-decoration: none;
   min-height: 44px;
   padding: 12px 0;
 }
 
 .exploration-card-link:hover {
+  color: var(--link-hover);
   text-decoration: underline;
 }
 
@@ -933,7 +939,7 @@ body {
   text-decoration: none;
 }
 .exploration-card-spotlight-name a:hover {
-  color: var(--primary);
+  color: var(--link);
   text-decoration: underline;
 }
 .exploration-card-spotlight-tagline {
@@ -975,8 +981,13 @@ body {
   padding: 8px 4px;
   min-height: 44px;
   line-height: 28px;
-  color: var(--primary);
-  text-decoration-color: var(--primary-light);
+  color: var(--link);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
 }
 
 .footer-doc-links {
@@ -1595,7 +1606,7 @@ body {
   color: var(--foreground);
 }
 .rec-dev-note a {
-  color: var(--primary);
+  color: var(--link);
   font-weight: 500;
 }
 
@@ -1628,7 +1639,7 @@ body {
   text-decoration: none;
 }
 .rec-spotlight-name a:hover {
-  color: var(--primary);
+  color: var(--link);
   text-decoration: underline;
 }
 .rec-spotlight-tagline {
@@ -1656,10 +1667,11 @@ body {
 .rec-nav a {
   font-size: 13px;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--link);
   text-decoration: none;
 }
 .rec-nav a:hover {
+  color: var(--link-hover);
   text-decoration: underline;
 }
 .rec-nav-sep {
@@ -1691,10 +1703,11 @@ body {
   line-height: 1.5;
 }
 .decision-card-context a {
-  color: var(--primary);
+  color: var(--link);
   text-decoration: none;
 }
 .decision-card-context a:hover {
+  color: var(--link-hover);
   text-decoration: underline;
 }
 
@@ -1709,11 +1722,12 @@ body {
   line-height: 1.5;
 }
 .decision-card-banner a {
-  color: var(--primary);
+  color: var(--link);
   text-decoration: none;
   font-weight: 500;
 }
 .decision-card-banner a:hover {
+  color: var(--link-hover);
   text-decoration: underline;
 }
 
