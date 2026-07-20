@@ -8,7 +8,7 @@ Reference document for how the APA scoring engine works. All data is driven from
 |---|---|---|
 | `agent_builder` | Agent Builder | No-code declarative agents inside Microsoft 365 Copilot |
 | `m365_copilot` | Microsoft 365 Copilot | Built-in Copilot experiences (fast-track path only) |
-| `copilot_studio` | Copilot Studio | Low-code agents with actions, workflows, connectors, governance, and broad publishing |
+| `copilot_studio` | Copilot Studio | Governed low-code enterprise agents with tools, workflows, triggers, computer use, evaluation, monitoring, and broad publishing |
 | `foundry` | Microsoft Foundry | Full-code agents with custom AI models, orchestration, and Azure-scale engineering controls |
 
 M365 Copilot is excluded from the scored assessment. It is only recommended via the prescreen fast-track path. In the full wizard, `m365_copilot` is always zeroed.
@@ -42,7 +42,7 @@ Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3).
 | Business user / SME — no coding | q1a | **3** | 1 | 0 |
 | Low-code maker / IT pro | q1b | 1 | **3** | 0 |
 | Professional developer | q1c | 0 | 2 | **3** |
-| Data scientist / ML engineer | q1d | 0 | 0 | **3** |
+| Data scientist / ML engineer | q1d | 0 | 1 | **3** |
 
 CS gets 2 for q1c because it supports pro developers via YAML authoring and the VS Code extension.
 
@@ -65,7 +65,7 @@ Deployment surface is still a hard constraint. Agent Builder runs inside Microso
 |---|---|---|---|---|---|
 | Microsoft 365 Copilot chat | q2a | **3** | **3** | 1 | — |
 | Custom app (website/mobile) | q2b | 0 | **3** | 2 | Zeros AB |
-| Background (event-driven) | q2c | 0 | 2 | **3** | Zeros AB |
+| Background (event-driven) | q2c | 0 | **3** | **3** | Zeros AB |
 | Multiple / not decided | q2d | 1 | **3** | 2 | — |
 
 Foundry gets 1 for q2a because Foundry agents can be surfaced in Teams via custom bot frameworks.
@@ -80,21 +80,22 @@ Task complexity is the strongest discriminator between Agent Builder, Copilot St
 | Conversational (multi-turn) | q4b | 2 | **3** | 2 | — |
 | Create/analyze content in Copilot | q4e | **3** | 2 | 1 | — |
 | Multi-step tasks with actions | q4c | 0 | **3** | **3** | Zeros AB |
-| Complex orchestration | q4d | 0 | 1 | **3** | Zeros AB, M365 |
+| Complex orchestration | q4d | 0 | 2 | **3** | Zeros AB, M365 |
 
 Foundry gets 1 for q4a/q4e because it can do these jobs, but is usually overkill for simple knowledge and content scenarios.
 
 ### Q3 — What information does this agent need to access?
 
-Agent Builder is no longer treated as "Microsoft 365 files only." It can use Microsoft 365 content, scoped web, embedded files, and admin-enabled Microsoft 365 Copilot connectors. It is still not the right platform for direct APIs, Dataverse knowledge, private search indexes, custom databases, or team-managed retrieval systems.
+Agent Builder is no longer treated as "Microsoft 365 files only." It can use Microsoft 365 content, scoped web, embedded files, and admin-enabled Microsoft 365 Copilot connectors. Copilot Studio is the strongest low-code option for Dataverse, custom connectors, business APIs, and Power Platform integration. Foundry remains strongest for custom RAG, Azure AI Search, private indexes, tuned Foundry IQ knowledge bases, and engineering-managed retrieval systems.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
 | Microsoft 365 content | q3a | **3** | 2 | 0 | — |
 | Connector-backed business systems | q3b | 2 | **3** | 2 | — |
-| Direct APIs / private data platforms | q3c | 0 | 1 | **3** | Zeros AB |
+| Dataverse / custom connectors / business APIs | q3c | 0 | **3** | 2 | Zeros AB |
 | M365 + connector-backed systems | q3d | 2 | **3** | 2 | — |
 | Public websites or uploaded files | q3e | **3** | 2 | 0 | — |
+| Custom RAG / Azure AI Search / private indexes / Foundry IQ | q3f | 0 | 1 | **3** | Zeros AB |
 
 ## Scoring Pipeline
 
@@ -105,11 +106,12 @@ Hard rules zero out platforms before scores are summed. They represent real plat
 | Trigger | Platforms zeroed | Reason |
 |---|---|---|
 | q8b (external users) | AB, M365 | Cannot publish externally |
-| q4d (complex orchestration) | AB, M365 | Requires Foundry-style orchestration |
+| q4d (complex orchestration) | AB, M365 | Requires Copilot Studio or Foundry orchestration |
 | q4c (multi-step action workflows) | AB | Cannot submit forms, update records, or take actions across systems |
 | q2b (custom app) | AB | Can only run inside Microsoft 365 Copilot surfaces |
 | q2c (background) | AB | No event-driven or autonomous background runtime |
-| q3c (direct private data integration) | AB | Cannot directly connect to custom APIs, Dataverse, private search indexes, or team-managed data platforms |
+| q3c (direct business system integration) | AB | Cannot directly connect to Dataverse, custom connectors, or business APIs |
+| q3f (custom retrieval architecture) | AB | Cannot directly use custom RAG, Azure AI Search, private indexes, Foundry IQ, or engineering-managed retrieval systems |
 
 Additionally, M365 Copilot is always zeroed in the full assessment (hard-coded in JS).
 
@@ -123,7 +125,7 @@ Persona preferences force one platform above another in ranking regardless of sc
 
 | Trigger | Prefer | Over | Rationale |
 |---|---|---|---|
-| q1d (data scientist / AI-ML) | Copilot Studio | Agent Builder | CS supports custom AI model integration, code-first development, and flexible orchestration that AB lacks |
+| q1d (data scientist / AI-ML) | Copilot Studio | Agent Builder | CS supports curated model selection, evaluations, Foundry IQ integration, code-first development, and flexible orchestration that AB lacks |
 
 ### Step 3 — Threshold labels
 
@@ -164,7 +166,8 @@ Contextual warning banners when answer combinations are logically contradictory:
 | q2c + q4a | Background agent doing simple Q&A — contradictory |
 | q8b + q2a | External users in Microsoft 365 Copilot chat — external users can't access your tenant |
 | q1a + q4d | Business user wants complex orchestration — requires dev skills |
-| q1a + q3c | Business user needs direct private data integration — requires technical expertise |
+| q1a + q3c | Business user needs direct business system integration — requires technical expertise |
+| q1a + q3f | Business user needs custom retrieval architecture — requires engineering expertise |
 
 ### Step 7 — Winner-persona mismatch
 
@@ -172,37 +175,37 @@ When Foundry wins but the builder is a business user (q1a), a banner advises par
 
 ## Distribution Analysis
 
-Across all 1,600 possible answer combinations:
+Across all 1,920 possible answer combinations:
 
 | Platform | Wins | % |
 |---|---:|---:|
-| Copilot Studio | 1,271 | 79.4% |
-| Foundry | 269 | 16.8% |
-| Agent Builder | 60 | 3.8% |
+| Copilot Studio | 1,721 | 89.6% |
+| Foundry | 139 | 7.2% |
+| Agent Builder | 60 | 3.1% |
 
-**Ties:** 161 combos (10.1%) — 127 are CS/Foundry, 34 are AB/CS. Close-score cases within 2 points are common because Copilot Studio overlaps with both Agent Builder and Foundry.
+**Ties:** 154 combos (8.0%) — 124 are CS/Foundry, 30 are AB/CS. Close-score cases within 2 points are common because Copilot Studio overlaps with both Agent Builder and Foundry.
 
 ### When Agent Builder wins
 
 AB now wins beyond the old SharePoint/OneDrive-only path. Its sweet spot is: **business user or low-code maker, small team or undecided internal audience, Microsoft 365 Copilot surface, Q&A/conversation/content-analysis, and Microsoft 365, web/uploaded, or connector-backed knowledge**.
 
-Agent Builder still loses whenever the user needs external publishing, custom app deployment, background execution, direct private data integration, or action workflows that update external systems.
+Agent Builder still loses whenever the user needs external publishing, custom app deployment, background execution, direct business system integration, custom retrieval architecture, or action workflows that update external systems.
 
 ### When Foundry wins
 
-Foundry wins when answers include any combination of: pro dev or ML persona (q1c/q1d), background deployment (q2c), complex tasks (q4c/q4d), or direct private data integration (q3c). Its strongest signal comes from persona + task/runtime complexity.
+Foundry wins when answers include strong technical signals: pro dev or ML persona (q1c/q1d), complex or long-running orchestration (q4d), and custom retrieval architecture (q3f). Copilot Studio now ties or beats Foundry for event-triggered workflows and business APIs unless the scenario clearly needs full-code control.
 
 ### Copilot Studio dominance
 
-CS remains the default recommendation for most combinations because it bridges Agent Builder's no-code Microsoft 365-native scenarios and Foundry's full-code scenarios. It wins when the user needs broader internal or external deployment, actions, branching workflows, enterprise governance, custom connectors, or a safer path when scope is undecided.
+CS remains the default recommendation for most combinations because it bridges Agent Builder's no-code Microsoft 365-native scenarios and Foundry's full-code scenarios. It wins when the user needs broader internal or external deployment, actions, branching workflows, event triggers, enterprise governance, Dataverse/custom connectors, MCP tools, computer use, evaluation, monitoring, or a safer path when scope is undecided.
 
 ### Score ranges when winning
 
 | Platform | Min | Max | Avg |
 |---|---:|---:|---:|
 | Agent Builder | 11 | 15 | 12.8 |
-| Copilot Studio | 8 | 15 | 11.8 |
-| Foundry | 9 | 15 | 11.6 |
+| Copilot Studio | 9 | 15 | 12.3 |
+| Foundry | 10 | 15 | 12.5 |
 
 No combination produces a "best platform" below 8, so every user gets at least a "Good fit" recommendation.
 
@@ -210,10 +213,11 @@ No combination produces a "best platform" below 8, so every user gets at least a
 
 | Note | Combos | % |
 |---|---:|---:|
-| Background + SimpleQA | 80 | 5.0% |
-| External + M365 Copilot chat | 100 | 6.3% |
-| BizUser + Orchestrate | 80 | 5.0% |
-| BizUser + Direct private data | 80 | 5.0% |
-| Foundry + BizUser (persona mismatch) | 21 | 1.3% |
+| Background + SimpleQA | 96 | 5.0% |
+| External + M365 Copilot chat | 120 | 6.3% |
+| BizUser + Orchestrate | 96 | 5.0% |
+| BizUser + Business APIs | 80 | 4.2% |
+| BizUser + Custom retrieval | 80 | 4.2% |
+| Foundry + BizUser (persona mismatch) | 7 | 0.4% |
 
 Notes are not mutually exclusive — a single combo can trigger multiple notes.

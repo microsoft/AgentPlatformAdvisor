@@ -55,7 +55,7 @@ questions:
         label: Data scientist or AI/ML engineer — works with AI models and data infrastructure
         scores:
           agent_builder: 0
-          copilot_studio: 0
+          copilot_studio: 1
           foundry: 3
 
   - id: q8
@@ -121,7 +121,7 @@ questions:
         label: Running automatically in the background — triggered by events, not by a person chatting with it
         scores:
           agent_builder: 0
-          copilot_studio: 2
+          copilot_studio: 3
           foundry: 3
 
       - id: q2d
@@ -173,7 +173,7 @@ questions:
         label: Manage complex workflows — coordinate multiple agents or handle long-running processes
         scores:
           agent_builder: 0
-          copilot_studio: 1
+          copilot_studio: 2
           foundry: 3
         hard_rule_trigger: true
 
@@ -197,11 +197,11 @@ questions:
           foundry: 2
 
       - id: q3c
-        label: Direct APIs, Dataverse, custom databases, private search indexes, or data platforms managed by your team
+        label: Dataverse, custom connectors, or direct business APIs your team can expose to the agent
         scores:
           agent_builder: 0
-          copilot_studio: 1
-          foundry: 3
+          copilot_studio: 3
+          foundry: 2
 
       - id: q3d
         label: A mix — Microsoft 365 content plus connector-backed business systems
@@ -217,6 +217,13 @@ questions:
           copilot_studio: 2
           foundry: 0
 
+      - id: q3f
+        label: Custom RAG, Azure AI Search, private indexes, Foundry IQ knowledge bases, or large-scale retrieval managed by engineering
+        scores:
+          agent_builder: 0
+          copilot_studio: 1
+          foundry: 3
+
 ################################################################################
 # SCORING ENGINE
 ################################################################################
@@ -230,7 +237,7 @@ scoring:
   hard_rules:
     q4d:
       zero: [agent_builder, m365_copilot]
-      label: "Complex agent orchestration — this is a hard requirement for Foundry"
+      label: "Complex agent orchestration — Agent Builder and M365 Copilot are not suitable for multi-agent or long-running orchestration"
     q4c:
       zero: [agent_builder]
       label: "Multi-step action workflows — Agent Builder cannot submit forms, update records, or take actions across systems"
@@ -245,7 +252,10 @@ scoring:
       label: "Background execution — Agent Builder has no event-driven or autonomous capabilities"
     q3c:
       zero: [agent_builder]
-      label: "Direct private data integration — Agent Builder cannot directly connect to custom APIs, Dataverse, private search indexes, or team-managed data platforms"
+      label: "Direct business system integration — Agent Builder cannot directly connect to Dataverse, custom connectors, or business APIs"
+    q3f:
+      zero: [agent_builder]
+      label: "Custom retrieval architecture — Agent Builder cannot directly use custom RAG, Azure AI Search, private indexes, Foundry IQ, or engineering-managed retrieval systems"
   # Step 2 — Sum raw scores across all answered questions.
   raw_score_max: 15  # 5 questions × max score of 3
 
@@ -259,8 +269,9 @@ scoring:
       over: agent_builder
       rationale: >
         Copilot Studio is recommended over Agent Builder for data scientists and AI/ML engineers
-        because it supports custom AI model integration, code-first development via the VS Code
-        extension, and more flexible orchestration — capabilities that Agent Builder does not offer.
+        because it supports curated model selection, agent evaluations, Foundry IQ integration,
+        code-first development via the VS Code extension, and more flexible orchestration —
+        capabilities that Agent Builder does not offer.
 
   # Step 3 — Map raw scores to recommendation strength.
   recommendation_thresholds:
@@ -340,9 +351,16 @@ scoring:
         q1: q1a
         q3: q3c
       note: >
-        Advanced data sources like data warehouses and AI search tools usually require
-        technical expertise to configure. Consider whether your IT or development team
-        will help set up data access for the agent.
+        Direct business system integrations like Dataverse, custom connectors, or APIs
+        usually require technical expertise to configure. Consider whether your IT or
+        development team will help set up data access for the agent.
+    - when:
+        q1: q1a
+        q3: q3f
+      note: >
+        Custom retrieval architectures like Azure AI Search, private indexes, Foundry IQ,
+        or large-scale RAG usually require engineering expertise. Consider partnering with
+        your development or data platform team before building the agent.
 
   # Winner-persona mismatch notes — shown when the recommended platform
   # doesn't match the builder persona.
@@ -482,30 +500,35 @@ recommendations:
 
   copilot_studio:
     headline: Copilot Studio
-    description: Build agents that connect to other business systems, automate processes, and work across websites, Teams, and more
+    description: Build governed enterprise agents that combine knowledge, tools, workflows, event triggers, human review, connected agents, evaluation, monitoring, and multi-channel deployment
     resources_url: https://microsoft.github.io/agent-resources/copilot-studio/
-    scoring_summary: The most flexible low-code option for agents that connect to external systems.
-    exploration_best_for: Extend agents across business systems and workflows
+    scoring_summary: The governed low-code platform for enterprise agents that need actions, workflows, connectors, evaluation, monitoring, and broad deployment.
+    exploration_best_for: Build governed enterprise agents and workflows
     exploration_summary: >
-      Choose Copilot Studio when you need agents that go beyond Microsoft 365 —
-      connecting to CRMs, databases, or external APIs with 1,400+ pre-built connectors.
-      Great for IT pros and makers building multi-turn conversational experiences.
+      Choose Copilot Studio when you need agents that go beyond quick knowledge lookup —
+      connecting to CRMs, databases, APIs, MCP servers, workflows, Microsoft 365 context,
+      and other agents. Great for makers and IT teams building governed agents that can
+      reason, take actions, evaluate quality, and deploy across channels.
     summary: >
-      The most flexible option for building agents without heavy coding —
-      connect to outside systems, deploy to websites or Teams, and automate
-      business processes.
+      The best low-code platform for governed enterprise agents — connect to outside
+      systems, automate business processes, use generative orchestration, evaluate
+      quality, monitor behavior, and deploy to websites, Teams, Microsoft 365, and more.
     best_for:
       - Low-code makers and IT pros
-      - Agents connecting to external APIs, CRM, ERP, or databases — over 1,400 pre-built connectors plus MCP server support
-      - Agent-to-agent orchestration — an agent can call other agents as tools
-      - Multi-turn conversational experiences
+      - Agents connecting to external APIs, CRM, ERP, Dataverse, databases, MCP servers, or custom connectors
+      - Event-triggered, scheduled, or user-triggered workflows with actions, branching, human review, and approvals
+      - Agent-to-agent orchestration — child agents, connected Copilot Studio agents, and A2A integrations
+      - Automating legacy web or desktop apps with computer use when no API exists
+      - Multi-turn conversational experiences with generative orchestration, Microsoft IQ context, and optional per-user memory in the new experience
       - Internal and external-facing deployment
-      - Built-in evaluation test sets with quality scoring and groundedness detection
+      - Built-in evaluation test sets, activity maps, analytics, monitoring, and tenant-wide agent inventory
     watch_out_for:
       - Complex ML pipelines or custom model training require Foundry
-      - Long-running multi-agent orchestration is better served by Foundry
-      - Model selection is limited to a curated list — no bring-your-own model
-      - No per-user long-term memory or personalization
+      - Highly custom, high-scale, or code-first multi-agent orchestration is better served by Foundry
+      - Supports curated GA, preview, and experimental models, including deep reasoning models; use Foundry for arbitrary bring-your-own model hosting, custom model training, model routing, and full runtime control
+      - Memory is available in the new experience preview with per-user/per-agent storage and lifecycle limits; use Foundry when you need custom memory architecture, longer retention, or application-controlled memory
+      - Computer use requires careful credential, supervision, access-control, observability, and cost governance
+      - Copilot Credits can scale quickly with generative answers, agent actions, tenant graph grounding, workflows, reasoning models, voice, and computer use
     persona_tips:
       q1c: >
         🛠️ <strong>Developer tip:</strong> You can build Copilot Studio agents in YAML using the

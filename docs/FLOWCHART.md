@@ -15,7 +15,7 @@ flowchart TD
     Q1 -->|Business user / no code| Q1A["AB:3 · CS:1 · Foundry:0"]
     Q1 -->|Low-code maker / IT pro| Q1B["AB:1 · CS:3 · Foundry:0"]
     Q1 -->|"🔀 Professional developer"| Q1C["AB:0 · CS:2 · Foundry:3\n→ TIEBREAKER: AB tie → prefer CS"]
-    Q1 -->|"🔀 Data scientist / AI-ML"| Q1D["AB:0 · CS:0 · Foundry:3\n→ PERSONA PREF: CS always over AB\n→ TIEBREAKER: CS/Foundry tie → prefer CS"]
+    Q1 -->|"🔀 Data scientist / AI-ML"| Q1D["AB:0 · CS:1 · Foundry:3\n→ PERSONA PREF: CS always over AB\n→ TIEBREAKER: CS/Foundry tie → prefer CS"]
 
     Q1A & Q1B & Q1C & Q1D --> Q8
 
@@ -30,7 +30,7 @@ flowchart TD
     Q2["**Q2: Where will users interact?**"]
     Q2 -->|Microsoft 365 Copilot chat| Q2A["AB:3 · CS:3 · Foundry:1"]
     Q2 -->|"⚠️ Custom app / website"| Q2B["AB:0 · CS:3 · Foundry:2\n→ HARD RULE: AB=0"]
-    Q2 -->|"⚠️ Background / event-triggered"| Q2C["AB:0 · CS:2 · Foundry:3\n→ HARD RULE: AB=0"]
+    Q2 -->|"⚠️ Background / event-triggered"| Q2C["AB:0 · CS:3 · Foundry:3\n→ HARD RULE: AB=0"]
     Q2 -->|Multiple places / undecided| Q2D["AB:1 · CS:3 · Foundry:2"]
 
     Q2A & Q2B & Q2C & Q2D --> Q4
@@ -40,18 +40,19 @@ flowchart TD
     Q4 -->|Multi-turn conversation| Q4B["AB:2 · CS:3 · Foundry:2"]
     Q4 -->|Create/analyze content in Copilot| Q4E["AB:3 · CS:2 · Foundry:1"]
     Q4 -->|"⚠️ Multi-step action workflows"| Q4C["AB:0 · CS:3 · Foundry:3\n→ HARD RULE: AB=0"]
-    Q4 -->|"⚠️ Complex workflows / multi-agent"| Q4D["AB:0 · CS:1 · Foundry:3\n→ HARD RULE: AB=0"]
+    Q4 -->|"⚠️ Complex workflows / multi-agent"| Q4D["AB:0 · CS:2 · Foundry:3\n→ HARD RULE: AB=0"]
 
     Q4A & Q4B & Q4E & Q4C & Q4D --> Q3
 
     Q3["**Q3: What information does the agent need?**"]
     Q3 -->|Microsoft 365 content| Q3A["AB:3 · CS:2 · Foundry:0"]
     Q3 -->|Connector-backed business systems| Q3B["AB:2 · CS:3 · Foundry:2"]
-    Q3 -->|"⚠️ Direct APIs / private data platforms"| Q3C["AB:0 · CS:1 · Foundry:3\n→ HARD RULE: AB=0"]
+    Q3 -->|"⚠️ Dataverse / custom connectors / APIs"| Q3C["AB:0 · CS:3 · Foundry:2\n→ HARD RULE: AB=0"]
     Q3 -->|M365 + connector-backed systems| Q3D["AB:2 · CS:3 · Foundry:2"]
     Q3 -->|Public websites / uploaded files| Q3E["AB:3 · CS:2 · Foundry:0"]
+    Q3 -->|"⚠️ Custom RAG / private indexes"| Q3F["AB:0 · CS:1 · Foundry:3\n→ HARD RULE: AB=0"]
 
-    Q3A & Q3B & Q3C & Q3D & Q3E --> SCORE
+    Q3A & Q3B & Q3C & Q3D & Q3E & Q3F --> SCORE
 
     SCORE["**Apply Hard Rules + Sum Scores**\nPre-sum: zero out platforms per hard rules\nMax possible: 15 pts per platform"]
 
@@ -74,6 +75,7 @@ flowchart TD
     style Q4C fill:#fff3cd,stroke:#ffc107
     style Q4D fill:#fff3cd,stroke:#ffc107
     style Q3C fill:#fff3cd,stroke:#ffc107
+    style Q3F fill:#fff3cd,stroke:#ffc107
     style SCORE fill:#e8f4fd,stroke:#0078D4
     style PREF fill:#e8f0fe,stroke:#4a86e8
     style RESULT fill:#d4edda,stroke:#28a745
