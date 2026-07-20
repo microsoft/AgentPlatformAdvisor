@@ -1,138 +1,193 @@
 # Design System — Agent Platform Advisor
 
 ## Product Context
-- **What this is:** A YAML-driven scoring wizard that recommends the right Microsoft agent platform for a given scenario
-- **Who it's for:** Microsoft enterprise customers — business users, IT pros, professional developers, and data/ML engineers evaluating Microsoft agent platforms
-- **Space/industry:** Microsoft productivity & AI tooling, enterprise decision-support tools
-- **Project type:** Single-page web app (multi-step wizard with scored results)
-- **Distribution:** Static site on GitHub Pages, published by Microsoft CAT
+
+- **What this is:** A static, YAML-driven decision-support web app that recommends the right Microsoft agent experience for a scenario.
+- **Who it's for:** Microsoft enterprise customers, business users, IT pros, professional developers, architects, and data/ML engineers choosing how to use, delegate, or build agents.
+- **Space/industry:** Microsoft productivity, Copilot, enterprise AI tooling, and platform-selection guidance.
+- **Project type:** Single-page web app with a prescreen flow, scored wizard, recommendation results, and exploratory guidance.
+- **Distribution:** Static site on GitHub Pages, published by Microsoft CAT.
+- **Memorable thing:** Serious decision software for Microsoft AI builders and buyers.
 
 ## Aesthetic Direction
-- **Direction:** Fluent 2 — Microsoft's current design language. Layered surfaces, purposeful depth, clean hierarchy. Not flat, not skeuomorphic. Trustworthy without being stiff.
-- **Decoration level:** Intentional — a subtle three-stop diagonal gradient on the canvas background (inspired by Microsoft's modern product pages), soft layered neutrals, nothing loud. Decoration serves depth, not decoration for its own sake.
-- **Mood:** Authoritative and efficient. A user should feel they're using a real Microsoft product, not an internal hack. The tool should feel like it takes their scenario seriously.
+
+- **Direction:** Graphite Decision Instrument.
+- **Decoration level:** Intentional. Use lit edges, thin dividers, score rails, subtle grid texture, and diagnostic readouts. Do not use decorative blobs, gradient hero sections, or icon-in-circle ornament.
+- **Mood:** The app should feel like an engineered decision console. Users should feel the tool is measuring their scenario, not selling them a generic AI product.
+- **Category stance:** Stay Microsoft-literate through trust, clarity, accessibility, and restrained blue. Depart from default Microsoft marketing pages by using a darker, more technical workspace model.
+- **Reference sources:** Fluent 2 design principles, Microsoft 365 Copilot product pages, Copilot Studio product pages, Microsoft Foundry surfaces, and current enterprise AI dashboard guidance.
 
 ## Typography
 
-- **Body/UI:** `"Segoe UI Variable", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif`
-  - The modern Fluent 2 font. Non-negotiable first-party signal. Segoe UI Variable is available natively on Windows; system-ui picks it up on macOS/Linux with acceptable fallback.
-  - Use for: all body text, headings, labels, buttons, navigation, descriptions.
+- **Display/Hero:** `"IBM Plex Sans", sans-serif` at 600-700 weight.
+  - Use for the product title, question text, recommendation headings, and large decision statements.
+  - Rationale: engineered, serious, and readable without falling into the default Segoe/Inter/Roboto convergence trap.
+- **Body/UI:** `"IBM Plex Sans", sans-serif` at 400-500 weight.
+  - Use for all body copy, option text, explanations, buttons, and UI labels that are not diagnostic metadata.
+- **Data/Tables/Labels:** `"IBM Plex Mono", "Geist Mono", "Cascadia Code", monospace`.
+  - Use for score numbers, platform IDs, step counters, fit deltas, diagnostic metadata, and compact labels.
+  - Always use `font-variant-numeric: tabular-nums` for numeric scores and score comparisons.
+- **Fallback:** Aptos or Segoe UI may appear after IBM Plex in the stack for Microsoft environments, but they are fallbacks, not the visual signature.
+- **Loading:** Use Google Fonts or a self-hosted font strategy with `font-display: swap`.
+  - `https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap`
 
-- **Data/Scores/Platform labels:** `"Geist Mono", "Cascadia Code", "Consolas", monospace`
-  - Load from Google Fonts: `https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap`
-  - Always use `font-variant-numeric: tabular-nums` for numeric score display.
-  - Use for: platform identifier chips, score numbers, raw score display, step counters (`Question 3 of 8`), technical metadata.
-  - Rationale: monospace makes scores feel like outputs of a technical scoring system rather than marketing copy. Enterprise dev tools use this pattern to signal precision.
+### Type Scale
 
-- **Type scale:**
-
-| Token    | Size  | Weight | Use                                  |
-|----------|-------|--------|--------------------------------------|
-| display  | 32px  | 700    | Welcome hero heading, question text  |
-| heading  | 24px  | 600/700| Results heading, section titles      |
-| subhead  | 20px  | 600    | Subsection headings                  |
-| body-lg  | 16px  | 400    | Welcome description, important body  |
-| body     | 14px  | 400    | Standard body, option descriptions   |
-| caption  | 12px  | 400    | Metadata, hints, secondary info      |
-| micro    | 11px  | 500    | Mono platform labels (all-caps)      |
+| Token | Size | Weight | Use |
+|---|---:|---:|---|
+| display | 56px / 3.5rem | 700 | First screen thesis, final recommendation headline |
+| title | 36px / 2.25rem | 700 | Page headings, major result titles |
+| heading | 26px / 1.625rem | 600 | Question text, section headings |
+| subhead | 20px / 1.25rem | 600 | Card titles, panel headings |
+| body-lg | 18px / 1.125rem | 400 | Lead copy, important explanations |
+| body | 15px / .9375rem | 400 | Standard UI copy |
+| caption | 13px / .8125rem | 400 | Secondary details |
+| mono | 12px / .75rem | 500-600 | Platform IDs, counters, score labels |
 
 ## Color
 
-- **Approach:** Restrained — one primary accent + semantic neutrals. Color is reserved and meaningful.
+- **Approach:** Restrained dark-primary system. One saturated signal color, cool graphite neutrals, semantic colors reserved for actual state.
 
-- **Primary:** `#0078D4` — Microsoft brand blue. Used for: interactive elements, progress bars, winner highlight, score bars, CTA buttons.
-- **Primary Dark:** `#005A9E` — Hover/pressed state for primary elements.
-- **Primary Light:** `#C7E0F4` — Badge backgrounds, winner card border accent.
-- **Primary XLight:** `#EFF6FC` — Selected state backgrounds, info alert backgrounds, winner card fill.
+| Token | Hex | Use |
+|---|---|---|
+| `--canvas` | `#0C0F14` | Page background |
+| `--surface` | `#151A22` | Main panels and cards |
+| `--surface-raised` | `#1D2430` | Active panels, selected options, result readouts |
+| `--surface-hot` | `#202A38` | Hover/active surface state |
+| `--text` | `#E8EDF5` | Primary text |
+| `--muted` | `#8B96A8` | Secondary text and explanatory copy |
+| `--border` | `#2A3342` | Default borders and dividers |
+| `--border-hot` | `#3C4A5F` | Active borders and panel lit edges |
+| `--accent` | `#2BA8FF` | Primary signal: winner, progress, focus, score rails, primary CTA |
+| `--accent-strong` | `#58C7FF` | Hover/focus highlights and high-emphasis labels |
+| `--accent-dim` | `#145A82` | Low-emphasis progress fills and quiet data visualization |
+| `--success` | `#4CC38A` | Strong fit, positive delta, success |
+| `--warning` | `#F2C94C` | Caveats, close calls, confidence warnings |
+| `--error` | `#FF6B6B` | Hard-rule conflicts and failures |
 
-- **Neutrals:**
-  - `#242424` — Text primary (headings, labels, important body)
-  - `#616161` — Text secondary (descriptions, hints, captions)
-  - `#A0A0A0` — Text disabled / placeholder
-  - `#D1D1D1` — Border (default)
-  - `#E8E8E8` — Border subtle (card edges, dividers)
-  - `#F5F5F5` — Canvas background base
-  - `#FFFFFF` — Card/surface background
-
-- **Canvas gradient:** `linear-gradient(135deg, #F0F6FF 0%, #F5F5F5 60%, #FAF5FF 100%)`
-  - Applied to `body` background. Subtle, not loud. Gives the tool a slightly premium feel vs pure neutral.
-
-- **Semantic:**
-  - Success: `#107C10` / bg `#DFF6DD` — Assessment complete, strong match
-  - Warning: `#C19C00` / bg `#FFF4CE` — Close match, confidence flag
-  - Error: `#A4262C` / bg `#FDE7E9` — Load failures, errors
-  - Info: `#0078D4` / bg `#EFF6FC` — Tips, informational callouts
-
-- **Dark mode strategy:** Redesign surfaces to dark neutrals; reduce blue saturation ~10%. Canvas `#1A1A1A`, card `#2A2A2A`, primary `#2899F5`, border `#3D3D3D`. Canvas gradient: `linear-gradient(135deg, #0F1B2D 0%, #1A1A1A 60%, #1A1525 100%)`. Implement with CSS custom properties under `[data-theme="dark"]`.
+- **Light mode:** Optional secondary mode, not the identity. If retained, invert the system deliberately instead of flattening to white cards. Use `#F4F7FB` canvas, `#FFFFFF` surface, `#172033` text, `#5D6B80` muted, and keep `#0078D4` or `#2B8CE8` as the Microsoft-compatible signal color.
+- **Contrast:** Body text must meet WCAG AA. Accent text on dark surfaces must be tested, not assumed.
 
 ## Spacing
 
-- **Base unit:** 4px
-- **Density:** Comfortable — not cramped, not wasteful. Fluent standard.
+- **Base unit:** 4px.
+- **Density:** Compact-comfortable. Tighter than a marketing page, less dense than a monitoring dashboard.
 
-| Token | Value | Common use                                |
-|-------|-------|-------------------------------------------|
-| sp-1  | 4px   | Icon gap, tight inline spacing           |
-| sp-2  | 8px   | Compact gap, badge padding               |
-| sp-3  | 12px  | Component internal padding               |
-| sp-4  | 16px  | Card internal gap, form field spacing    |
-| sp-5  | 20px  | List item padding                        |
-| sp-6  | 24px  | Section gap, card padding edge           |
-| sp-8  | 32px  | Major section spacing                    |
-| sp-10 | 40px  | Card body horizontal padding             |
-| sp-12 | 48px  | Welcome screen vertical padding          |
-| sp-16 | 64px  | Between major page sections              |
+| Token | Value | Use |
+|---|---:|---|
+| 2xs | 2px | Fine borders, tiny offsets |
+| xs | 4px | Tight inline gaps |
+| sm | 8px | Label gaps, compact padding |
+| md | 16px | Option padding, form rhythm |
+| lg | 24px | Panel padding, section internals |
+| xl | 32px | Major content spacing |
+| 2xl | 48px | Screen section gaps |
+| 3xl | 64px | First viewport rhythm |
 
 ## Layout
 
-- **Approach:** Grid-disciplined — strict centering, predictable alignment. Wizard steps always horizontally centered. Results use a 2×2 platform grid.
-- **Max content width:** `1024px`
-- **Page padding:** `0 24px` (mobile collapses gracefully)
-- **Border radius:**
-  - `sm`: 4px — buttons, inputs, small controls
-  - `md`: 8px — question options, result cards, badges
-  - `lg`: 12px — main card container, welcome icon wrapper
-  - `full`: 9999px — progress bar fill, step dots, round badges
-
-- **Elevation / Shadows:**
-  - `shadow-sm`: `0 1px 2px rgba(0,0,0,0.08)` — palette swatches, minor elements
-  - `shadow-md`: `0 2px 8px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06)` — main card
-  - `shadow-lg`: `0 4px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08)` — modals/overlays
+- **Approach:** Hybrid instrument layout. Use grid discipline for readability, but avoid symmetric card catalogs as the primary mental model.
+- **Primary workspace:** A decision workspace with three zones when space allows:
+  - Left: intent or live fit rail.
+  - Center: current question, recommendation, or scenario explanation.
+  - Right: evidence panel, score rationale, warnings, or next-step details.
+- **Explore page:** Group by mental model, not a flat gallery.
+  - Use agents: Microsoft 365 Copilot, Copilot Cowork, Microsoft Scout.
+  - Build agents: Agent Builder, Copilot Studio, Microsoft Foundry.
+- **Wizard:** The user should always know the current question, current progress, and how each answer affects recommendation confidence.
+- **Results:** The winning recommendation should feel like a diagnostic report: score delta, why it won, hard-rule notes, and next steps.
+- **Grid:** 12-column desktop grid, 8-column tablet grid, single-column mobile layout.
+- **Max content width:** 1200px for instrument workspace, 1024px for prose-heavy wizard panels.
+- **Border radius:** `sm: 4px`, `md: 8px`, `lg: 12px`, `full: 9999px`. Radius should express containment hierarchy, not bubbly decoration.
+- **Elevation:** Prefer borders, lit edges, and surface contrast over large shadows. Shadows may be used sparingly for modals.
 
 ## Motion
 
-- **Approach:** Minimal-functional — only transitions that aid comprehension or signal state changes. No decoration for its own sake.
-- **Easing:** `enter: ease-out` / `exit: ease-in` / `move: cubic-bezier(0.4, 0, 0.2, 1)`
+- **Approach:** Minimal-functional with one signature behavior: score/readout calibration.
+- **Easing:** enter `ease-out`, exit `ease-in`, move `cubic-bezier(0.4, 0, 0.2, 1)`.
 - **Duration:**
+  - micro: 50-100ms for hovers and focus.
+  - short: 150-220ms for option selection and panel changes.
+  - medium: 250-400ms for section transitions.
+  - long: 600-900ms for score rail calibration.
+- **Rules:**
+  - Animate transform, opacity, and score widths only.
+  - Do not use `transition: all`.
+  - Respect `prefers-reduced-motion`.
+  - Motion must explain state change. No decorative shimmer, bounce, or scroll theater.
 
-| Token  | Range      | Use                                          |
-|--------|------------|----------------------------------------------|
-| micro  | 50–100ms   | Button hover states, focus rings            |
-| short  | 150–200ms  | Card section fade-in, option hover           |
-| medium | 300–400ms  | Card enter/exit transitions (`fade-in`)     |
-| long   | 800–1200ms | Score bar animation on results reveal        |
+## Components and Patterns
 
-- **Score bar animation:** Ease-out cubic over ~1s. Bars animate from 0% to final width simultaneously on results reveal. Use `IntersectionObserver` — trigger when results grid enters viewport, not on page load.
-- **Progress bar:** Smooth fill `transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1)` on every question advance.
-- **Card transitions:** Existing `.fade-in` class is correct. Keep it.
+### Decision Rail
 
-## Platform Visual Identity
+Use a persistent or contextual rail to show current platform fit. Each row includes:
+- Mono platform ID.
+- Current score or fit label.
+- Thin signal bar.
+- Optional delta from leader.
 
-Each platform gets a short `font-family: var(--font-mono)` identifier chip shown in all-caps with letter-spacing. Never spell out the full name in the chip — use the ID-style token:
+The rail turns the advisor into an instrument and reduces the generic quiz feel.
 
-| Platform           | Chip label         |
-|--------------------|--------------------|
-| Copilot Studio     | `COPILOT_STUDIO`   |
-| Microsoft Foundry  | `MS_FOUNDRY`       |
-| M365 Copilot       | `M365_COPILOT`     |
-| Agent Builder      | `AGENT_BUILDER`    |
+### Evidence Panel
+
+Use a side panel or expandable section for:
+- Why the leading recommendation changed.
+- Hard-rule exclusions.
+- Confidence warnings.
+- Source/rationale links.
+- Next actions.
+
+### Option Cards
+
+Option cards are allowed only when they are the interaction. They must include a clear label, concise explanation, visible selected state, keyboard focus, and enough hit area for touch.
+
+### Explore Groups
+
+Explore should not be one undifferentiated six-card gallery. It must preserve the decision model:
+- Use agents.
+- Build agents.
+
+Each group needs a short explanation of what the group means before listing products.
+
+## Anti-Slop Rules
+
+Never introduce these patterns without explicit approval:
+
+- Purple/violet gradients as the default AI signal.
+- Generic three-column feature grids with icon, title, and two-line description.
+- Icons in colored circles as decoration.
+- Centered-everything hero sections.
+- Decorative blobs, waves, floating orbs, or soft abstract AI shapes.
+- Uniform large border radius on every element.
+- Gradient CTA buttons.
+- Stock-photo-style hero imagery.
+- Vague marketing copy like "unlock the power of AI" or "built for the future."
+- Flat white card galleries as the primary information architecture.
+
+## Accessibility
+
+- All interactive targets must be at least 44px tall or wide.
+- Every custom interactive element must have keyboard support and visible `:focus-visible`.
+- Body text contrast must meet 4.5:1. Large text and UI components must meet 3:1.
+- Do not encode status with color alone. Pair color with label, icon, or text.
+- Preserve visible labels. Never use placeholders as labels.
+- Support reduced motion.
+
+## Migration Guidance
+
+The current implementation may still use the older Fluent-light system until a redesign lands. Future visual work should migrate toward this system in coherent sections, not one token at a time. Prioritize:
+
+1. Explore page grouping and decision-model language.
+2. Result page diagnostic report styling.
+3. Wizard progress and score calibration behavior.
+4. Dark graphite token implementation.
+5. Typography migration to IBM Plex Sans and IBM Plex Mono.
 
 ## Decisions Log
 
-| Date       | Decision                         | Rationale                                                                 |
-|------------|----------------------------------|---------------------------------------------------------------------------|
-| 2026-03-20 | Initial design system created    | Created by /design-consultation. Fluent 2 + CAT identity for APA v2.    |
-| 2026-03-20 | Geist Mono for scores + labels   | Technical authority signal; enterprise dev tools use monospace for precision |
-| 2026-03-20 | Real MS brand blue #0078D4       | Replaces oversaturated #0090FF in v1 CSS; correct Fluent token           |
-| 2026-03-20 | Canvas gradient (subtle)         | Matches Microsoft modern product pages; lifts perceived quality vs pure neutral |
-| 2026-03-20 | Animated score bars              | Makes recommendation feel earned through visible computation, not instant |
+| Date | Decision | Rationale |
+|---|---|---|
+| 2026-07-20 | Replaced Fluent-light direction with Graphite Decision Instrument | Created by /design-consultation after the user chose to start fresh and selected "serious decision software for Microsoft AI builders and buyers" as the memorable thing. |
+| 2026-07-20 | IBM Plex Sans + IBM Plex Mono | Gives the product an engineered, technical voice without relying on Segoe as the visual signature. |
+| 2026-07-20 | Dark graphite + Azure-cyan signal color | Raises memorability and lowers AI-slop risk while preserving a Microsoft-adjacent trust cue. |
+| 2026-07-20 | Explore by Use agents / Build agents | Keeps the information architecture aligned with how users decide, instead of flattening everything into a six-card gallery. |
