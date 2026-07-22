@@ -585,12 +585,39 @@ recommendations:
       - Use Agent Builder for simple no-code Microsoft 365 Copilot knowledge agents
 
   # ---------------------------------------------------------------------------
-  # Personal agents (delegate path only) — Cowork and Scout are ready-made
-  # agents you delegate work to and extend with skills/plugins, rather than
+  # Ready-made agent entry points (entry-point wizard only) — Copilot Chat,
+  # Cowork, and Scout are places an end user goes to get work done, not
   # platforms you build agents on. They are NOT part of the scored wizard and
   # never appear in meta.platforms. They are reached only via the prescreen
-  # "Delegate work to a personal agent" path.
+  # "Help me find the right place to get work done" path, which asks about the
+  # work pattern (involvement, cadence, reach) instead of product names.
   # ---------------------------------------------------------------------------
+
+  copilot_chat:
+    headline: Copilot Chat
+    description: The conversational Microsoft 365 Copilot experience where you ask questions, summarize, draft, and invoke agents in the flow of your work
+    resources_url: https://learn.microsoft.com/microsoft-365-copilot/
+    scoring_summary: Best when you want to stay hands-on and get answers or drafts in the flow of work.
+    exploration_best_for: Ask, summarize, and draft in the flow of work
+    exploration_summary: >
+      Copilot Chat is the conversational front door to Microsoft 365 Copilot — you
+      ask, iterate, and get answers, summaries, and drafts yourself, and you can call
+      agents when you need them. Ideal for broad, ad hoc, user-initiated help without
+      handing off a whole task.
+    summary: >
+      Stay hands-on and get answers, summaries, and drafts conversationally across
+      Microsoft 365 — the fastest place to start when you are not delegating a whole task.
+    best_for:
+      - Ad hoc, user-initiated questions, summaries, and drafting
+      - Working through a task yourself rather than handing it off
+      - Invoking agents on demand from the flow of Microsoft 365 work
+      - Grounded in your Microsoft 365 context (email, meetings, files, messages)
+    watch_out_for:
+      - You stay in the loop — it does not run a multi-step task end to end on its own
+      - Not always-on or proactively monitoring
+      - Use a built-in Microsoft 365 Copilot agent (Researcher, Analyst, Facilitator, Interpreter) instead when the task is a specialized job it already handles
+      - Use Cowork instead when you want to delegate a bounded, multi-step deliverable
+      - Use Scout instead when work should continue or act over time
 
   cowork:
     headline: Copilot Cowork
@@ -617,6 +644,8 @@ recommendations:
       - Centered on Microsoft 365 — no desktop, shell, browser, or local-file runtime
       - Usage-based billing through Copilot Credits
       - Take actions like sending email or posting in Teams require explicit approval
+      - Use Copilot Chat instead when you just want to ask and iterate yourself
+      - Use Scout instead when work should run continuously or reach beyond Microsoft 365
 
   scout:
     headline: Microsoft Scout
@@ -645,5 +674,7 @@ recommendations:
       - Gated through Frontier enrollment, Intune policy, attestation, and GitHub Copilot licensing
       - Desktop application for Windows and macOS
       - Sensitive actions (sending email, writing files, running commands) require approval
+      - Use Cowork instead when the work is a bounded Microsoft 365 deliverable done on demand
+      - Use Copilot Chat instead when you just want to ask and iterate yourself
 
 ################################################################################

@@ -9,9 +9,49 @@ async function openDelegate(page) {
   await expect(page.locator('#delegate-section')).toBeVisible();
 }
 
-test.describe('Delegate Path (Cowork / Scout)', () => {
+async function chooseDelegate(page) {
+  await page.locator('.delegate-option[data-group="involvement"][data-value="delegate"]').click();
+}
+
+test.describe('Entry-point wizard (Copilot Chat / Cowork / Scout)', () => {
+  test('interactive + general help recommends Copilot Chat', async ({ page }) => {
+    await openDelegate(page);
+    await page.locator('.delegate-option[data-group="involvement"][data-value="interactive"]').click();
+    // The interactive follow-up (task type) is now revealed; button stays disabled until answered
+    await expect(page.locator('#interactive-followup')).toHaveClass(/is-open/);
+    await expect(page.locator('#delegate-next-btn')).toBeDisabled();
+    await page.locator('.delegate-option[data-group="taskType"][data-value="general"]').click();
+    await expect(page.locator('#delegate-next-btn')).toBeEnabled();
+    await page.locator('#delegate-next-btn').click();
+
+    await expect(page.locator('#recommendation-section')).toBeVisible();
+    await expect(page.locator('#rec-primary-card')).toContainText('Copilot Chat');
+    await expect(page.locator('#rec-second-card')).toBeEmpty();
+  });
+
+  test('interactive + specialized job recommends Microsoft 365 Copilot built-in agents', async ({ page }) => {
+    await openDelegate(page);
+    await page.locator('.delegate-option[data-group="involvement"][data-value="interactive"]').click();
+    await page.locator('.delegate-option[data-group="taskType"][data-value="specialized"]').click();
+    await page.locator('#delegate-next-btn').click();
+
+    await expect(page.locator('#recommendation-section')).toBeVisible();
+    await expect(page.locator('#rec-primary-card')).toContainText('Microsoft 365 Copilot');
+    await expect(page.locator('#rec-second-card')).toBeEmpty();
+  });
+
+  test('only the relevant follow-up is revealed as you answer', async ({ page }) => {
+    await openDelegate(page);
+    await expect(page.locator('#delegate-followup')).not.toHaveClass(/is-open/);
+    await expect(page.locator('#interactive-followup')).not.toHaveClass(/is-open/);
+    await chooseDelegate(page);
+    await expect(page.locator('#delegate-followup')).toHaveClass(/is-open/);
+    await expect(page.locator('#interactive-followup')).not.toHaveClass(/is-open/);
+  });
+
   test('on-demand + Microsoft 365 recommends Cowork', async ({ page }) => {
     await openDelegate(page);
+    await chooseDelegate(page);
     await page.locator('.delegate-option[data-group="cadence"][data-value="ondemand"]').click();
     await page.locator('.delegate-option[data-group="reach"][data-value="m365"]').click();
     await page.locator('#delegate-next-btn').click();
@@ -23,6 +63,7 @@ test.describe('Delegate Path (Cowork / Scout)', () => {
 
   test('continuous work recommends Scout', async ({ page }) => {
     await openDelegate(page);
+    await chooseDelegate(page);
     await page.locator('.delegate-option[data-group="cadence"][data-value="continuous"]').click();
     await page.locator('.delegate-option[data-group="reach"][data-value="m365"]').click();
     await page.locator('#delegate-next-btn').click();
@@ -32,6 +73,7 @@ test.describe('Delegate Path (Cowork / Scout)', () => {
 
   test('cross-environment reach recommends Scout', async ({ page }) => {
     await openDelegate(page);
+    await chooseDelegate(page);
     await page.locator('.delegate-option[data-group="cadence"][data-value="ondemand"]').click();
     await page.locator('.delegate-option[data-group="reach"][data-value="cross"]').click();
     await page.locator('#delegate-next-btn').click();
@@ -41,6 +83,7 @@ test.describe('Delegate Path (Cowork / Scout)', () => {
 
   test('undecided answers present both as a complementary pair', async ({ page }) => {
     await openDelegate(page);
+    await chooseDelegate(page);
     await page.locator('.delegate-option[data-group="cadence"][data-value="unsure"]').click();
     await page.locator('.delegate-option[data-group="reach"][data-value="m365"]').click();
     await page.locator('#delegate-next-btn').click();
@@ -50,8 +93,11 @@ test.describe('Delegate Path (Cowork / Scout)', () => {
     await expect(page.locator('#rec-second-card')).toContainText('Microsoft Scout');
   });
 
-  test('button is disabled until both questions answered', async ({ page }) => {
+  test('button is disabled until the wizard has enough answers', async ({ page }) => {
     await openDelegate(page);
+    await expect(page.locator('#delegate-next-btn')).toBeDisabled();
+    await chooseDelegate(page);
+    // Delegating requires cadence + reach
     await expect(page.locator('#delegate-next-btn')).toBeDisabled();
     await page.locator('.delegate-option[data-group="cadence"][data-value="ondemand"]').click();
     await expect(page.locator('#delegate-next-btn')).toBeDisabled();
@@ -59,8 +105,24 @@ test.describe('Delegate Path (Cowork / Scout)', () => {
     await expect(page.locator('#delegate-next-btn')).toBeEnabled();
   });
 
-  test('delegate result hides scored UI', async ({ page }) => {
+  test('switching from delegate to interactive swaps the follow-up questions', async ({ page }) => {
     await openDelegate(page);
+    await chooseDelegate(page);
+    await page.locator('.delegate-option[data-group="cadence"][data-value="ondemand"]').click();
+    await page.locator('.delegate-option[data-group="involvement"][data-value="interactive"]').click();
+    // Delegate follow-up collapses; interactive follow-up opens and gates the button
+    await expect(page.locator('#delegate-followup')).not.toHaveClass(/is-open/);
+    await expect(page.locator('#interactive-followup')).toHaveClass(/is-open/);
+    await expect(page.locator('#delegate-next-btn')).toBeDisabled();
+    await page.locator('.delegate-option[data-group="taskType"][data-value="general"]').click();
+    await expect(page.locator('#delegate-next-btn')).toBeEnabled();
+    await page.locator('#delegate-next-btn').click();
+    await expect(page.locator('#rec-primary-card')).toContainText('Copilot Chat');
+  });
+
+  test('entry-point result hides scored UI', async ({ page }) => {
+    await openDelegate(page);
+    await chooseDelegate(page);
     await page.locator('.delegate-option[data-group="cadence"][data-value="continuous"]').click();
     await page.locator('.delegate-option[data-group="reach"][data-value="cross"]').click();
     await page.locator('#delegate-next-btn').click();
@@ -71,7 +133,13 @@ test.describe('Delegate Path (Cowork / Scout)', () => {
     await expect(page.locator('#rec-nav')).toBeHidden();
   });
 
-  test('delegate result via URL params', async ({ page }) => {
+  test('Copilot Chat result via URL params', async ({ page }) => {
+    await page.goto('/?dt=copilot_chat&r=copilot_chat&d=20260713&mode=card');
+    await expect(page.locator('#recommendation-section')).toBeVisible();
+    await expect(page.locator('#rec-primary-card')).toContainText('Copilot Chat');
+  });
+
+  test('Scout result via URL params', async ({ page }) => {
     await page.goto('/?dt=scout&r=scout&d=20260713&mode=card');
     await expect(page.locator('#recommendation-section')).toBeVisible();
     await expect(page.locator('#rec-primary-card')).toContainText('Microsoft Scout');
@@ -89,10 +157,8 @@ test.describe('Delegate Path (Cowork / Scout)', () => {
     await expect(page.locator('#prescreen-section')).toBeVisible();
   });
 
-  test('Cowork spotlight no longer appears on M365 fast-track card', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('#start-btn').click();
-    await page.locator('#prescreen-yes').click();
+  test('Microsoft 365 Copilot card shows no Cowork spotlight', async ({ page }) => {
+    await page.goto('/?dt=m365_copilot&r=m365_copilot&d=20260713&mode=card');
     await expect(page.locator('#rec-primary-card')).toContainText('Microsoft 365 Copilot');
     await expect(page.locator('#rec-primary-card .rec-spotlight')).toHaveCount(0);
   });

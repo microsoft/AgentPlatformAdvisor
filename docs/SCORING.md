@@ -13,23 +13,45 @@ Reference document for how the APA scoring engine works. All data is driven from
 
 M365 Copilot is excluded from the scored assessment. It is only recommended via the prescreen fast-track path. In the full wizard, `m365_copilot` is always zeroed.
 
-## Non-scored destinations: personal agents (Cowork & Scout)
+## Non-scored destinations: entry-point wizard (Copilot Chat, M365 built-in agents, Cowork & Scout)
 
-Cowork and Scout are **not** build platforms — they are ready-made personal agents you delegate work to (and can extend with skills/plugins). They are **not** part of the scored wizard, are **not** in `meta.platforms`, and never enter the 0–15 sum. They are reached only via the prescreen path **"I'd like a ready-made agent to do work for me,"** which opens a two-question micro-decision:
+Copilot Chat, Microsoft 365 Copilot's built-in agents, Cowork, and Scout are **not** build platforms — they are ready-made places to *get work done*, not platforms you build on. They are **not** part of the scored wizard, are **not** in `meta.platforms`, and never enter the 0–15 sum. They are reached via the prescreen path **"Help me find the right place to get work done,"** which opens a short **entry-point wizard** ("Where should you get this work done?"). This wizard exists because Microsoft asks end users to choose between too many entry points (Copilot Chat vs. built-in agents vs. Cowork vs. Scout); the wizard resolves that choice from work patterns instead of product names. There is no longer a separate "built-in Microsoft 365 Copilot experience" prescreen tile — that destination now lives inside this wizard.
+
+The first question forks the flow:
 
 | Question | Options |
 |---|---|
-| **Cadence** — how should the agent work? | On-demand (defined task now) · Continuous (always-on monitoring) · Not sure |
-| **Reach** — where does it need to reach? | Microsoft 365 only · Also desktop/browser/local/CLI · Not sure |
+| **Involvement** — how do you want to work? | Stay hands-on and iterate turn-by-turn · Hand it off and let an agent run |
 
-**Routing rule** (`resolveDelegateResult` in `apa.js`):
+- **Hands-on / interactive** → a follow-up asks **what kind of task** it is:
+
+  | Question | Options |
+  |---|---|
+  | **Task type** | General help (brainstorm, find info, catch up on email/meetings, draft & edit documents) · A specialized task (deep research, data analysis, meeting facilitation, translation) |
+
+  General → **Copilot Chat**; specialized → **Microsoft 365 Copilot's built-in agents** (`m365_copilot`: Researcher, Analyst, Facilitator, Interpreter, …).
+
+- **Hand it off / delegate** → two follow-up questions decide between Cowork and Scout:
+
+  | Question | Options |
+  |---|---|
+  | **Cadence** — how should the agent work? | On-demand (finish a multi-step job in one go — several artifacts or a process across systems) · Continuous (always-on, manage & coordinate my day) · Not sure |
+  | **Reach** — where does it need to reach? | Microsoft 365 only · Also desktop/browser/local/CLI · Not sure |
+
+**Routing rule** (`resolveDelegateResult(involvement, taskType, cadence, reach)` in `apa.js`):
 
 | Condition | Result |
 |---|---|
+| Involvement = interactive **and** Task type = specialized | **Microsoft 365 Copilot built-in agents** (`m365_copilot`) |
+| Involvement = interactive **and** Task type = general | **Copilot Chat** |
 | Cadence = continuous | **Scout** |
 | Reach = cross-environment | **Scout** |
 | Cadence = on-demand **and** Reach = Microsoft 365 | **Cowork** |
-| Otherwise (undecided signals) | **Both**, shown as a complementary pair |
+| Otherwise (undecided signals) | **Both** (Cowork + Scout), shown as a complementary pair |
+
+**Readiness** (`isDelegateReady` in `apa.js`): interactive requires a task type; delegate requires both cadence and reach before the wizard can finish.
+
+> `m365_copilot` still exists in `meta.platforms` for content, but is always zeroed in the scored wizard (`if (!fastTrack) zeroed['m365_copilot'] = true`) — it only surfaces as this wizard destination. The legacy `?ft=1` share link still resolves to the same card for backward compatibility.
 
 ## Questions and Scoring Matrix
 

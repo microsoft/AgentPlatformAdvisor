@@ -2,14 +2,17 @@
 flowchart TD
     START([Start]) --> PRESCREEN{"**Prescreen: Where would you like to begin?**"}
 
-    PRESCREEN -->|Built-in M365 Copilot experience| M365FT["Fast-track → Microsoft 365 Copilot\n(non-scored)"]
-    PRESCREEN -->|Ready-made agent to do work for me| DELEGATE{"**Delegate micro-decision**\n(non-scored)"}
+    PRESCREEN -->|Help me find the right place to get work done| DELEGATE{"**Entry-point wizard**\nWhere should you get this work done?\n(non-scored)"}
     PRESCREEN -->|Explore what's possible| EXPLORE["Explore grid\n(all platforms + Cowork + Scout)"]
     PRESCREEN -->|Build a custom agent| Q1
 
-    DELEGATE -->|"Cadence: continuous OR Reach: cross-environment"| SCOUT["**Microsoft Scout**\nAlways-on Autopilot across desktop, browser, M365\n(Frontier preview)"]
-    DELEGATE -->|"Cadence: on-demand AND Reach: Microsoft 365"| COWORK["**Copilot Cowork**\nOn-demand multi-step M365 deliverables"]
-    DELEGATE -->|"Undecided signals"| BOTH["**Both** — complementary pair\nScout monitors · Cowork delivers"]
+    DELEGATE -->|"Involvement: stay hands-on / iterate"| INTERACTIVE{"**Interactive follow-up**\nWhat kind of task?"}
+    DELEGATE -->|"Involvement: hand it off"| DELEGATE2{"**Delegate follow-up**\nCadence + Reach"}
+    INTERACTIVE -->|"General help"| CHAT["**Copilot Chat**\nInteractive, turn-by-turn assistance"]
+    INTERACTIVE -->|"Specialized job (research, data, meetings, translation)"| M365AGENTS["**Microsoft 365 Copilot built-in agents**\nResearcher · Analyst · Facilitator · Interpreter …"]
+    DELEGATE2 -->|"Cadence: continuous OR Reach: cross-environment"| SCOUT["**Microsoft Scout**\nAlways-on Autopilot across desktop, browser, M365\n(Frontier preview)"]
+    DELEGATE2 -->|"Cadence: on-demand AND Reach: Microsoft 365"| COWORK["**Copilot Cowork**\nOn-demand multi-step M365 deliverables"]
+    DELEGATE2 -->|"Undecided signals"| BOTH["**Both** — complementary pair\nScout monitors · Cowork delivers"]
 
     Q1["**Q1: Who is building this agent?**"]
     Q1 -->|Business user / no code| Q1A["AB:3 · CS:1 · Foundry:0"]
@@ -66,9 +69,12 @@ flowchart TD
     style Q1D fill:#e8f0fe,stroke:#4a86e8
     style SCOUT fill:#ECEBFB,stroke:#5B5FC7
     style COWORK fill:#ECEBFB,stroke:#5B5FC7
+    style CHAT fill:#ECEBFB,stroke:#5B5FC7
+    style M365AGENTS fill:#ECEBFB,stroke:#5B5FC7
     style BOTH fill:#ECEBFB,stroke:#5B5FC7
     style DELEGATE fill:#ECEBFB,stroke:#5B5FC7
-    style M365FT fill:#e8f4fd,stroke:#0078D4
+    style DELEGATE2 fill:#ECEBFB,stroke:#5B5FC7
+    style INTERACTIVE fill:#ECEBFB,stroke:#5B5FC7
     style Q8B fill:#fff3cd,stroke:#ffc107
     style Q2B fill:#fff3cd,stroke:#ffc107
     style Q2C fill:#fff3cd,stroke:#ffc107

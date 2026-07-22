@@ -8,13 +8,12 @@ The live tool is at [https://microsoft.github.io/AgentPlatformAdvisor/index.html
 
 ## What it does
 
-The Agent Platform Advisor is a static single-page web app that helps people navigate the Microsoft agent landscape. It has evolved from a simple build-platform picker into a broader advisor for three distinct intents:
+The Agent Platform Advisor is a static single-page web app that helps people navigate the Microsoft agent landscape. It has evolved from a simple build-platform picker into a broader advisor for two distinct intents:
 
-1. **Use agents** — start with built-in Microsoft 365 Copilot experiences when they already cover the need.
-2. **Delegate work** — choose between ready-made personal agents, **Copilot Cowork** and **Microsoft Scout**.
-3. **Build agents** — answer a scored assessment that recommends **Agent Builder**, **Copilot Studio**, or **Microsoft Foundry**.
+1. **Get work done** — an entry-point wizard routes end users to the right place to do the work — **Copilot Chat**, **Microsoft 365 Copilot's built-in agents**, **Copilot Cowork**, or **Microsoft Scout** — based on how the work should happen, not which product they name.
+2. **Build agents** — answer a scored assessment that recommends **Agent Builder**, **Copilot Studio**, or **Microsoft Foundry**.
 
-The start page presents six ways to use or build agents:
+The start page presents ways to use or build agents:
 
 | Intent | Destination | Best for |
 |---|---|---|
@@ -27,12 +26,11 @@ The start page presents six ways to use or build agents:
 
 ## User paths
 
-From **Get Started**, users choose one of four paths:
+From **Get Started**, users choose one of three paths:
 
-1. **Built-in Microsoft 365 Copilot fast-track** — skips the wizard and recommends Microsoft 365 Copilot when first-party Copilot capabilities and agents already solve the scenario.
-2. **Ready-made agent delegation** — asks two routing questions, then recommends Cowork, Scout, or both as a complementary pair.
-3. **Custom agent assessment** — runs the scored 5-question wizard for Agent Builder, Copilot Studio, and Foundry.
-4. **Explore what's possible** — compares ways to use or build agents before deciding whether to take the assessment.
+1. **Entry-point wizard** ("Help me find the right place to get work done") — asks how hands-on you want to be, then routes to Copilot Chat, Microsoft 365 Copilot's built-in agents, Cowork, Scout, or a Cowork+Scout pair. Non-scored.
+2. **Custom agent assessment** — runs the scored 5-question wizard for Agent Builder, Copilot Studio, and Foundry.
+3. **Explore what's possible** — compares ways to use or build agents before deciding whether to take the assessment.
 
 The custom agent assessment asks about:
 
@@ -78,20 +76,18 @@ The app is purely static: no backend, no bundler, and no build step. `index.html
 
 See [docs/SCORING.md](docs/SCORING.md) for the full reference and [docs/FLOWCHART.md](docs/FLOWCHART.md) for the visual decision tree.
 
-There are three recommendation modes:
+There are two recommendation modes:
 
-1. **Microsoft 365 Copilot fast-track** is non-scored. It is selected only when the user explicitly wants a built-in Microsoft 365 Copilot experience.
-2. **Cowork and Scout delegation** is non-scored. A two-question micro-decision routes on cadence and reach:
-   - Continuous work or cross-environment reach -> Scout
-   - On-demand work inside Microsoft 365 -> Cowork
-   - Undecided signals -> both
-3. **Custom agent assessment** is scored across Agent Builder, Copilot Studio, and Foundry:
+1. **Entry-point wizard** is non-scored. It first asks how hands-on the user wants to be:
+   - Hands-on → a task-type question: general help -> Copilot Chat; a specialized job (research, data, meetings, translation) -> Microsoft 365 Copilot's built-in agents
+   - Hand it off → cadence + reach questions: continuous work or cross-environment reach -> Scout; on-demand work inside Microsoft 365 -> Cowork; undecided signals -> both
+2. **Custom agent assessment** is scored across Agent Builder, Copilot Studio, and Foundry:
    - Hard rules zero out platforms for disqualifying combinations before scoring.
    - Raw scores sum across 5 questions, with a maximum of 15 points per platform.
    - Persona preferences and tiebreakers adjust ranking when scores are tied or misleading for the selected builder persona.
    - Thresholds map scores to fit labels: Strong fit (12-15), Good fit (8-11), Partial fit (4-7), Not recommended (0-3).
 
-Microsoft 365 Copilot, Cowork, and Scout are not part of the 0-15 scored wizard. They are reached only through their prescreen paths.
+Copilot Chat, Microsoft 365 Copilot, Cowork, and Scout are not part of the 0-15 scored wizard. They are reached only through the entry-point wizard.
 
 ## Current platform positioning
 

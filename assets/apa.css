@@ -419,14 +419,6 @@ body {
   flex-shrink: 0;
 }
 
-.prescreen-option-icon--builtin {
-  background: var(--primary-xlight);
-  color: var(--primary);
-}
-.prescreen-option--builtin {
-  border-left-color: var(--primary);
-}
-
 .prescreen-option-icon--custom {
   background: rgba(76, 195, 138, 0.12);
   color: var(--success);
@@ -476,6 +468,42 @@ body {
   font-weight: 600;
   margin: 0 0 12px;
   color: var(--foreground);
+}
+
+/* Follow-up questions revealed progressively as the user answers the step above.
+   Uses the grid 0fr->1fr technique for a smooth height change with no layout jump. */
+.delegate-followup {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-4px);
+  visibility: hidden;
+  transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms ease-out,
+              transform 180ms ease-out,
+              visibility 0s linear 220ms;
+}
+.delegate-followup-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.delegate-followup.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 180ms ease-out,
+              transform 180ms ease-out,
+              visibility 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .delegate-followup {
+    transition: visibility 0s linear 0ms;
+  }
+  .delegate-followup.is-open {
+    transition: none;
+  }
 }
 
 /* Assessment navigation */

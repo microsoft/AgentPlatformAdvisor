@@ -193,29 +193,16 @@
       Choose a starting point. This helps us tailor the best recommendation for you.
     </p>
     <div class="options-list">
-      <div class="option-card prescreen-option prescreen-option--builtin" id="prescreen-yes" role="button" tabindex="0" onclick="handlePrescreenYes()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenYes()}">
-        <div class="prescreen-option-icon prescreen-option-icon--builtin">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        </div>
-        <div class="option-content">
-          <div class="option-label">
-            I'd like to start with a built-in Microsoft 365 Copilot experience
-          </div>
-          <div class="option-description">
-            Explore first-party agents and built-in Copilot capabilities across Teams, Outlook, and SharePoint — like Researcher, Analyst, Facilitator, and Interpreter
-          </div>
-        </div>
-      </div>
       <div class="option-card prescreen-option prescreen-option--delegate" id="prescreen-delegate" role="button" tabindex="0" onclick="handlePrescreenDelegate()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenDelegate()}">
         <div class="prescreen-option-icon prescreen-option-icon--delegate">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <div class="option-content">
           <div class="option-label">
-            I'd like a ready-made agent to do work for me
+            Help me find the right place to get work done
           </div>
           <div class="option-description">
-            Leverage personal agents that plan and complete multi-step work on my behalf and can be extended with custom skills and plugins
+            Answer a few quick questions about how you want the work to happen, and we'll point you to the best place to do it
           </div>
         </div>
       </div>
@@ -251,19 +238,47 @@
         <div id="delegate-section" class="fade-in hidden"><div class="card">
   <div class="card-content card-content--centered">
     <a href="#" class="exploration-back" onclick="showSection('prescreen-section');pushState('prescreen-section');return false">← Back to options</a>
-    <h2 class="prescreen-heading">Which personal agent fits?</h2>
+    <h2 class="prescreen-heading">Where should you get this work done?</h2>
     <p class="prescreen-description">
-      Cowork and Scout both do work on your behalf and can be extended with skills and plugins.
-      Answer two quick questions and we'll point you to the right one.
+      Copilot Chat, Microsoft 365 Copilot's built-in agents, Cowork, and Scout are all places to
+      get work done. Answer a couple of quick questions and we'll point you to the best entry point.
     </p>
     <div class="delegate-question">
-      <h3 class="delegate-question-title">How should the agent work?</h3>
+      <h3 class="delegate-question-title">How hands-on do you want to be?</h3>
+      <div class="options-list">
+        <div class="option-card delegate-option" data-group="involvement" data-value="interactive" role="button" tabindex="0" onclick="selectDelegateOption(this,'involvement','interactive')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'involvement','interactive')}">
+          <div class="option-content"><div class="option-label">I'll ask questions and work through it myself</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="involvement" data-value="delegate" role="button" tabindex="0" onclick="selectDelegateOption(this,'involvement','delegate')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'involvement','delegate')}">
+          <div class="option-content"><div class="option-label">Hand off the whole task and give me the result</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="interactive-followup" class="delegate-followup" aria-hidden="true">
+    <div class="delegate-followup-inner">
+    <div class="delegate-question">
+      <h3 class="delegate-question-title">What kind of task is it?</h3>
+      <div class="options-list">
+        <div class="option-card delegate-option" data-group="taskType" data-value="general" role="button" tabindex="0" onclick="selectDelegateOption(this,'taskType','general')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'taskType','general')}">
+          <div class="option-content"><div class="option-label">General help — brainstorm, find info, catch up on email or meetings, draft and edit documents</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="taskType" data-value="specialized" role="button" tabindex="0" onclick="selectDelegateOption(this,'taskType','specialized')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'taskType','specialized')}">
+          <div class="option-content"><div class="option-label">A specialized task — deep research, data analysis, meeting facilitation, or translation</div></div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+    <div id="delegate-followup" class="delegate-followup" aria-hidden="true">
+    <div class="delegate-followup-inner">
+    <div class="delegate-question">
+      <h3 class="delegate-question-title">Should it finish and hand back, or keep working over time?</h3>
       <div class="options-list">
         <div class="option-card delegate-option" data-group="cadence" data-value="ondemand" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','ondemand')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','ondemand')}">
-          <div class="option-content"><div class="option-label">Complete a defined task now and hand me the result</div></div>
+          <div class="option-content"><div class="option-label">Finish a multi-step job in one go — several artifacts, or a process across systems — and hand me the result</div></div>
         </div>
         <div class="option-card delegate-option" data-group="cadence" data-value="continuous" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','continuous')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','continuous')}">
-          <div class="option-content"><div class="option-label">Stay on continuously — monitor, follow up, and act over time</div></div>
+          <div class="option-content"><div class="option-label">Stay always-on — manage and coordinate my day, following up and acting over time</div></div>
         </div>
         <div class="option-card delegate-option" data-group="cadence" data-value="unsure" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','unsure')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','unsure')}">
           <div class="option-content"><div class="option-label">Not sure yet</div></div>
@@ -283,6 +298,8 @@
           <div class="option-content"><div class="option-label">Not sure yet</div></div>
         </div>
       </div>
+    </div>
+    </div>
     </div>
     <div class="center assessment-nav">
       <button class="btn btn-primary" id="delegate-next-btn" disabled onclick="finishDelegate()">

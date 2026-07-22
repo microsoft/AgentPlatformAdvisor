@@ -4,6 +4,21 @@ All notable changes to Agent Platform Advisor are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), organized by repository commit date.
 
+## Unreleased
+
+### Changed
+
+- **Replaced the two-question delegate path with an entry-point wizard** ("Where should you get this work done?") that helps end users choose between Copilot Chat, Microsoft 365 Copilot's built-in agents, Cowork, and Scout from work patterns instead of product names — addressing the pain point of Microsoft asking users to pick among too many entry points.
+  - New first question — **Involvement**: stay hands-on and iterate vs. hand it off to an agent.
+  - **Hands-on** now asks a follow-up — **Task type**: general help (→ **Copilot Chat**) vs. a specialized task (→ **Microsoft 365 Copilot built-in agents**: Researcher, Analyst, Facilitator, Interpreter, …).
+  - **Hand it off** asks Cadence + Reach (→ **Cowork**, **Scout**, or both). The wizard uses **progressive disclosure**: each follow-up is revealed only when its branch is chosen (smooth grid expand, respects `prefers-reduced-motion`), and collapsed follow-ups leave the tab order — no dimmed/greyed dead content.
+  - **Removed the standalone "built-in Microsoft 365 Copilot experience" prescreen tile** — that destination is now reached through the wizard, eliminating the naming overlap with Copilot Chat. `m365_copilot` is reused as the wizard destination; the legacy `?ft=1` share link still resolves to the same card.
+  - Reframed the prescreen entry to **"Help me find the right place to get work done."**
+  - Added a `copilot_chat` recommendation block to `apa.yaml` with `use X instead when…` cross-references to the built-in agents, Cowork, and Scout (and vice versa).
+  - Shareable via `?dt=copilot_chat` and `?dt=m365_copilot`.
+  - Tightened the wizard option copy to echo the "Microsoft 365 Copilot: what to use and when" task vocabulary — general help (brainstorm, find info, catch up on email/meetings, draft & edit docs), on-demand (multi-step job / multiple artifacts in one go), and continuous (always-on, manage & coordinate my day) — so users self-identify faster.
+  - Updated `docs/SCORING.md` and `docs/FLOWCHART.md`; extended Playwright coverage for the entry-point wizard and built-in-agents destination.
+
 ## 2026-07-20
 
 ### Added
