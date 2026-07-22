@@ -2,8 +2,8 @@
 let apa = null; // populated from YAML
 let answers = {}; // { q1: 'q1a', q2: 'q2b', ... }
 let fastTrack = false;
-let delegateResult = null; // 'cowork' | 'scout' | 'both' — set on the delegate path
-let delegateAnswers = {}; // { cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
+let delegateResult = null; // 'copilot_chat' | 'm365_copilot' | 'cowork' | 'scout' | 'both' — set on the entry-point path
+let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
 let currentQuestionIndex = 0;
 let listenersReady = false;
 let recommendedPlatformId = null;
@@ -247,6 +247,7 @@ const PLATFORM_ICONS = {
   m365_copilot:   'images/m365-copilot-logo.png',
   copilot_studio: 'images/copilot-studio.png',
   foundry:        'images/foundry.svg',
+  copilot_chat:   'images/copilot.png',
   cowork:         'images/cowork.png',
   scout:          'images/scout.svg',
 };
@@ -475,16 +476,6 @@ function setupListeners() {
   document.getElementById('prev-btn').addEventListener('click', handlePrev);
 }
 
-function handlePrescreenYes() {
-  fastTrack = true;
-  delegateResult = null;
-  answers = {};
-  if (typeof clarity === 'function') clarity('set', 'fast_track', 'true');
-  renderRecommendation();
-  showSection('recommendation-section');
-  pushState('recommendation-section');
-}
-
 function handlePrescreenNo() {
   fastTrack = false;
   delegateResult = null;
@@ -508,6 +499,13 @@ function handlePrescreenDelegate() {
   delegateAnswers = {};
   // Reset any prior selections in the static delegate section
   document.querySelectorAll('#delegate-section .delegate-option').forEach(el => el.classList.remove('selected'));
+  ['interactive-followup', 'delegate-followup'].forEach(id => {
+    const followup = document.getElementById(id);
+    if (followup) {
+      followup.classList.remove('is-open');
+      followup.setAttribute('aria-hidden', 'true');
+    }
+  });
   const btn = document.getElementById('delegate-next-btn');
   if (btn) btn.disabled = true;
   if (typeof clarity === 'function') clarity('set', 'delegate_path', 'true');
@@ -519,16 +517,50 @@ function selectDelegateOption(el, group, value) {
   delegateAnswers[group] = value;
   document.querySelectorAll(`#delegate-section .delegate-option[data-group="${group}"]`)
     .forEach(o => o.classList.toggle('selected', o === el));
-  const ready = delegateAnswers.cadence && delegateAnswers.reach;
+
+  // The involvement answer controls which follow-up questions apply.
+  // Interactive → ask what kind of task (Copilot Chat vs. a built-in M365 agent).
+  // Delegate → ask cadence + reach (Cowork vs. Scout).
+  if (group === 'involvement') {
+    setFollowupEnabled('interactive-followup', value === 'interactive', ['taskType']);
+    setFollowupEnabled('delegate-followup', value === 'delegate', ['cadence', 'reach']);
+  }
+
   const btn = document.getElementById('delegate-next-btn');
-  if (btn) btn.disabled = !ready;
+  if (btn) btn.disabled = !isDelegateReady();
 }
 
-// Routing rule from the Cowork vs Scout decision framework:
-// Scout wins if the work is continuous OR reaches beyond Microsoft 365;
+// Enable/disable a follow-up block, clearing its stale answers and selections when hidden.
+function setFollowupEnabled(id, enabled, groups) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('is-open', enabled);
+  el.setAttribute('aria-hidden', String(!enabled));
+  if (!enabled) {
+    groups.forEach(g => delete delegateAnswers[g]);
+    el.querySelectorAll('.delegate-option').forEach(o => o.classList.remove('selected'));
+  }
+}
+
+// Ready when interactive help has a task type, or a delegation is fully specified.
+function isDelegateReady() {
+  if (delegateAnswers.involvement === 'interactive') return !!delegateAnswers.taskType;
+  if (delegateAnswers.involvement === 'delegate') {
+    return !!(delegateAnswers.cadence && delegateAnswers.reach);
+  }
+  return false;
+}
+
+// Routing rule for the "where should I get work done" entry-point wizard:
+// Interactive + specialized job → a built-in Microsoft 365 Copilot agent (Researcher,
+// Analyst, Facilitator, Interpreter, …); interactive + general help → Copilot Chat.
+// When delegating: Scout wins if the work is continuous OR reaches beyond Microsoft 365;
 // Cowork wins only when the work is on demand AND scoped to Microsoft 365;
-// otherwise (undecided signals) present both as a complementary pair.
-function resolveDelegateResult(cadence, reach) {
+// otherwise (undecided signals) present Cowork and Scout as a complementary pair.
+function resolveDelegateResult(involvement, taskType, cadence, reach) {
+  if (involvement === 'interactive') {
+    return taskType === 'specialized' ? 'm365_copilot' : 'copilot_chat';
+  }
   if (cadence === 'continuous') return 'scout';
   if (reach === 'cross') return 'scout';
   if (cadence === 'ondemand' && reach === 'm365') return 'cowork';
@@ -536,8 +568,10 @@ function resolveDelegateResult(cadence, reach) {
 }
 
 function finishDelegate() {
-  if (!delegateAnswers.cadence || !delegateAnswers.reach) return;
-  delegateResult = resolveDelegateResult(delegateAnswers.cadence, delegateAnswers.reach);
+  if (!isDelegateReady()) return;
+  delegateResult = resolveDelegateResult(
+    delegateAnswers.involvement, delegateAnswers.taskType,
+    delegateAnswers.cadence, delegateAnswers.reach);
   renderRecommendation();
   showSection('recommendation-section');
   pushState('recommendation-section');
@@ -709,7 +743,7 @@ function getScoreReason(platformId, ranked, answersMap) {
     const labels = getHardRuleLabels(platformId, answersMap);
     if (labels.length > 0) return labels.map(l => `⚠️ ${l}`).join('<br>');
     if (platformId === 'm365_copilot' && !fastTrack) {
-      return 'Only available via the Microsoft 365 Copilot path — excluded from custom agent assessment.';
+      return 'Only available via the entry-point wizard — excluded from custom agent assessment.';
     }
     return rec ? rec.scoring_summary : 'Not applicable for this scenario.';
   }
@@ -882,8 +916,8 @@ function showRecNav(hasSecondary) {
   alsoSep.style.display = hasSecondary ? '' : 'none';
 }
 
-// Renders the Cowork/Scout delegate result. Non-scored: no score breakdown,
-// no cross-question notes, no decision card — mirrors the fast-track branch.
+// Renders the entry-point result (Copilot Chat / Cowork / Scout). Non-scored:
+// no score breakdown, no cross-question notes, no decision card — mirrors the fast-track branch.
 function renderDelegateRecommendation() {
   const ids = delegateResult === 'both' ? ['cowork', 'scout'] : [delegateResult];
   recommendedPlatformId = ids[0];
@@ -1091,9 +1125,9 @@ function parseURLParams() {
   originalPlatformId = params.get('r') || null;
   originalDate = params.get('d') || null;
 
-  // Delegate-path handling (Cowork / Scout)
+  // Entry-point path handling (Copilot Chat / Cowork / Scout)
   const dt = params.get('dt');
-  if (dt && ['cowork', 'scout', 'both'].includes(dt)) {
+  if (dt && ['copilot_chat', 'm365_copilot', 'cowork', 'scout', 'both'].includes(dt)) {
     delegateResult = dt;
     fastTrack = false;
     answers = {};
