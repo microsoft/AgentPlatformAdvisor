@@ -6,15 +6,15 @@
 - **Who it's for:** Microsoft enterprise customers, business users, IT pros, professional developers, architects, and data/ML engineers choosing how to use, delegate, or build agents.
 - **Space/industry:** Microsoft productivity, Copilot, enterprise AI tooling, and platform-selection guidance.
 - **Project type:** Single-page web app with a prescreen flow, scored wizard, recommendation results, and exploratory guidance.
-- **Distribution:** Static site on GitHub Pages, published by Microsoft CAT.
+- **Distribution:** Static site on GitHub Pages, published by Robert Standefer.
 - **Memorable thing:** Serious decision software for Microsoft AI builders and buyers.
 
 ## Aesthetic Direction
 
-- **Direction:** Graphite Decision Instrument.
-- **Decoration level:** Intentional. Use lit edges, thin dividers, score rails, subtle grid texture, and diagnostic readouts. Do not use decorative blobs, gradient hero sections, or icon-in-circle ornament.
+- **Direction:** Warm Charcoal Instrument.
+- **Decoration level:** Intentional. Use thin dividers, score rails, subtle grid texture, and diagnostic readouts. Do not use decorative blobs, gradient hero sections, glows, or icon-in-circle ornament.
 - **Mood:** The app should feel like an engineered decision console. Users should feel the tool is measuring their scenario, not selling them a generic AI product.
-- **Category stance:** Stay Microsoft-literate through trust, clarity, accessibility, and restrained blue. Depart from default Microsoft marketing pages by using a darker, more technical workspace model.
+- **Category stance:** Stay Microsoft-literate through trust, clarity, and accessibility. Depart from the default AI-tool look (near-black canvas + blue signal glow) by using a warm, matte charcoal workspace with a single restrained teal signal — no glows.
 - **Reference sources:** Fluent 2 design principles, Microsoft 365 Copilot product pages, Copilot Studio product pages, Microsoft Foundry surfaces, and current enterprise AI dashboard guidance.
 
 ## Typography
@@ -46,26 +46,27 @@
 
 ## Color
 
-- **Approach:** Restrained dark-primary system. One saturated signal color, cool graphite neutrals, semantic colors reserved for actual state.
+- **Approach:** Restrained warm-charcoal dark-primary system. One saturated signal color (teal), warm matte neutrals (no blue-black), no glows, semantic colors reserved for actual state.
 
 | Token | Hex | Use |
 |---|---|---|
-| `--canvas` | `#0C0F14` | Page background |
-| `--surface` | `#151A22` | Main panels and cards |
-| `--surface-raised` | `#1D2430` | Active panels, selected options, result readouts |
-| `--surface-hot` | `#202A38` | Hover/active surface state |
-| `--text` | `#E8EDF5` | Primary text |
-| `--muted` | `#8B96A8` | Secondary text and explanatory copy |
-| `--border` | `#2A3342` | Default borders and dividers |
-| `--border-hot` | `#3C4A5F` | Active borders and panel lit edges |
-| `--accent` | `#2BA8FF` | Primary signal: winner, progress, focus, score rails, primary CTA |
-| `--accent-strong` | `#58C7FF` | Hover/focus highlights and high-emphasis labels |
-| `--accent-dim` | `#145A82` | Low-emphasis progress fills and quiet data visualization |
-| `--success` | `#4CC38A` | Strong fit, positive delta, success |
-| `--warning` | `#F2C94C` | Caveats, close calls, confidence warnings |
-| `--error` | `#FF6B6B` | Hard-rule conflicts and failures |
+| `--canvas` | `#1A1714` | Page background (warm matte charcoal) |
+| `--surface` | `#221E1A` | Main panels and cards |
+| `--surface-raised` | `#2A241F` | Active panels, selected options, result readouts |
+| `--surface-hot` | `#332E28` | Hover/active surface state |
+| `--text` | `#ECE6DC` | Primary text (warm off-white) |
+| `--muted` | `#9C9384` | Secondary text and explanatory copy |
+| `--border` | `#332E28` | Default borders and dividers |
+| `--border-hot` | `#453E35` | Active borders and panel edges |
+| `--accent` | `#17B0A7` | Primary signal: winner, progress, focus, score rails, primary CTA |
+| `--accent-strong` | `#2BC7BD` | Hover/focus highlights and high-emphasis labels |
+| `--accent-dim` | `#12706A` | Low-emphasis progress fills and quiet data visualization |
+| `--success` | `#35C08A` | Strong fit, positive delta, success |
+| `--warning` | `#E0B24B` | Caveats, close calls, confidence warnings |
+| `--error` | `#E5695E` | Hard-rule conflicts and failures |
 
-- **Light mode:** Optional secondary mode, not the identity. If retained, invert the system deliberately instead of flattening to white cards. Use `#F4F7FB` canvas, `#FFFFFF` surface, `#172033` text, `#5D6B80` muted, and keep `#0078D4` or `#2B8CE8` as the Microsoft-compatible signal color.
+- **Light mode:** Optional secondary mode, not the identity. If retained, invert the system deliberately instead of flattening to white cards. Use `#F4F7FB` canvas, `#FFFFFF` surface, `#172033` text, `#5D6B80` muted, and keep a deep teal `#0B7A72` as the signal color.
+- **No glows:** Do not add colored `box-shadow` glows or `text-shadow` on the accent. The signal reads through hue and placement, not bloom.
 - **Contrast:** Body text must meet WCAG AA. Accent text on dark surfaces must be tested, not assumed.
 
 ## Spacing
@@ -190,4 +191,5 @@ The current implementation may still use the older Fluent-light system until a r
 | 2026-07-20 | Replaced Fluent-light direction with Graphite Decision Instrument | Created by /design-consultation after the user chose to start fresh and selected "serious decision software for Microsoft AI builders and buyers" as the memorable thing. |
 | 2026-07-20 | IBM Plex Sans + IBM Plex Mono | Gives the product an engineered, technical voice without relying on Segoe as the visual signature. |
 | 2026-07-20 | Dark graphite + Azure-cyan signal color | Raises memorability and lowers AI-slop risk while preserving a Microsoft-adjacent trust cue. |
+| 2026-07-22 | Replaced Graphite/Azure-cyan with Warm Charcoal + teal signal (via /design-shotgun) | The near-black `#0C0F14` canvas + single cyan-blue glow read as the generic AI-tool look the user rejects. New system: warm matte charcoal `#1A1714` (no blue-black), single restrained teal `#17B0A7` signal, no glows. IBM Plex Sans/Mono retained. User rejected: generic-AI-dark, Blueprint (light/amber), signal-red, sage, bone, brass-gold, and emerald before landing on teal. |
 | 2026-07-20 | Explore by Use agents / Build agents | Keeps the information architecture aligned with how users decide, instead of flattening everything into a six-card gallery. |

@@ -1,47 +1,47 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 
-/* ── Graphite Decision Instrument ── */
+/* ── Warm Charcoal Instrument (emerald) ── */
 :root {
-  /* Canvas & Surfaces */
-  --background: #0C0F14;
-  --foreground: #E8EDF5;
-  --card: #151A22;
-  --card-foreground: #E8EDF5;
-  --popover: #1D2430;
-  --popover-foreground: #E8EDF5;
+  /* Canvas & Surfaces — warm matte charcoal, no blue-black */
+  --background: #1A1714;
+  --foreground: #ECE6DC;
+  --card: #221E1A;
+  --card-foreground: #ECE6DC;
+  --popover: #2A241F;
+  --popover-foreground: #ECE6DC;
 
-  /* Brand — Azure-cyan signal */
-  --primary: #2BA8FF;
-  --primary-hover: #58C7FF;
-  --primary-foreground: #0C0F14;
-  --primary-light: #145A82;
-  --primary-xlight: rgba(43, 168, 255, 0.08);
+  /* Brand — restrained teal signal */
+  --primary: #17B0A7;
+  --primary-hover: #2BC7BD;
+  --primary-foreground: #06110F;
+  --primary-light: #12706A;
+  --primary-xlight: rgba(23, 176, 167, 0.08);
 
   /* Secondary / Muted */
-  --secondary: rgba(43, 168, 255, 0.08);
-  --secondary-hover: rgba(43, 168, 255, 0.14);
-  --secondary-foreground: #E8EDF5;
-  --muted: #1D2430;
-  --muted-foreground: #8B96A8;
-  --accent: rgba(43, 168, 255, 0.08);
-  --accent-foreground: #E8EDF5;
+  --secondary: rgba(23, 176, 167, 0.08);
+  --secondary-hover: rgba(23, 176, 167, 0.14);
+  --secondary-foreground: #ECE6DC;
+  --muted: #2A241F;
+  --muted-foreground: #9C9384;
+  --accent: rgba(23, 176, 167, 0.08);
+  --accent-foreground: #ECE6DC;
 
   /* Semantic */
-  --destructive: #FF6B6B;
-  --destructive-foreground: #0C0F14;
-  --success: #4CC38A;
-  --success-bg: rgba(76, 195, 138, 0.12);
-  --warning: #F2C94C;
-  --warning-bg: rgba(242, 201, 76, 0.10);
+  --destructive: #E5695E;
+  --destructive-foreground: #08160F;
+  --success: #35C08A;
+  --success-bg: rgba(53, 192, 138, 0.12);
+  --warning: #E0B24B;
+  --warning-bg: rgba(224, 178, 75, 0.10);
 
   /* UI */
-  --border: #2A3342;
-  --border-subtle: #1D2430;
-  --input: #2A3342;
-  --ring: #2BA8FF;
-  --ring-focus: rgba(43, 168, 255, 0.25);
-  --link: #58C7FF;
-  --link-hover: #8DD8FF;
+  --border: #332E28;
+  --border-subtle: #2A2620;
+  --input: #453E35;
+  --ring: #17B0A7;
+  --ring-focus: rgba(23, 176, 167, 0.25);
+  --link: #2BC7BD;
+  --link-hover: #5FD9D0;
 
   --radius-sm: 4px;
   --radius: 8px;
@@ -50,7 +50,7 @@
   --font-sans: "IBM Plex Sans", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", "Cascadia Code", "Consolas", monospace;
 
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.30), 0 1px 2px rgba(0, 0, 0, 0.20);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.32), 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
 /* ── Light mode (optional secondary) ── */
@@ -64,19 +64,19 @@
   --popover-foreground: #172033;
 
   /* Brand */
-  --primary: #0078D4;
-  --primary-hover: #005A9E;
+  --primary: #0B7A72;
+  --primary-hover: #085E58;
   --primary-foreground: #FFFFFF;
-  --primary-light: #C7E0F4;
-  --primary-xlight: #EFF6FC;
+  --primary-light: #BCE6E2;
+  --primary-xlight: #EAF6F5;
 
   /* Secondary / Muted */
-  --secondary: #EFF6FC;
-  --secondary-hover: #D4E9F7;
+  --secondary: #EAF6F5;
+  --secondary-hover: #D4EEEB;
   --secondary-foreground: #172033;
   --muted: #F0F2F5;
   --muted-foreground: #5D6B80;
-  --accent: #EFF6FC;
+  --accent: #EAF6F5;
   --accent-foreground: #172033;
 
   /* Semantic */
@@ -91,10 +91,10 @@
   --border: #D1D1D1;
   --border-subtle: #E8E8E8;
   --input: #D1D1D1;
-  --ring: #0078D4;
-  --ring-focus: rgba(0, 120, 212, 0.2);
-  --link: #0078D4;
-  --link-hover: #005A9E;
+  --ring: #0B7A72;
+  --ring-focus: rgba(11, 122, 114, 0.2);
+  --link: #0B7A72;
+  --link-hover: #085E58;
 
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
@@ -117,8 +117,8 @@ body {
   line-height: 1.5;
   background-color: var(--background);
   background-image:
-    linear-gradient(rgba(43, 168, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(43, 168, 255, 0.015) 1px, transparent 1px);
+    linear-gradient(rgba(236, 230, 220, 0.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(236, 230, 220, 0.014) 1px, transparent 1px);
   background-size: 48px 48px;
   background-attachment: fixed;
   color: var(--foreground);
@@ -260,7 +260,6 @@ body {
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
-  box-shadow: 0 2px 8px rgba(43, 168, 255, 0.2);
 }
 
 .btn-secondary {
@@ -1308,7 +1307,7 @@ body {
   gap: 6px;
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--primary-foreground);
   background: var(--primary);
   text-decoration: none;
   margin-bottom: 20px;
@@ -1318,9 +1317,8 @@ body {
 }
 .rec-resources-link:hover {
   background: var(--primary-hover);
-  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.25);
   text-decoration: none;
-  color: #fff;
+  color: var(--primary-foreground);
 }
 .rec-section-title {
   font-size: 14px;

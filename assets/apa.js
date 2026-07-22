@@ -373,7 +373,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
     </div>`;
 }
 
-const DEFAULT_TITLE = 'Agent Platform Advisor — Microsoft CAT';
+const DEFAULT_TITLE = 'Agent Platform Advisor';
 
 // === SESSION STORAGE ===
 function saveAnswersToStorage() {
@@ -499,7 +499,7 @@ function handlePrescreenDelegate() {
   delegateAnswers = {};
   // Reset any prior selections in the static delegate section
   document.querySelectorAll('#delegate-section .delegate-option').forEach(el => el.classList.remove('selected'));
-  ['interactive-followup', 'delegate-followup'].forEach(id => {
+  ['interactive-followup', 'delegate-followup', 'reach-followup'].forEach(id => {
     const followup = document.getElementById(id);
     if (followup) {
       followup.classList.remove('is-open');
@@ -520,10 +520,17 @@ function selectDelegateOption(el, group, value) {
 
   // The involvement answer controls which follow-up questions apply.
   // Interactive → ask what kind of task (Copilot Chat vs. a built-in M365 agent).
-  // Delegate → ask cadence + reach (Cowork vs. Scout).
+  // Delegate → ask cadence first; reach is revealed only once cadence is answered.
   if (group === 'involvement') {
     setFollowupEnabled('interactive-followup', value === 'interactive', ['taskType']);
-    setFollowupEnabled('delegate-followup', value === 'delegate', ['cadence', 'reach']);
+    setFollowupEnabled('delegate-followup', value === 'delegate', ['cadence']);
+    setFollowupEnabled('reach-followup', false, ['reach']);
+  }
+
+  // Reach only becomes relevant once the user has told us the cadence, so we
+  // reveal it progressively instead of showing both delegate questions at once.
+  if (group === 'cadence') {
+    setFollowupEnabled('reach-followup', true, ['reach']);
   }
 
   const btn = document.getElementById('delegate-next-btn');

@@ -18,6 +18,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - Shareable via `?dt=copilot_chat` and `?dt=m365_copilot`.
   - Tightened the wizard option copy to echo the "Microsoft 365 Copilot: what to use and when" task vocabulary — general help (brainstorm, find info, catch up on email/meetings, draft & edit docs), on-demand (multi-step job / multiple artifacts in one go), and continuous (always-on, manage & coordinate my day) — so users self-identify faster.
   - Updated `docs/SCORING.md` and `docs/FLOWCHART.md`; extended Playwright coverage for the entry-point wizard and built-in-agents destination.
+- **Refreshed the visual identity to the Warm Charcoal Instrument** (via `/design-shotgun`): the previous near-black `#0C0F14` canvas with a single cyan-blue signal glow read as the generic AI-tool aesthetic. New system keeps IBM Plex Sans/Mono but swaps to a warm matte charcoal canvas (`#1A1714`, no blue-black) with a single restrained **teal** signal (`#17B0A7`) and no colored glows.
+  - Retokenized dark + light `:root` palettes; removed the two blue `box-shadow` glows and the blue canvas grid tint.
+  - Updated `docs/DESIGN.md` (direction, color table, light-mode note, no-glow rule, Decisions Log). All 38 Playwright tests passing.
 
 ## 2026-07-20
 
