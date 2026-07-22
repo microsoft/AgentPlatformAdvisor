@@ -7,12 +7,13 @@ flowchart TD
     PRESCREEN -->|Build a custom agent| Q1
 
     DELEGATE -->|"Involvement: stay hands-on / iterate"| INTERACTIVE{"**Interactive follow-up**\nWhat kind of task?"}
-    DELEGATE -->|"Involvement: hand it off"| DELEGATE2{"**Delegate follow-up**\nCadence + Reach"}
+    DELEGATE -->|"Involvement: hand it off"| DELEGATE2{"**Delegate follow-up**\nCadence (asked first)"}
     INTERACTIVE -->|"General help"| CHAT["**Copilot Chat**\nInteractive, turn-by-turn assistance"]
     INTERACTIVE -->|"Specialized job (research, data, meetings, translation)"| M365AGENTS["**Microsoft 365 Copilot built-in agents**\nResearcher · Analyst · Facilitator · Interpreter …"]
-    DELEGATE2 -->|"Cadence: continuous OR Reach: cross-environment"| SCOUT["**Microsoft Scout**\nAlways-on Autopilot across desktop, browser, M365\n(Frontier preview)"]
-    DELEGATE2 -->|"Cadence: on-demand AND Reach: Microsoft 365"| COWORK["**Copilot Cowork**\nOn-demand multi-step M365 deliverables"]
-    DELEGATE2 -->|"Undecided signals"| BOTH["**Both** — complementary pair\nScout monitors · Cowork delivers"]
+    DELEGATE2 -->|"Any cadence answered → reveal Reach"| REACH{"**Reach**\nWhere does it need to reach?"}
+    REACH -->|"Cadence: continuous OR Reach: cross-environment"| SCOUT["**Microsoft Scout**\nAlways-on Autopilot across desktop, browser, M365\n(Frontier preview)"]
+    REACH -->|"Cadence: on-demand AND Reach: Microsoft 365"| COWORK["**Copilot Cowork**\nOn-demand multi-step M365 deliverables"]
+    REACH -->|"Undecided signals"| BOTH["**Both** — complementary pair\nScout monitors · Cowork delivers"]
 
     Q1["**Q1: Who is building this agent?**"]
     Q1 -->|Business user / no code| Q1A["AB:3 · CS:1 · Foundry:0"]

@@ -31,12 +31,12 @@ The first question forks the flow:
 
   General → **Copilot Chat**; specialized → **Microsoft 365 Copilot's built-in agents** (`m365_copilot`: Researcher, Analyst, Facilitator, Interpreter, …).
 
-- **Hand it off / delegate** → two follow-up questions decide between Cowork and Scout:
+- **Hand it off / delegate** → two follow-up questions decide between Cowork and Scout. They are asked **progressively**: Cadence appears first, and Reach is revealed only once a cadence has been answered (so both questions never show at once).
 
   | Question | Options |
   |---|---|
-  | **Cadence** — how should the agent work? | On-demand (finish a multi-step job in one go — several artifacts or a process across systems) · Continuous (always-on, manage & coordinate my day) · Not sure |
-  | **Reach** — where does it need to reach? | Microsoft 365 only · Also desktop/browser/local/CLI · Not sure |
+  | **Cadence** (asked first) — how should the agent work? | On-demand (finish a multi-step job in one go — several artifacts or a process across systems) · Continuous (always-on, manage & coordinate my day) · Not sure |
+  | **Reach** (revealed after Cadence) — where does it need to reach? | Microsoft 365 only · Also desktop/browser/local/CLI · Not sure |
 
 **Routing rule** (`resolveDelegateResult(involvement, taskType, cadence, reach)` in `apa.js`):
 
