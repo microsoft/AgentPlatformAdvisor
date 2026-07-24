@@ -8,8 +8,8 @@ flowchart TD
 
     DELEGATE -->|"Involvement: stay hands-on / iterate"| INTERACTIVE{"**Interactive follow-up**\nWhat kind of task?"}
     DELEGATE -->|"Involvement: hand it off"| DELEGATE2{"**Delegate follow-up**\nCadence (asked first)"}
-    INTERACTIVE -->|"General help"| CHAT["**Copilot Chat**\nInteractive, turn-by-turn assistance"]
-    INTERACTIVE -->|"Specialized job (research, data, meetings, translation)"| M365AGENTS["**Microsoft 365 Copilot built-in agents**\nResearcher · Analyst · Facilitator · Interpreter …"]
+    INTERACTIVE -->|"General help"| CHAT["**Microsoft 365 Copilot**\nStart Here: Copilot Chat\nAsk, summarize, draft in the flow of work"]
+    INTERACTIVE -->|"Specialized job (research, data, meetings, translation)"| M365AGENTS["**Microsoft 365 Copilot**\nStart Here: built-in agents\nResearcher · Analyst · Facilitator · Interpreter …"]
     DELEGATE2 -->|"Any cadence answered → reveal Reach"| REACH{"**Reach**\nWhere does it need to reach?"}
     REACH -->|"Cadence: continuous OR Reach: cross-environment"| SCOUT["**Microsoft Scout**\nAlways-on Autopilot across desktop, browser, M365\n(Frontier preview)"]
     REACH -->|"Cadence: on-demand AND Reach: Microsoft 365"| COWORK["**Copilot Cowork**\nOn-demand multi-step M365 deliverables"]

@@ -2,7 +2,8 @@
 let apa = null; // populated from YAML
 let answers = {}; // { q1: 'q1a', q2: 'q2b', ... }
 let fastTrack = false;
-let delegateResult = null; // 'copilot_chat' | 'm365_copilot' | 'cowork' | 'scout' | 'both' — set on the entry-point path
+let delegateResult = null; // 'm365_copilot' | 'cowork' | 'scout' | 'both' — set on the entry-point path
+let delegateStart = null;  // 'chat' | 'agents' — which surface inside Microsoft 365 Copilot to start with
 let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
 let currentQuestionIndex = 0;
 let listenersReady = false;
@@ -247,10 +248,12 @@ const PLATFORM_ICONS = {
   m365_copilot:   'images/m365-copilot-logo.png',
   copilot_studio: 'images/copilot-studio.png',
   foundry:        'images/foundry.svg',
-  copilot_chat:   'images/copilot.png',
   cowork:         'images/cowork.png',
   scout:          'images/scout.svg',
 };
+
+// Destinations reached through the entry-point wizard rather than the scored wizard.
+const ENTRY_POINT_PLATFORMS = ['m365_copilot', 'cowork', 'scout'];
 
 function badgeClass(label) {
   if (label.startsWith('Strong'))   return 'badge-strong';
@@ -260,11 +263,14 @@ function badgeClass(label) {
 }
 
 
-function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge) {
+function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge, startKey) {
   const rec = apa.recommendations[platformId];
   if (!rec) return `<div class="rec-card"><p>Platform data unavailable.</p></div>`;
   const rankEntry = ranked.find(r => r.id === platformId);
-  const detailsOpen = platformId === 'm365_copilot' ? ' open' : '';
+  // Entry-point destinations are single-card results with nothing to compare against,
+  // so their accordions start expanded — the card is the whole page. Scored platform
+  // cards stay collapsed to keep the comparison scannable.
+  const detailsOpen = ENTRY_POINT_PLATFORMS.includes(platformId) ? ' open' : '';
   // showBadge is true only for scored primary cards; key factors are only meaningful in that same context
   const factors = isPrimary && showBadge ? getKeyFactors(platformId, answersMap) : [];
   const icon = PLATFORM_ICONS[platformId] || '';
@@ -284,16 +290,21 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
 
   const bestFor = (rec.best_for || []).map(f => `<li>${f}</li>`).join('');
   const watchOut = (rec.watch_out_for || []).map(f => `<li>${f}</li>`).join('');
-  const spotlightHtml = rec.spotlight ? (() => {
-    const nameHtml = rec.spotlight.url
-      ? `<a href="${rec.spotlight.url}" target="_blank" rel="noopener noreferrer">${rec.spotlight.label}</a>`
-      : rec.spotlight.label;
+  // A start_here entry (chosen by the entry-point wizard) takes precedence over a
+  // static spotlight: it tells the user which surface of this platform to open first.
+  const startHere = startKey && rec.start_here ? rec.start_here[startKey] : null;
+  const spotlight = startHere || rec.spotlight;
+  const spotlightEyebrow = startHere ? 'Start Here' : 'Featured Capability';
+  const spotlightHtml = spotlight ? (() => {
+    const nameHtml = spotlight.url
+      ? `<a href="${spotlight.url}" target="_blank" rel="noopener noreferrer">${spotlight.label}</a>`
+      : spotlight.label;
     return `
     <div class="rec-spotlight">
-      <div class="rec-spotlight-eyebrow">Featured Capability</div>
+      <div class="rec-spotlight-eyebrow">${spotlightEyebrow}</div>
       <div class="rec-spotlight-name">${nameHtml}</div>
-      <div class="rec-spotlight-tagline">${rec.spotlight.tagline}</div>
-      <p class="rec-spotlight-description">${rec.spotlight.description}</p>
+      <div class="rec-spotlight-tagline">${spotlight.tagline}</div>
+      <p class="rec-spotlight-description">${spotlight.description}</p>
     </div>`;
   })() : '';
 
@@ -519,7 +530,7 @@ function selectDelegateOption(el, group, value) {
     .forEach(o => o.classList.toggle('selected', o === el));
 
   // The involvement answer controls which follow-up questions apply.
-  // Interactive → ask what kind of task (Copilot Chat vs. a built-in M365 agent).
+  // Interactive → ask what kind of task (which Microsoft 365 Copilot surface to start with).
   // Delegate → ask cadence first; reach is revealed only once cadence is answered.
   if (group === 'involvement') {
     setFollowupEnabled('interactive-followup', value === 'interactive', ['taskType']);
@@ -559,19 +570,25 @@ function isDelegateReady() {
 }
 
 // Routing rule for the "where should I get work done" entry-point wizard:
-// Interactive + specialized job → a built-in Microsoft 365 Copilot agent (Researcher,
-// Analyst, Facilitator, Interpreter, …); interactive + general help → Copilot Chat.
+// Staying hands-on always lands on Microsoft 365 Copilot — Copilot Chat and the
+// built-in agents (Researcher, Analyst, Facilitator, Interpreter, …) are surfaces of
+// that one product, not separate destinations, so the task type selects which surface
+// to start with (see resolveDelegateStart) rather than which card to show.
 // When delegating: Scout wins if the work is continuous OR reaches beyond Microsoft 365;
 // Cowork wins only when the work is on demand AND scoped to Microsoft 365;
 // otherwise (undecided signals) present Cowork and Scout as a complementary pair.
 function resolveDelegateResult(involvement, taskType, cadence, reach) {
-  if (involvement === 'interactive') {
-    return taskType === 'specialized' ? 'm365_copilot' : 'copilot_chat';
-  }
+  if (involvement === 'interactive') return 'm365_copilot';
   if (cadence === 'continuous') return 'scout';
   if (reach === 'cross') return 'scout';
   if (cadence === 'ondemand' && reach === 'm365') return 'cowork';
   return 'both';
+}
+
+// Which Microsoft 365 Copilot surface the result card should feature.
+function resolveDelegateStart(involvement, taskType) {
+  if (involvement !== 'interactive') return null;
+  return taskType === 'specialized' ? 'agents' : 'chat';
 }
 
 function finishDelegate() {
@@ -579,6 +596,7 @@ function finishDelegate() {
   delegateResult = resolveDelegateResult(
     delegateAnswers.involvement, delegateAnswers.taskType,
     delegateAnswers.cadence, delegateAnswers.reach);
+  delegateStart = resolveDelegateStart(delegateAnswers.involvement, delegateAnswers.taskType);
   renderRecommendation();
   showSection('recommendation-section');
   pushState('recommendation-section');
@@ -930,7 +948,7 @@ function renderDelegateRecommendation() {
   recommendedPlatformId = ids[0];
 
   document.getElementById('rec-primary-card').innerHTML =
-    buildPlatformCard(ids[0], [], {}, true, false);
+    buildPlatformCard(ids[0], [], {}, true, false, delegateStart);
 
   const pairBanner = document.getElementById('rec-pair-banner');
   const secondLabel = document.getElementById('rec-second-label');
@@ -1096,6 +1114,7 @@ function restart() {
   answers = {};
   fastTrack = false;
   delegateResult = null;
+  delegateStart = null;
   delegateAnswers = {};
   currentQuestionIndex = 0;
   recommendedPlatformId = null;
@@ -1115,6 +1134,7 @@ function restart() {
 function startFullAssessment() {
   fastTrack = false;
   delegateResult = null;
+  delegateStart = null;
   answers = {};
   currentQuestionIndex = 0;
   renderQuestion();
@@ -1132,10 +1152,15 @@ function parseURLParams() {
   originalPlatformId = params.get('r') || null;
   originalDate = params.get('d') || null;
 
-  // Entry-point path handling (Copilot Chat / Cowork / Scout)
+  // Entry-point path handling (Microsoft 365 Copilot / Cowork / Scout).
+  // dt=copilot_chat is a legacy alias from when Copilot Chat was its own destination;
+  // it now resolves to Microsoft 365 Copilot with the Copilot Chat surface featured.
   const dt = params.get('dt');
   if (dt && ['copilot_chat', 'm365_copilot', 'cowork', 'scout', 'both'].includes(dt)) {
-    delegateResult = dt;
+    delegateResult = dt === 'copilot_chat' ? 'm365_copilot' : dt;
+    const st = params.get('st');
+    delegateStart = dt === 'copilot_chat' ? 'chat'
+      : (['chat', 'agents'].includes(st) ? st : null);
     fastTrack = false;
     answers = {};
     return { mode: 'card' };
@@ -1188,6 +1213,7 @@ function buildShareableURL() {
 
   if (delegateResult) {
     params.set('dt', delegateResult);
+    if (delegateStart) params.set('st', delegateStart);
   } else if (fastTrack) {
     params.set('ft', '1');
   } else {
@@ -1339,7 +1365,7 @@ function copyShareLink() {
       fallback.id = 'decision-card-fallback-url';
       fallback.type = 'text';
       fallback.readOnly = true;
-      fallback.style.cssText = 'width:100%;margin-top:8px;padding:8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-mono);';
+      fallback.style.cssText = 'width:100%;margin-top:8px;padding:8px;font-size:var(--fs-mono);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-mono);';
       document.getElementById('decision-card').appendChild(fallback);
     }
     fallback.value = url;

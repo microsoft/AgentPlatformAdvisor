@@ -7,15 +7,17 @@ Reference document for how the APA scoring engine works. All data is driven from
 | ID | Label | Description |
 |---|---|---|
 | `agent_builder` | Agent Builder | No-code declarative agents inside Microsoft 365 Copilot |
-| `m365_copilot` | Microsoft 365 Copilot | Built-in Copilot experiences (fast-track path only) |
+| `m365_copilot` | Microsoft 365 Copilot | Built-in Copilot experiences — Copilot Chat, Search, app-native assistance, and Microsoft-built agents (entry-point wizard only) |
 | `copilot_studio` | Copilot Studio | Governed low-code enterprise agents with tools, workflows, triggers, computer use, evaluation, monitoring, and broad publishing |
 | `foundry` | Microsoft Foundry | Managed production agent runtime for prompt agents, hosted code agents, custom retrieval, tools, identity, observability, and Azure-scale controls |
 
-M365 Copilot is excluded from the scored assessment. It is only recommended via the prescreen fast-track path. In the full wizard, `m365_copilot` is always zeroed.
+M365 Copilot is excluded from the scored assessment. It is only recommended via the entry-point wizard (or the legacy `?ft=1` / `?dt=copilot_chat` share links). In the full wizard, `m365_copilot` is always zeroed.
 
-## Non-scored destinations: entry-point wizard (Copilot Chat, M365 built-in agents, Cowork & Scout)
+## Non-scored destinations: entry-point wizard (Microsoft 365 Copilot, Cowork & Scout)
 
-Copilot Chat, Microsoft 365 Copilot's built-in agents, Cowork, and Scout are **not** build platforms — they are ready-made places to *get work done*, not platforms you build on. They are **not** part of the scored wizard, are **not** in `meta.platforms`, and never enter the 0–15 sum. They are reached via the prescreen path **"Help me find the right place to get work done,"** which opens a short **entry-point wizard** ("Where should you get this work done?"). This wizard exists because Microsoft asks end users to choose between too many entry points (Copilot Chat vs. built-in agents vs. Cowork vs. Scout); the wizard resolves that choice from work patterns instead of product names. There is no longer a separate "built-in Microsoft 365 Copilot experience" prescreen tile — that destination now lives inside this wizard.
+Microsoft 365 Copilot, Cowork, and Scout are **not** build platforms — they are ready-made places to *get work done*, not platforms you build on. They are **not** part of the scored wizard, are **not** in `meta.platforms`, and never enter the 0–15 sum. They are reached via the prescreen path **"Help me find the right place to get work done,"** which opens a short **entry-point wizard** ("Where should you get this work done?"). This wizard exists because Microsoft asks end users to choose between too many entry points (Microsoft 365 Copilot vs. Cowork vs. Scout); the wizard resolves that choice from work patterns instead of product names. There is no longer a separate "built-in Microsoft 365 Copilot experience" prescreen tile — that destination now lives inside this wizard.
+
+**Copilot Chat is not a destination.** Copilot Chat and the built-in agents (Researcher, Analyst, Facilitator, Interpreter, …) are *surfaces of* Microsoft 365 Copilot, not products that compete with it. Staying hands-on therefore always resolves to the single `m365_copilot` card; the task-type answer only selects which surface the card tells you to **Start Here** with, via `recommendations.m365_copilot.start_here` in `apa.yaml` (`chat` or `agents`).
 
 The first question forks the flow:
 
@@ -29,7 +31,7 @@ The first question forks the flow:
   |---|---|
   | **Task type** | General help (brainstorm, find info, catch up on email/meetings, draft & edit documents) · A specialized task (deep research, data analysis, meeting facilitation, translation) |
 
-  General → **Copilot Chat**; specialized → **Microsoft 365 Copilot's built-in agents** (`m365_copilot`: Researcher, Analyst, Facilitator, Interpreter, …).
+  Both answers resolve to **Microsoft 365 Copilot** (`m365_copilot`). General selects the **Copilot Chat** start surface; specialized selects the **built-in agents** start surface (Researcher, Analyst, Facilitator, Interpreter, …).
 
 - **Hand it off / delegate** → two follow-up questions decide between Cowork and Scout. They are asked **progressively**: Cadence appears first, and Reach is revealed only once a cadence has been answered (so both questions never show at once).
 
@@ -42,8 +44,7 @@ The first question forks the flow:
 
 | Condition | Result |
 |---|---|
-| Involvement = interactive **and** Task type = specialized | **Microsoft 365 Copilot built-in agents** (`m365_copilot`) |
-| Involvement = interactive **and** Task type = general | **Copilot Chat** |
+| Involvement = interactive | **Microsoft 365 Copilot** (`m365_copilot`) — `resolveDelegateStart` then picks the start surface: specialized → `agents`, general → `chat` |
 | Cadence = continuous | **Scout** |
 | Reach = cross-environment | **Scout** |
 | Cadence = on-demand **and** Reach = Microsoft 365 | **Cowork** |
@@ -51,7 +52,7 @@ The first question forks the flow:
 
 **Readiness** (`isDelegateReady` in `apa.js`): interactive requires a task type; delegate requires both cadence and reach before the wizard can finish.
 
-> `m365_copilot` still exists in `meta.platforms` for content, but is always zeroed in the scored wizard (`if (!fastTrack) zeroed['m365_copilot'] = true`) — it only surfaces as this wizard destination. The legacy `?ft=1` share link still resolves to the same card for backward compatibility.
+> `m365_copilot` still exists in `meta.platforms` for content, but is always zeroed in the scored wizard (`if (!fastTrack) zeroed['m365_copilot'] = true`) — it only surfaces as this wizard destination. The legacy `?ft=1` share link still resolves to the same card for backward compatibility, as does the legacy `?dt=copilot_chat` link (it maps to `dt=m365_copilot` with the `chat` start surface). New share links carry the surface as `&st=chat|agents`.
 
 ## Questions and Scoring Matrix
 

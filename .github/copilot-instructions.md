@@ -35,7 +35,7 @@ Four platforms are scored: Agent Builder, Copilot Studio, Microsoft Foundry, Mic
 3. **Tiebreakers** in `apa.yaml` resolve equal scores using persona context
 4. **Thresholds** map scores to fit labels: Strong (12–15), Good (8–11), Partial (4–7), Not recommended (0–3)
 
-M365 Copilot is only recommended via the prescreen fast-track path, never through the scored wizard.
+M365 Copilot is never recommended through the scored wizard — it is always zeroed there. It is reached only through the entry-point wizard ("Help me find the right place to get work done"), alongside Cowork and Scout, or via the legacy `?ft=1` / `?dt=copilot_chat` share links. Copilot Chat and the built-in agents (Researcher, Analyst, …) are surfaces *of* M365 Copilot, not separate destinations: the wizard's task-type answer selects a `start_here` surface on the one card.
 
 ## Testing
 
@@ -49,7 +49,7 @@ npx playwright test tests/e2e/wizard-completion.spec.js  # single test file
 npx playwright test -g "completes full wizard"           # single test by name
 ```
 
-Tests cover: wizard completion, shared link loading, temporal change detection, M365 fast-track path, and share button behavior.
+Tests cover: wizard completion, shared link loading, temporal change detection, the entry-point wizard (M365 Copilot / Cowork / Scout) including legacy share links, and share button behavior.
 
 ## Conventions
 

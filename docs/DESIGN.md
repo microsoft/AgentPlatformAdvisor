@@ -14,7 +14,7 @@
 - **Direction:** Warm Charcoal Instrument.
 - **Decoration level:** Intentional. Use thin dividers, score rails, subtle grid texture, and diagnostic readouts. Do not use decorative blobs, gradient hero sections, glows, or icon-in-circle ornament.
 - **Mood:** The app should feel like an engineered decision console. Users should feel the tool is measuring their scenario, not selling them a generic AI product.
-- **Category stance:** Stay Microsoft-literate through trust, clarity, and accessibility. Depart from the default AI-tool look (near-black canvas + blue signal glow) by using a warm, matte charcoal workspace with a single restrained teal signal — no glows.
+- **Category stance:** Stay Microsoft-literate through trust, clarity, and accessibility. Depart from the default AI-tool look (near-black canvas + blue signal glow) by using a warm, matte charcoal workspace with a single restrained Microsoft blue signal — no glows.
 - **Reference sources:** Fluent 2 design principles, Microsoft 365 Copilot product pages, Copilot Studio product pages, Microsoft Foundry surfaces, and current enterprise AI dashboard guidance.
 
 ## Typography
@@ -33,20 +33,27 @@
 
 ### Type Scale
 
-| Token | Size | Weight | Use |
-|---|---:|---:|---|
-| display | 56px / 3.5rem | 700 | First screen thesis, final recommendation headline |
-| title | 36px / 2.25rem | 700 | Page headings, major result titles |
-| heading | 26px / 1.625rem | 600 | Question text, section headings |
-| subhead | 20px / 1.25rem | 600 | Card titles, panel headings |
-| body-lg | 18px / 1.125rem | 400 | Lead copy, important explanations |
-| body | 15px / .9375rem | 400 | Standard UI copy |
-| caption | 13px / .8125rem | 400 | Secondary details |
-| mono | 12px / .75rem | 500-600 | Platform IDs, counters, score labels |
+| Token | CSS variable | Size | Weight | Use |
+|---|---|---:|---:|---|
+| display | `--fs-display` | 3rem / 48px | 700 | First screen thesis, final recommendation headline |
+| title | `--fs-title` | 2.25rem / 36px | 700 | Page headings, major result titles |
+| heading | `--fs-heading` | 1.625rem / 26px | 600 | Question text, section headings |
+| subhead | `--fs-subhead` | 1.25rem / 20px | 600 | Card titles, panel headings |
+| body-lg | `--fs-body-lg` | 1.125rem / 18px | 400 | Lead copy, important explanations |
+| body | `--fs-body` | 1rem / 16px | 400 | Standard UI copy, option labels |
+| body-sm | `--fs-body-sm` | .9375rem / 15px | 400-500 | Supporting copy, option descriptions, buttons |
+| caption | `--fs-caption` | .875rem / 14px | 400 | Secondary details |
+| mono | `--fs-mono` | .8125rem / 13px | 500-600 | Platform IDs, counters, score labels |
+| mono-sm | `--fs-mono-sm` | .75rem / 12px | 500-600 | Badges and legends — **the smallest size permitted** |
+
+- **Always use `rem`, never `px`, for `font-size`.** Sizes are declared once as `--fs-*` tokens on `:root` and referenced everywhere else, so a user's browser font-size preference scales the whole app. `html { font-size: 100% }` — do not reset it to `62.5%` or a fixed px value.
+- **12px is the floor.** No text below `--fs-mono-sm`, including badges, eyebrows, and legends. Small + uppercase + letter-spaced + `--muted-foreground` is the least legible combination in the system; do not stack all four below 13px.
+- **Never shrink type at mobile breakpoints.** Responsive overrides may reduce display/title sizes for line-length reasons, but body, caption, and mono sizes hold at every viewport.
+- **Measure:** cap running prose at ~70ch. The container is 1024px wide, which yields ~95ch lines at body size.
 
 ## Color
 
-- **Approach:** Restrained warm-charcoal dark-primary system. One saturated signal color (teal), warm matte neutrals (no blue-black), no glows, semantic colors reserved for actual state.
+- **Approach:** Restrained warm-charcoal dark-primary system. One saturated signal color (blue), warm matte neutrals (no blue-black), no glows, semantic colors reserved for actual state.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -58,14 +65,14 @@
 | `--muted` | `#9C9384` | Secondary text and explanatory copy |
 | `--border` | `#332E28` | Default borders and dividers |
 | `--border-hot` | `#453E35` | Active borders and panel edges |
-| `--accent` | `#17B0A7` | Primary signal: winner, progress, focus, score rails, primary CTA |
-| `--accent-strong` | `#2BC7BD` | Hover/focus highlights and high-emphasis labels |
-| `--accent-dim` | `#12706A` | Low-emphasis progress fills and quiet data visualization |
+| `--accent` | `#0078D4` | Primary signal: winner, progress, focus, score rails, primary CTA |
+| `--accent-strong` | `#2B9AEE` | Hover/focus highlights and high-emphasis labels |
+| `--accent-dim` | `#0B5187` | Low-emphasis progress fills and quiet data visualization |
 | `--success` | `#35C08A` | Strong fit, positive delta, success |
 | `--warning` | `#E0B24B` | Caveats, close calls, confidence warnings |
 | `--error` | `#E5695E` | Hard-rule conflicts and failures |
 
-- **Light mode:** Optional secondary mode, not the identity. If retained, invert the system deliberately instead of flattening to white cards. Use `#F4F7FB` canvas, `#FFFFFF` surface, `#172033` text, `#5D6B80` muted, and keep a deep teal `#0B7A72` as the signal color.
+- **Light mode:** Optional secondary mode, not the identity. If retained, invert the system deliberately instead of flattening to white cards. Use `#F4F7FB` canvas, `#FFFFFF` surface, `#172033` text, `#5D6B80` muted, and keep a deep blue `#005A9E` as the signal color.
 - **No glows:** Do not add colored `box-shadow` glows or `text-shadow` on the accent. The signal reads through hue and placement, not bloom.
 - **Contrast:** Body text must meet WCAG AA. Accent text on dark surfaces must be tested, not assumed.
 
@@ -191,5 +198,7 @@ The current implementation may still use the older Fluent-light system until a r
 | 2026-07-20 | Replaced Fluent-light direction with Graphite Decision Instrument | Created by /design-consultation after the user chose to start fresh and selected "serious decision software for Microsoft AI builders and buyers" as the memorable thing. |
 | 2026-07-20 | IBM Plex Sans + IBM Plex Mono | Gives the product an engineered, technical voice without relying on Segoe as the visual signature. |
 | 2026-07-20 | Dark graphite + Azure-cyan signal color | Raises memorability and lowers AI-slop risk while preserving a Microsoft-adjacent trust cue. |
+| 2026-07-24 | Rebuilt the type scale on rem tokens and raised every size one step | An audit found the code had drifted a full step below the documented scale (body shipped at 14px, captions at 12px, some labels at 10-11px) and used `px` everywhere, so browser font-size preferences did nothing. All 74 declarations now reference `--fs-*` rem tokens, with a 12px floor and no downward mobile overrides. |
+| 2026-07-24 | Swapped the teal signal for Microsoft blue `#0078D4` | User asked for the green/teal highlight to be blue. Warm charcoal canvas, neutrals, typography, and no-glow rule are unchanged; only the signal hue moved (dark `#0078D4` / `#2B9AEE` / `#0B5187`, light `#005A9E`). Success/warning/error semantics untouched. |
 | 2026-07-22 | Replaced Graphite/Azure-cyan with Warm Charcoal + teal signal (via /design-shotgun) | The near-black `#0C0F14` canvas + single cyan-blue glow read as the generic AI-tool look the user rejects. New system: warm matte charcoal `#1A1714` (no blue-black), single restrained teal `#17B0A7` signal, no glows. IBM Plex Sans/Mono retained. User rejected: generic-AI-dark, Blueprint (light/amber), signal-red, sage, bone, brass-gold, and emerald before landing on teal. |
 | 2026-07-20 | Explore by Use agents / Build agents | Keeps the information architecture aligned with how users decide, instead of flattening everything into a six-card gallery. |

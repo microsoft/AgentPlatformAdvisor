@@ -13,8 +13,21 @@ async function chooseDelegate(page) {
   await page.locator('.delegate-option[data-group="involvement"][data-value="delegate"]').click();
 }
 
-test.describe('Entry-point wizard (Copilot Chat / Cowork / Scout)', () => {
-  test('interactive + general help recommends Copilot Chat', async ({ page }) => {
+// Copilot Chat and the built-in agents are surfaces of Microsoft 365 Copilot, not
+// separate destinations: staying hands-on always lands on the one Microsoft 365
+// Copilot card, and the task type only decides which surface it says to start with.
+async function expectM365Card(page, startHere) {
+  await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText('Microsoft 365 Copilot');
+  if (startHere) {
+    await expect(page.locator('#rec-primary-card .rec-spotlight-eyebrow')).toHaveText('Start Here');
+    await expect(page.locator('#rec-primary-card .rec-spotlight-name')).toContainText(startHere);
+  } else {
+    await expect(page.locator('#rec-primary-card .rec-spotlight')).toHaveCount(0);
+  }
+}
+
+test.describe('Entry-point wizard (Microsoft 365 Copilot / Cowork / Scout)', () => {
+  test('interactive + general help starts with Copilot Chat', async ({ page }) => {
     await openDelegate(page);
     await page.locator('.delegate-option[data-group="involvement"][data-value="interactive"]').click();
     // The interactive follow-up (task type) is now revealed; button stays disabled until answered
@@ -25,18 +38,18 @@ test.describe('Entry-point wizard (Copilot Chat / Cowork / Scout)', () => {
     await page.locator('#delegate-next-btn').click();
 
     await expect(page.locator('#recommendation-section')).toBeVisible();
-    await expect(page.locator('#rec-primary-card')).toContainText('Copilot Chat');
+    await expectM365Card(page, 'Copilot Chat');
     await expect(page.locator('#rec-second-card')).toBeEmpty();
   });
 
-  test('interactive + specialized job recommends Microsoft 365 Copilot built-in agents', async ({ page }) => {
+  test('interactive + specialized job starts with the built-in agents', async ({ page }) => {
     await openDelegate(page);
     await page.locator('.delegate-option[data-group="involvement"][data-value="interactive"]').click();
     await page.locator('.delegate-option[data-group="taskType"][data-value="specialized"]').click();
     await page.locator('#delegate-next-btn').click();
 
     await expect(page.locator('#recommendation-section')).toBeVisible();
-    await expect(page.locator('#rec-primary-card')).toContainText('Microsoft 365 Copilot');
+    await expectM365Card(page, 'Researcher');
     await expect(page.locator('#rec-second-card')).toBeEmpty();
   });
 
@@ -117,7 +130,7 @@ test.describe('Entry-point wizard (Copilot Chat / Cowork / Scout)', () => {
     await page.locator('.delegate-option[data-group="taskType"][data-value="general"]').click();
     await expect(page.locator('#delegate-next-btn')).toBeEnabled();
     await page.locator('#delegate-next-btn').click();
-    await expect(page.locator('#rec-primary-card')).toContainText('Copilot Chat');
+    await expectM365Card(page, 'Copilot Chat');
   });
 
   test('entry-point result hides scored UI', async ({ page }) => {
@@ -133,10 +146,18 @@ test.describe('Entry-point wizard (Copilot Chat / Cowork / Scout)', () => {
     await expect(page.locator('#rec-nav')).toBeHidden();
   });
 
-  test('Copilot Chat result via URL params', async ({ page }) => {
+  test('legacy Copilot Chat share link resolves to the Microsoft 365 Copilot card', async ({ page }) => {
     await page.goto('/?dt=copilot_chat&r=copilot_chat&d=20260713&mode=card');
     await expect(page.locator('#recommendation-section')).toBeVisible();
-    await expect(page.locator('#rec-primary-card')).toContainText('Copilot Chat');
+    await expectM365Card(page, 'Copilot Chat');
+  });
+
+  test('start-surface share links feature the right surface', async ({ page }) => {
+    await page.goto('/?dt=m365_copilot&st=chat&r=m365_copilot&d=20260713&mode=card');
+    await expectM365Card(page, 'Copilot Chat');
+
+    await page.goto('/?dt=m365_copilot&st=agents&r=m365_copilot&d=20260713&mode=card');
+    await expectM365Card(page, 'Researcher');
   });
 
   test('Scout result via URL params', async ({ page }) => {
@@ -157,9 +178,8 @@ test.describe('Entry-point wizard (Copilot Chat / Cowork / Scout)', () => {
     await expect(page.locator('#prescreen-section')).toBeVisible();
   });
 
-  test('Microsoft 365 Copilot card shows no Cowork spotlight', async ({ page }) => {
+  test('Microsoft 365 Copilot card without a start surface shows no spotlight', async ({ page }) => {
     await page.goto('/?dt=m365_copilot&r=m365_copilot&d=20260713&mode=card');
-    await expect(page.locator('#rec-primary-card')).toContainText('Microsoft 365 Copilot');
-    await expect(page.locator('#rec-primary-card .rec-spotlight')).toHaveCount(0);
+    await expectM365Card(page, null);
   });
 });

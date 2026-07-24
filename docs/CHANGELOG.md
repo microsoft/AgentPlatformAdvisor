@@ -4,7 +4,31 @@ All notable changes to Agent Platform Advisor are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), organized by repository commit date.
 
-## Unreleased
+## 2026-07-24
+
+### Changed
+
+- **Entry-point recommendation cards now open their accordions by default.** Microsoft 365 Copilot, Cowork, and Scout are single-card results with nothing to compare against — the card *is* the page — so *Best For*, *Important Considerations*, and the capability list start expanded instead of hiding the substance behind three clicks. Scored platform cards (Agent Builder, Copilot Studio, Foundry) stay collapsed so the comparison stays scannable. Driven by a new `ENTRY_POINT_PLATFORMS` constant in `apa.js`, replacing the `platformId === 'm365_copilot'` special case.
+- **Merged the `copilot_chat` destination into `m365_copilot`.** Copilot Chat is a surface *of* Microsoft 365 Copilot — as is each built-in agent — so modeling it as a sibling destination to Cowork and Scout claimed a product boundary that doesn't exist (and, after the headline rename, produced two identically-titled cards). The entry-point wizard's hands-on path now always resolves to the single **Microsoft 365 Copilot** card.
+  - The **task type** answer no longer picks a destination; it picks which surface the card tells you to **Start Here** with, rendered through the previously unused `spotlight` slot: general help → **Copilot Chat**, specialized task → **built-in agents** (Researcher, Analyst, Facilitator, Interpreter).
+  - Added `recommendations.m365_copilot.start_here.{chat,agents}` to `apa.yaml` and folded the old `copilot_chat` guidance into `m365_copilot`'s new `best_for` / `watch_out_for`; deleted the `copilot_chat` recommendation block.
+  - `resolveDelegateStart()` in `apa.js` derives the surface; `buildPlatformCard()` takes a `startKey` and labels the spotlight **Start Here** (a static `spotlight` still renders as *Featured Capability*).
+  - Share links carry the surface as `&st=chat|agents`. The legacy `?dt=copilot_chat` link still works and resolves to Microsoft 365 Copilot with the Copilot Chat surface featured.
+  - Cowork's and Scout's "use X instead" notes now point to *Microsoft 365 Copilot (Copilot Chat)* rather than a sibling product. Updated `docs/SCORING.md`, `docs/FLOWCHART.md`, the prescreen copy, and `tests/e2e/delegate-path.spec.js` (39 tests passing).
+- **Renamed the `copilot_chat` destination headline to "Microsoft 365 Copilot"** (was "Copilot Chat"), which makes it share a headline with the `m365_copilot` destination. Updated `tests/e2e/delegate-path.spec.js` so the two are no longer distinguished by headline substring alone: a new `expectPrimaryCard()` helper asserts the exact `.rec-platform-name` text plus a description phrase unique to each destination ("conversational Microsoft 365 Copilot experience" vs. "Built-in, permission-aware AI across Microsoft 365"), so the two paths can't silently swap.
+- **Rebuilt the type scale on rem tokens and raised every size one step.** An audit found the CSS had drifted a full step below the scale documented in `docs/DESIGN.md` — body copy shipped at 14px (20 rules) against a documented 15px, captions at 12px, and badges/eyebrows at 10-11px — and every one of the 74 `font-size` declarations used `px`, so a reader's browser font-size preference had no effect.
+  - Added `--fs-display` … `--fs-mono-sm` rem tokens on `:root` and `html { font-size: 100% }`; all 74 declarations now reference a token.
+  - Sizes move up one step: body 14 → 15/16px, caption 13 → 14px, mono 12 → 13px, and everything at 10-11px comes up to a **12px floor** (`.sc-badge`, `.pq-legend`, `.rec-spotlight-eyebrow`, `.exploration-card-spotlight-eyebrow`).
+  - Removed the two responsive overrides that *shrank* text on small screens (`.progress-bar` → 11px at 768px, `.sc-badge` → 10px at 480px).
+  - Capped running prose at `70ch` — the 1024px container was producing ~95ch lines.
+  - Updated the `docs/DESIGN.md` type scale with the token names plus rules on rem-only sizing, the 12px floor, no mobile shrinkage, and measure.
+- **Made the start-page platform tiles read as informational, not clickable.** They were styled as bordered, filled cards with a hover border-color change, which implied they were selectable. Removed the hover treatment and the card chrome (filled background, full border, rounded corners) in favor of flat, center-aligned entries separated by a hairline top rule, plus `cursor: default`. Added a lead-in line — "Here's what the advisor chooses between — select **Get Started** below to find your fit." — so the section reads as a preview of the destinations rather than a menu.
+- **Center-aligned the start-page platform previews** — icon, title, and description all sit on a shared center axis (`.platform-preview-icon` is a centered flex box; `.platform-preview` is `text-align: center`).
+- **Increased the platform preview card title** from 16px to 20px, matching the `subhead` type token in `docs/DESIGN.md`, so platform names read as card titles rather than body copy.
+- **Increased the delegate group label size** from 11px to 13px (weight 500 → 600) so the "…" section dividers above the delegate platform grid are legible at a glance.
+- **Swapped the teal signal color for Microsoft blue** at the user's request: the accent used for selected options, progress, the winning platform, focus rings, and primary CTAs is now `#0078D4` (hover `#2B9AEE`, dim `#0B5187`) in dark mode and `#005A9E` in light mode. Warm charcoal canvas, neutrals, typography, and the no-glow rule are unchanged; `--success` / `--warning` / `--error` semantics are untouched. Updated `docs/DESIGN.md`.
+
+## 2026-07-22
 
 ### Changed
 
@@ -21,7 +45,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Refreshed the visual identity to the Warm Charcoal Instrument** (via `/design-shotgun`): the previous near-black `#0C0F14` canvas with a single cyan-blue signal glow read as the generic AI-tool aesthetic. New system keeps IBM Plex Sans/Mono but swaps to a warm matte charcoal canvas (`#1A1714`, no blue-black) with a single restrained **teal** signal (`#17B0A7`) and no colored glows.
   - Retokenized dark + light `:root` palettes; removed the two blue `box-shadow` glows and the blue canvas grid tint.
   - Updated `docs/DESIGN.md` (direction, color table, light-mode note, no-glow rule, Decisions Log). All 38 Playwright tests passing.
-
 ## 2026-07-20
 
 ### Added
