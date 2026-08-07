@@ -500,7 +500,7 @@ recommendations:
     first_party_label: Built-in Copilot capabilities and agents
     first_party_agents:
       - label: Copilot Chat
-        description: Permission-aware chat for drafting, summarizing, answering questions, and working across Microsoft 365 content and the web
+        description: Permission-aware chat for drafting, summarizing, answering questions, and working across Microsoft 365 content and the web — agents can render interactive UI like forms and cards inline via MCP Apps
         url: https://learn.microsoft.com/microsoft-365/copilot/microsoft-365-copilot-overview
       - label: Copilot Search
         description: AI-powered universal search across Microsoft 365 and connected third-party sources, with natural-language queries and handoff to chat
@@ -508,6 +508,9 @@ recommendations:
       - label: Copilot Pages and Notebooks
         description: Persistent, shareable workspaces for synthesizing content and grounding Copilot on curated material; stored in SharePoint Embedded/Loop containers
         url: https://learn.microsoft.com/microsoft-365/loop/cpcn-requirements
+      - label: Agent Store
+        description: Discover and add first- and third-party agents inside Microsoft 365 Copilot
+        url: https://learn.microsoft.com/microsoft-365/copilot/copilot-agent-store
       - label: Sales Agent
         description: Seller productivity in Teams, Outlook, and CRM apps
         url: https://learn.microsoft.com/microsoft-sales-copilot/
@@ -564,7 +567,7 @@ recommendations:
       - Low-code makers and IT pros
       - Agents connecting to external APIs, CRM, ERP, Dataverse, databases, MCP servers, or custom connectors
       - Event-triggered, scheduled, or user-triggered workflows with actions, branching, human review, and approvals
-      - Agent-to-agent orchestration — child agents, connected Copilot Studio agents, and A2A integrations
+      - Multi-agent orchestration (now generally available) — child agents, connected Copilot Studio agents, and A2A integrations
       - Automating legacy web or desktop apps with computer use when no API exists
       - Multi-turn conversational experiences with generative orchestration, Microsoft IQ context, and optional per-user memory in the new experience
       - Internal and external-facing deployment
@@ -606,8 +609,9 @@ recommendations:
       - Custom RAG and enterprise retrieval with Foundry IQ, Azure AI Search, Azure Blob Storage, SharePoint, OneLake, web sources, citations, ACLs, and Purview sensitivity labels
       - Foundry Toolboxes and MCP-compatible tool bundles with centralized authentication, versioning, and policy enforcement
       - Dedicated Microsoft Entra agent identities, RBAC, private networking, content filters, and bring-your-own Azure resources
-      - Full development lifecycle — versioning, stable endpoints, rollback, publishing, tracing, evaluation, optimization, monitoring, and Application Insights integration
+      - Full development lifecycle — versioning, stable endpoints, rollback, publishing, tracing, evaluation, Agent Optimizer's evaluate-and-optimize loop, monitoring, and Application Insights integration
       - Publishing agents to Microsoft 365 Copilot, Teams, custom apps, services, and the Entra Agent Registry
+      - Air-gapped, disconnected, or on-premises deployment with Foundry Local on Azure Local
       - Strict compliance, data residency, private networking, or security requirements
     watch_out_for:
       - Higher implementation complexity and time-to-value
@@ -644,11 +648,12 @@ recommendations:
     best_for:
       - Handing off a bounded, multi-step Microsoft 365 deliverable on demand
       - Meeting packets, inbox and calendar cleanup, deep research, coordinated document sets
+      - Scheduling recurring Microsoft 365 tasks — daily briefings, status roundups, inbox triage — with scheduled prompts
       - Human-in-the-loop control — progress updates, approval checkpoints, pause/resume/cancel
       - Grounded in your Microsoft 365 context (email, meetings, files, messages) via Work IQ
       - Extending the experience with custom skills and plugins
     watch_out_for:
-      - On demand and user-initiated — not always-on or proactively monitoring
+      - Runs on demand or on a schedule you set (scheduled prompts) — but is not always-on or autonomously monitoring for conditions the way Scout is
       - Centered on Microsoft 365 — no desktop, shell, browser, or local-file runtime
       - Usage-based billing through Copilot Credits
       - Take actions like sending email or posting in Teams require explicit approval

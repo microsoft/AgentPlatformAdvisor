@@ -4,6 +4,16 @@ All notable changes to Agent Platform Advisor are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), organized by repository commit date.
 
+## Unreleased
+
+### Changed
+
+- **Refreshed platform guidance in `apa.yaml` for mid-2026 product updates** (content only — the scoring matrix is unchanged, so `docs/SCORING.md` distribution figures still hold). Verified against Microsoft Learn and June 2026 release notes that two constraints are still accurate and left them in place: the no-code **Agent Builder is still reactive Q&A/retrieval only** (no action execution or event triggers — MCP Apps add UI, not actions), and **Cowork is still Microsoft 365-only** (no desktop/shell/browser/local runtime), so its reach split with Scout is unchanged.
+  - **Copilot Cowork now runs scheduled prompts.** Added a *Best For* line for scheduling recurring Microsoft 365 tasks (daily briefings, status roundups, inbox triage), and rewrote the "on demand and user-initiated" caution to distinguish Cowork's *scheduled/recurring* runs from Scout's *always-on, condition-monitoring* autonomy. Sourced from the Cowork overview (Learn, updated 2026-07-27).
+  - **Microsoft Foundry:** called out the **Agent Optimizer** evaluate-and-optimize loop in the lifecycle bullet and added a *Best For* line for **Foundry Local on Azure Local** (air-gapped, disconnected, or on-premises deployment).
+  - **Copilot Studio:** noted that **multi-agent orchestration is now generally available** (was preview) in the agent-to-agent orchestration bullet.
+  - **Microsoft 365 Copilot:** added the **Agent Store** as a built-in capability entry (discover and add first- and third-party agents) and noted that agents can render **interactive UI (forms and cards) inline via MCP Apps** in the Copilot Chat description.
+
 ## 2026-07-24
 
 ### Changed
