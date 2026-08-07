@@ -13,11 +13,20 @@
     <meta
       name="thumbnail"
       property="og:image"
-      content="https://microsoft.github.io/cat/images/powercattools.png"
+      content="https://microsoft.github.io/AgentPlatformAdvisor/images/og-image.png"
     />
     <meta name="thumbnail" property="og:image:width" content="1200" />
-    <meta name="thumbnail" property="og:image:height" content="1200" />
-    <meta property="og:image:alt" content="CAT Agent Platform Advisor" />
+    <meta name="thumbnail" property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta
+      property="og:image:alt"
+      content="The Agent Platform Advisor start page, showing the six Microsoft agent platforms it chooses between"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://microsoft.github.io/AgentPlatformAdvisor/images/og-image.png"
+    />
     <meta
       name="title"
       property="og:title"
@@ -26,30 +35,33 @@
     <meta
       name="description"
       property="og:description"
-      content="Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft agent platform for your scenario."
+      content="Answer a few questions about what you're trying to do, and we'll recommend the best Microsoft agent platform for your scenario."
     />
     <meta
       name="url"
       property="og:url"
-      content="https://microsoft.github.io/cat/agent-platform-advisor/index.html"
+      content="https://microsoft.github.io/AgentPlatformAdvisor/"
     />
     <meta name="type" property="og:type" content="article" />
     <meta
       name="site_name"
       property="og:site_name"
-      content="Microsoft CAT - Agent Platform Advisor"
+      content="Agent Platform Advisor"
     />
     <meta name="locale" property="og:locale" content="en_US" />
-    <meta name="author" property="og:author" content="Microsoft CAT" />
-    <meta name="publish_date" property="og:publish_date" content="2025-10-31" />
-    <meta name="description" content="Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft agent platform for your scenario." />
-  <title>Agent Platform Advisor — Microsoft CAT</title>
-  <link href="images/favicon.png" rel="shortcut icon" type="image/x-icon">
+    <meta name="author" property="og:author" content="Robert Standefer" />
+    <meta name="publish_date" property="og:publish_date" content="2026-07-24" />
+    <meta name="description" content="Answer a few questions about what you're trying to do, and we'll recommend the best Microsoft agent platform for your scenario." />
+  <title>Agent Platform Advisor</title>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
     <!-- Prevent flash of wrong theme -->
     <script>
       (function () {
-        var t = localStorage.getItem('cat-theme') || 'light';
+        var t = localStorage.getItem('cat-theme') || 'dark';
         document.documentElement.setAttribute('data-theme', t);
       })();
     </script>
@@ -63,8 +75,15 @@
         <div class="header-content">
           <div class="logo">
             <div class="logo-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M12 1.5a.75.75 0 0 1 .75.75 8.25 8.25 0 0 0 8.25 8.25.75.75 0 0 1 0 1.5 8.25 8.25 0 0 0-8.25 8.25.75.75 0 0 1-1.5 0 8.25 8.25 0 0 0-8.25-8.25.75.75 0 0 1 0-1.5 8.25 8.25 0 0 0 8.25-8.25A.75.75 0 0 1 12 1.5zM5.625 15a.375.375 0 0 1 .375.375 3.375 3.375 0 0 0 3.375 3.375.375.375 0 0 1 0 .75A3.375 3.375 0 0 0 6 22.875a.375.375 0 0 1-.75 0A3.375 3.375 0 0 0 1.875 19.5a.375.375 0 0 1 0-.75A3.375 3.375 0 0 0 5.25 15.375.375.375 0 0 1 5.625 15z"/>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+                <circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/>
+                <circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/>
+                <path d="M8 14c1 1.5 7 1.5 8 0"/>
+                <path d="M1 9h2"/>
+                <path d="M21 9h2"/>
+                <path d="M1 15h2"/>
+                <path d="M21 15h2"/>
               </svg>
             </div>
             <a class="logo-text" id="logo-home-link" href="#" aria-label="Go to Get Started page">Agent Platform Advisor</a>
@@ -79,31 +98,6 @@
                 <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
               </svg>
             </button>
-            <div class="nav-menu" id="nav-menu">
-              <button class="nav-menu-toggle" id="nav-menu-toggle" aria-label="Open documentation menu" aria-expanded="false" aria-controls="nav-menu-dropdown">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-              </button>
-              <div class="nav-menu-dropdown" id="nav-menu-dropdown" role="menu">
-                <a class="nav-menu-item" href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/README.md" target="_blank" rel="noopener" role="menuitem">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                  README
-                </a>
-                <a class="nav-menu-item" href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener" role="menuitem">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                  Changelog
-                </a>
-                <a class="nav-menu-item" href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/FLOWCHART.md" target="_blank" rel="noopener" role="menuitem">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                  Flowchart
-                </a>
-                <a class="nav-menu-item" href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/SCORING.md" target="_blank" rel="noopener" role="menuitem">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                  Scoring
-                </a>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -130,40 +124,74 @@
         <div id="welcome-section"  class="fade-in hidden"><div class="card">
   <div class="card-content card-content--centered">
     <div class="welcome-icon-wrapper">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="var(--primary)" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M12 1.5a.75.75 0 0 1 .75.75 8.25 8.25 0 0 0 8.25 8.25.75.75 0 0 1 0 1.5 8.25 8.25 0 0 0-8.25 8.25.75.75 0 0 1-1.5 0 8.25 8.25 0 0 0-8.25-8.25.75.75 0 0 1 0-1.5 8.25 8.25 0 0 0 8.25-8.25A.75.75 0 0 1 12 1.5zM5.625 15a.375.375 0 0 1 .375.375 3.375 3.375 0 0 0 3.375 3.375.375.375 0 0 1 0 .75A3.375 3.375 0 0 0 6 22.875a.375.375 0 0 1-.75 0A3.375 3.375 0 0 0 1.875 19.5a.375.375 0 0 1 0-.75A3.375 3.375 0 0 0 5.25 15.375.375.375 0 0 1 5.625 15z"/>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <circle cx="9" cy="9" r="1.5" fill="var(--primary)" stroke="none"/>
+        <circle cx="15" cy="9" r="1.5" fill="var(--primary)" stroke="none"/>
+        <path d="M8 14c1 1.5 7 1.5 8 0"/>
+        <path d="M1 9h2"/>
+        <path d="M21 9h2"/>
+        <path d="M1 15h2"/>
+        <path d="M21 15h2"/>
       </svg>
     </div>
     <h1 class="welcome-heading">
       Agent Platform Advisor
     </h1>
     <p class="welcome-description">
-      Answer a few questions about what you're trying to build, and we'll recommend the best Microsoft platform to build it on.
+      Answer a few questions about what you want from agents, and we'll recommend the best Microsoft platform for your agent needs.
     </p>
-    <div class="platform-grid">
-      <div class="platform-preview">
-        <div class="platform-preview-icon">
-          <img src="images/m365-copilot-logo.png" alt="Microsoft 365 Copilot" class="platform-preview-img">
+    <p class="platform-preview-intro">
+      Here's what the advisor chooses between — select <strong>Get Started</strong> below to find your fit.
+    </p>
+    <div class="delegate-group">
+      <div class="delegate-group-label">Use agents</div>
+      <div class="platform-grid platform-grid--delegate">
+        <div class="platform-preview">
+          <div class="platform-preview-icon">
+            <img src="images/m365-copilot-logo.png" alt="Microsoft 365 Copilot" class="platform-preview-img">
+          </div>
+          <h3 class="platform-preview-title">Microsoft 365 Copilot</h3>
+          <p class="platform-preview-desc">Get answers, draft content, and surface insights in seconds with secure AI chat</p>
         </div>
-        <h3 class="platform-preview-title">Microsoft 365 Copilot</h3>
+        <div class="platform-preview">
+          <div class="platform-preview-icon">
+            <img src="images/cowork.png" alt="Cowork" class="platform-preview-img">
+          </div>
+          <h3 class="platform-preview-title">Cowork</h3>
+          <p class="platform-preview-desc">Describe the outcome you want, grounded in the work in your emails, meetings, messages, files, and data.</p>
+        </div>
+        <div class="platform-preview">
+          <div class="platform-preview-icon">
+            <img src="images/scout.svg" alt="Scout" class="platform-preview-img">
+          </div>
+          <h3 class="platform-preview-title">Scout</h3>
+          <p class="platform-preview-desc">Use always-on agents that work autonomously, with their own identity, grounded in your enterprise data </p>
+        </div>
       </div>
+    </div>
+    <div class="delegate-group-label">Build agents</div>
+    <div class="platform-grid">
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/copilot.png" alt="Agent Builder" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Agent Builder</h3>
+        <p class="platform-preview-desc">Quickly build declarative agents by using natural language</p>
       </div>
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/copilot-studio.png" alt="Copilot Studio" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Copilot Studio</h3>
+        <p class="platform-preview-desc">Create custom agents with natural language or a graphical interface</p>
       </div>
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/foundry.svg" alt="Microsoft Foundry" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Microsoft Foundry</h3>
+        <p class="platform-preview-desc">Pro-code platform to build, ground, and govern AI apps and agents at scale</p>
       </div>
     </div>
     <button class="btn btn-primary btn-lg" id="start-btn">
@@ -180,16 +208,16 @@
       Choose a starting point. This helps us tailor the best recommendation for you.
     </p>
     <div class="options-list">
-      <div class="option-card prescreen-option prescreen-option--builtin" id="prescreen-yes" role="button" tabindex="0" onclick="handlePrescreenYes()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenYes()}">
-        <div class="prescreen-option-icon prescreen-option-icon--builtin">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <div class="option-card prescreen-option prescreen-option--delegate" id="prescreen-delegate" role="button" tabindex="0" onclick="handlePrescreenDelegate()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handlePrescreenDelegate()}">
+        <div class="prescreen-option-icon prescreen-option-icon--delegate">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <div class="option-content">
           <div class="option-label">
-            I'd like to start with a built-in Microsoft 365 Copilot experience
+            Help me find the right place to get work done
           </div>
           <div class="option-description">
-            Explore what's available in Microsoft 365, including Cowork and pre-built agents
+            Answer a few quick questions about how you want the work to happen, and we'll point you to the best place to do it
           </div>
         </div>
       </div>
@@ -215,19 +243,96 @@
             I'm exploring what's possible with agents
           </div>
           <div class="option-description">
-            Browse all four platforms and learn which scenarios each one is designed for
+            Browse the ways to use or build agents and learn which scenarios each one is designed for
           </div>
         </div>
       </div>
     </div>
   </div>
 </div></div>
+        <div id="delegate-section" class="fade-in hidden"><div class="card">
+  <div class="card-content card-content--centered">
+    <a href="#" class="exploration-back" onclick="showSection('prescreen-section');pushState('prescreen-section');return false">← Back to options</a>
+    <h2 class="prescreen-heading">Where should you get this work done?</h2>
+    <p class="prescreen-description">
+      Microsoft 365 Copilot, Cowork, and Scout are all places to get work done. Answer a couple of
+      quick questions and we'll point you to the best entry point — and where to start inside it.
+    </p>
+    <div class="delegate-question">
+      <h3 class="delegate-question-title">How hands-on do you want to be?</h3>
+      <div class="options-list">
+        <div class="option-card delegate-option" data-group="involvement" data-value="interactive" role="button" tabindex="0" onclick="selectDelegateOption(this,'involvement','interactive')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'involvement','interactive')}">
+          <div class="option-content"><div class="option-label">I'll ask questions and work through it myself</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="involvement" data-value="delegate" role="button" tabindex="0" onclick="selectDelegateOption(this,'involvement','delegate')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'involvement','delegate')}">
+          <div class="option-content"><div class="option-label">Hand off the whole task and give me the result</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="interactive-followup" class="delegate-followup" aria-hidden="true">
+    <div class="delegate-followup-inner">
+    <div class="delegate-question">
+      <h3 class="delegate-question-title">What kind of task is it?</h3>
+      <div class="options-list">
+        <div class="option-card delegate-option" data-group="taskType" data-value="general" role="button" tabindex="0" onclick="selectDelegateOption(this,'taskType','general')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'taskType','general')}">
+          <div class="option-content"><div class="option-label">General help — brainstorm, find info, catch up on email or meetings, draft and edit documents</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="taskType" data-value="specialized" role="button" tabindex="0" onclick="selectDelegateOption(this,'taskType','specialized')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'taskType','specialized')}">
+          <div class="option-content"><div class="option-label">A specialized task — deep research, data analysis, meeting facilitation, or translation</div></div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+    <div id="delegate-followup" class="delegate-followup" aria-hidden="true">
+    <div class="delegate-followup-inner">
+    <div class="delegate-question">
+      <h3 class="delegate-question-title">Should it finish and hand back, or keep working over time?</h3>
+      <div class="options-list">
+        <div class="option-card delegate-option" data-group="cadence" data-value="ondemand" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','ondemand')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','ondemand')}">
+          <div class="option-content"><div class="option-label">Finish a multi-step job in one go — several artifacts, or a process across systems — and hand me the result</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="cadence" data-value="continuous" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','continuous')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','continuous')}">
+          <div class="option-content"><div class="option-label">Stay always-on — manage and coordinate my day, following up and acting over time</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="cadence" data-value="unsure" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','unsure')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','unsure')}">
+          <div class="option-content"><div class="option-label">Not sure yet</div></div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+    <div id="reach-followup" class="delegate-followup" aria-hidden="true">
+    <div class="delegate-followup-inner">
+    <div class="delegate-question">
+      <h3 class="delegate-question-title">Where does it need to reach?</h3>
+      <div class="options-list">
+        <div class="option-card delegate-option" data-group="reach" data-value="m365" role="button" tabindex="0" onclick="selectDelegateOption(this,'reach','m365')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'reach','m365')}">
+          <div class="option-content"><div class="option-label">Inside Microsoft 365 — email, meetings, files, Teams</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="reach" data-value="cross" role="button" tabindex="0" onclick="selectDelegateOption(this,'reach','cross')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'reach','cross')}">
+          <div class="option-content"><div class="option-label">Also my desktop, browser, local files, and command line</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="reach" data-value="unsure" role="button" tabindex="0" onclick="selectDelegateOption(this,'reach','unsure')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'reach','unsure')}">
+          <div class="option-content"><div class="option-label">Not sure yet</div></div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+    <div class="center assessment-nav">
+      <button class="btn btn-primary" id="delegate-next-btn" disabled onclick="finishDelegate()">
+        See recommendation <span class="icon icon-chevron-right"></span>
+      </button>
+    </div>
+  </div>
+</div></div>
         <div id="exploration-section" class="fade-in hidden"><div class="card">
   <div class="card-content card-content--centered">
     <a href="#" class="exploration-back" onclick="showSection('prescreen-section');pushState('prescreen-section');return false">← Back to options</a>
-    <h2 class="welcome-heading" style="font-size:32px">Explore Microsoft Agent Platforms</h2>
-    <p class="welcome-description">See what each platform offers before deciding which fits your scenario.</p>
-    <div class="exploration-grid" id="exploration-grid"></div>
+    <h2 class="welcome-heading" style="font-size:2rem">Explore ways to use or build agents</h2>
+    <p class="welcome-description">Compare available agents and platforms for building your own.</p>
+    <div class="exploration-groups" id="exploration-groups"></div>
     <div class="exploration-cta">
       <h3 class="exploration-cta-heading">Not sure which fits? Let the assessment guide you</h3>
       <button class="btn btn-primary btn-lg" onclick="handlePrescreenNo()">Start the Assessment →</button>
@@ -297,9 +402,15 @@
 
     <div class="footer">
       Created by
-      <a href="https://www.linkedin.com/in/rstandefer/">Robert Standefer</a>&amp; the <a href="https://aka.ms/wearecat">Microsoft Copilot Acceleration Team</a>
+      <a href="https://www.linkedin.com/in/rstandefer/">Robert Standefer</a>
+      <div class="footer-doc-links" aria-label="Project documentation">
+        <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/README.md" target="_blank" rel="noopener">README</a>
+        <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>
+        <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/FLOWCHART.md" target="_blank" rel="noopener">FLOWCHART</a>
+        <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/SCORING.md" target="_blank" rel="noopener">SCORING</a>
+      </div>
       <p>If you encounter a problem, please
-        <a href="https://github.com/microsoft/cat/issues/new">create an issue</a>.
+        <a href="https://github.com/microsoft/cat/issues/new">create an issue</a>
       </p>
     </div>
 

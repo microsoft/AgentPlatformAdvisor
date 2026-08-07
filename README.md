@@ -1,6 +1,6 @@
 # Agent Platform Advisor
 
-Answer a few questions about what you're trying to build, and get a recommendation for the best Microsoft agent platform for your scenario.
+Choose the right Microsoft agent experience for what you want to do: use built-in Copilot capabilities, delegate work to a personal agent, or build a custom agent on the right platform.
 
 The live tool is at [https://microsoft.github.io/AgentPlatformAdvisor/index.html](https://microsoft.github.io/AgentPlatformAdvisor/index.html).
 
@@ -8,70 +8,110 @@ The live tool is at [https://microsoft.github.io/AgentPlatformAdvisor/index.html
 
 ## What it does
 
-The Agent Platform Advisor is a single-page web app that recommends the right Microsoft agent platform — **Agent Builder**, **Copilot Studio**, **Microsoft Foundry**, or **Microsoft 365 Copilot** — based on a short scored assessment.
+The Agent Platform Advisor is a static single-page web app that helps people navigate the Microsoft agent landscape. It has evolved from a simple build-platform picker into a broader advisor for two distinct intents:
 
-From the welcome screen you choose one of three paths:
+1. **Get work done** — an entry-point wizard routes end users to the right place to do the work — **Microsoft 365 Copilot**, **Copilot Cowork**, or **Microsoft Scout** — based on how the work should happen, not which product they name. When it lands on Microsoft 365 Copilot it also says which surface to start with: Copilot Chat, or a built-in agent such as Researcher, Analyst, Facilitator, or Interpreter.
+2. **Build agents** — answer a scored assessment that recommends **Agent Builder**, **Copilot Studio**, or **Microsoft Foundry**.
 
-1. **Take the assessment** — a 5-question wizard that scores each platform and produces a recommendation
-2. **Microsoft 365 Copilot fast-track** — skips the wizard when the user only needs built-in M365 Copilot experiences
-3. **Guided exploration** — browse all four platforms with scenario-focused summaries before deciding whether to start the assessment
+The start page presents ways to use or build agents:
 
-The assessment asks about:
+| Intent | Destination | Best for |
+|---|---|---|
+| Use | Microsoft 365 Copilot | Built-in, permission-aware chat, search, app-native Copilot, Pages, Notebooks, and Microsoft-built agents |
+| Delegate | Copilot Cowork | On-demand multi-step Microsoft 365 work with approval checkpoints |
+| Delegate | Microsoft Scout | Always-on, proactive work across desktop, browser, local files, shell, and Microsoft 365 |
+| Build | Agent Builder | No-code Microsoft 365 Copilot agents for small-team knowledge, web, file, and connector-backed scenarios |
+| Build | Copilot Studio | Governed low-code agents with tools, workflows, triggers, evaluation, monitoring, and broad deployment |
+| Build | Microsoft Foundry | Code-first production agents with managed runtime, custom retrieval, identity, networking, observability, and Azure-scale controls |
 
-- Who is building the agent (business user, low-code maker, developer, data scientist)
-- Who will use it (internal employees or external users)
-- Where users will interact with it (Microsoft 365 apps, a custom app, or background/event-triggered)
-- What the agent should do (Q&A, multi-turn conversation, multi-step tasks, or complex orchestration)
-- What data the agent needs to access (Microsoft 365 content, external systems, or advanced data sources)
+## User paths
 
-After completing the assessment, you get:
+From **Get Started**, users choose one of three paths:
 
-- A primary recommendation with fit badge, key factors, and persona-specific tips
-- A runner-up "Also Consider" card when a second platform is close
-- A score comparison panel with animated per-platform score bars
-- Contextual warnings when answer combinations are contradictory
-- A "Why not?" explainer when the top two platforms score within 2 points
-- A shareable link that encodes your answers and the recommendation date
+1. **Entry-point wizard** ("Help me find the right place to get work done") — asks how hands-on you want to be, then routes to Microsoft 365 Copilot (featuring either Copilot Chat or its built-in agents), Cowork, Scout, or a Cowork+Scout pair. Non-scored.
+2. **Custom agent assessment** — runs the scored 5-question wizard for Agent Builder, Copilot Studio, and Foundry.
+3. **Explore what's possible** — compares ways to use or build agents before deciding whether to take the assessment.
 
-The app also supports **dark mode** (toggle in the header, respects OS preference) and preserves wizard answers across page refreshes via sessionStorage.
+The custom agent assessment asks about:
+
+- Who is building the agent: business user, low-code maker, professional developer, or data scientist/AI engineer
+- Who will use it: small internal team, broad internal audience, external users, or undecided
+- Where users will interact with it: Microsoft 365 Copilot chat, custom app, background/event-triggered runtime, or multiple places
+- What the agent should do: Q&A, multi-turn conversation, content/data analysis, multi-step action workflows, or complex orchestration
+- What information it needs: Microsoft 365 content, connector-backed systems, Dataverse/custom APIs, public web/uploaded files, or custom retrieval architecture
+
+After completing a path, users get:
+
+- A primary recommendation with fit badge, key factors, and platform-specific guidance
+- A "Start Here" callout on entry-point results naming the surface to open first
+- A secondary "Also Consider" card when another option is close or complementary
+- A score comparison panel for the scored wizard
+- Contextual warnings for contradictory answer combinations
+- A "Why not?" explainer when the top two scored platforms are within 2 points
+- A shareable link that encodes the path, answers, recommendation, and recommendation date
+
+The app supports dark mode, browser history navigation, answer persistence through `sessionStorage`, shared result links, and temporal-change banners when a saved recommendation changes after `apa.yaml` is updated.
 
 ## Project structure
 
-```
+```text
 agent-platform-advisor/
-├── index.html              # App shell (YAML-driven)
-├── apa.yaml                # Scoring matrix, questions, recommendations, and all content
+├── index.html              # App shell and static markup
+├── apa.yaml                # Source of truth for questions, scores, routing, recommendations, and content
 ├── assets/
-│   ├── apa.css             # All styles (light + dark mode)
-│   └── apa.js              # All JavaScript (state, rendering, scoring engine)
+│   ├── apa.css             # All styles, theme tokens, responsive layout, and dark mode
+│   └── apa.js              # State, rendering, routing, scoring engine, sharing, and persistence
 ├── images/                 # Platform icons and favicons
 ├── docs/
 │   ├── CHANGELOG.md        # Version history
-│   ├── DESIGN.md           # Design system reference (Fluent 2)
-│   ├── FLOWCHART.md        # Scoring pipeline decision tree
+│   ├── DESIGN.md           # Design system reference
+│   ├── FLOWCHART.md        # Scoring and routing decision tree
 │   └── SCORING.md          # Scoring system reference
 └── tests/
     └── e2e/                # Playwright end-to-end tests
 ```
 
-The app is purely static — no build step, no backend. All content (questions, scores, platform descriptions, hard rules, tiebreakers, structure data, implementation checklists) lives in `apa.yaml` and is fetched at runtime. The YAML is validated against the expected schema on load.
+The app is purely static: no backend, no bundler, and no build step. `index.html` loads `assets/apa.js`, which fetches `apa.yaml` at runtime and renders the experience from that data.
 
-## How scoring works
+## How recommendation logic works
 
-See [docs/SCORING.md](docs/SCORING.md) for the full reference and [docs/FLOWCHART.md](docs/FLOWCHART.md) for a visual decision tree. The short version:
+See [docs/SCORING.md](docs/SCORING.md) for the full reference and [docs/FLOWCHART.md](docs/FLOWCHART.md) for the visual decision tree.
 
-1. **Hard rules** zero out platforms for certain answer combinations (e.g., Agent Builder is zeroed for external users, custom apps, background execution, or advanced data sources).
-2. **Raw scores** are summed across all 5 questions (max 15 points per platform).
-3. **Tiebreakers** in `apa.yaml` resolve equal scores using persona context (e.g., professional developer + tie → Copilot Studio preferred over Agent Builder).
-4. **Thresholds** map final scores to fit labels: Strong fit (12–15), Good fit (8–11), Partial fit (4–7), Not recommended (0–3).
+There are two recommendation modes:
 
-Microsoft 365 Copilot is only recommended via the prescreen fast-track path, never through the scored wizard.
+1. **Entry-point wizard** is non-scored. It first asks how hands-on the user wants to be:
+   - Hands-on → **Microsoft 365 Copilot**, plus a task-type question that picks the starting surface: general help -> Copilot Chat; a specialized job (research, data, meetings, translation) -> a built-in agent (Researcher, Analyst, Facilitator, Interpreter)
+   - Hand it off → cadence + reach questions: continuous work or cross-environment reach -> Scout; on-demand work inside Microsoft 365 -> Cowork; undecided signals -> both
+
+   Copilot Chat and the built-in agents are surfaces *of* Microsoft 365 Copilot, not competing destinations, so the hands-on path always produces a single Microsoft 365 Copilot card.
+2. **Custom agent assessment** is scored across Agent Builder, Copilot Studio, and Foundry:
+   - Hard rules zero out platforms for disqualifying combinations before scoring.
+   - Raw scores sum across 5 questions, with a maximum of 15 points per platform.
+   - Persona preferences and tiebreakers adjust ranking when scores are tied or misleading for the selected builder persona.
+   - Thresholds map scores to fit labels: Strong fit (12-15), Good fit (8-11), Partial fit (4-7), Not recommended (0-3).
+
+Microsoft 365 Copilot, Cowork, and Scout are not part of the 0-15 scored wizard. They are reached only through the entry-point wizard.
+
+## Current platform positioning
+
+The advisor reflects the current split between Microsoft agent options:
+
+- **Agent Builder** has expanded beyond SharePoint/OneDrive-only scenarios. It now covers no-code agents grounded in Microsoft 365 content, scoped web, uploaded files, and admin-enabled Microsoft 365 Copilot connectors, including lightweight content and data-analysis helpers.
+- **Copilot Studio** is the default governed low-code path for enterprise agents that need actions, workflows, triggers, connectors, MCP tools, computer use, connected agents, evaluation, monitoring, and multi-channel deployment.
+- **Microsoft Foundry** is the developer-controlled production runtime for prompt agents, hosted code agents, custom retrieval, managed endpoints, toolboxes, MCP, identity, private networking, tracing, evaluation, monitoring, and custom app/service integration.
+- **Microsoft 365 Copilot** is treated as the built-in productivity layer, and as one product rather than several: Copilot Chat, Copilot Search, app-native Copilot, Pages, Notebooks, and Microsoft-built agents are all surfaces within it.
+- **Copilot Cowork** and **Microsoft Scout** are personal agents you delegate work to, not platforms in the scored build assessment.
 
 ## Sharing results
 
-After completing the assessment, a **Share link** button copies a URL encoding your answers and the recommendation date. Recipients can view the recommendation directly or retake the assessment with your answers pre-filled (`?mode=wizard`).
+Share links encode the recommendation path:
 
-If `apa.yaml` is updated after a link was shared and the recommendation has changed, the app shows a temporal change banner explaining what shifted. If the schema itself has changed (questions added or removed), a schema drift note explains that criteria have been updated.
+- Wizard results include selected answers, the recommended platform, and the recommendation date.
+- Entry-point results include `dt=m365_copilot`, `dt=cowork`, `dt=scout`, or `dt=both`, plus `st=chat` or `st=agents` for the Microsoft 365 Copilot starting surface.
+- Older links keep working: `ft=1` and `dt=copilot_chat` both resolve to the Microsoft 365 Copilot card.
+- Recipients can view the recommendation directly or retake the assessment with answers pre-filled.
+
+When `apa.yaml` changes after a link is shared, the app can show a temporal-change banner if the recommendation changed. If the question schema changes, a schema drift note explains that the criteria have been updated.
 
 ## Running the tests
 
@@ -83,10 +123,10 @@ npm test              # headless
 npm run test:headed   # with browser visible
 ```
 
-25 tests across 5 spec files cover wizard completion, shared link loading, temporal change detection, the M365 fast-track path, and share button behavior. CI runs automatically on push and pull request via GitHub Actions.
+There are 39 tests across 6 spec files covering wizard completion, shared link loading, temporal change detection, legacy fast-track links, entry-point wizard routing, and share button behavior. To run a single file or test: `npx playwright test tests/e2e/delegate-path.spec.js` or `npx playwright test -g "completes full wizard"`. CI runs automatically on push and pull request via GitHub Actions.
 
 ## Contributing
 
-Content changes (question text, scores, platform descriptions, hard rules) go in `apa.yaml`. UI changes go in `assets/apa.css` and `assets/apa.js`. Read [docs/DESIGN.md](docs/DESIGN.md) before making any visual changes — colors, spacing, typography, and component specs are all defined there.
+Content changes go in `apa.yaml`: questions, scores, recommendations, platform descriptions, hard rules, tiebreakers, delegate routing content, and exploration copy. UI behavior goes in `assets/apa.js`. Styles go in `assets/apa.css`.
 
-Always update [docs/CHANGELOG.md](docs/CHANGELOG.md) after making changes. Update [docs/FLOWCHART.md](docs/FLOWCHART.md) and [docs/SCORING.md](docs/SCORING.md) if changes affect the scoring pipeline or user flow.
+Read [docs/DESIGN.md](docs/DESIGN.md) before making visual changes. Always update [docs/CHANGELOG.md](docs/CHANGELOG.md) after making changes. Update [docs/FLOWCHART.md](docs/FLOWCHART.md) and [docs/SCORING.md](docs/SCORING.md) when changes affect routing, scoring, hard rules, tiebreakers, or user flow.

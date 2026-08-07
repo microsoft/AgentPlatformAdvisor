@@ -2,6 +2,9 @@
 let apa = null; // populated from YAML
 let answers = {}; // { q1: 'q1a', q2: 'q2b', ... }
 let fastTrack = false;
+let delegateResult = null; // 'm365_copilot' | 'cowork' | 'scout' | 'both' — set on the entry-point path
+let delegateStart = null;  // 'chat' | 'agents' — which surface inside Microsoft 365 Copilot to start with
+let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
 let currentQuestionIndex = 0;
 let listenersReady = false;
 let recommendedPlatformId = null;
@@ -12,7 +15,7 @@ let originalDate = null; // from &d= URL param
 // === UTILITIES ===
 function showSection(id) {
   ['loading-section','error-section','welcome-section','prescreen-section',
-   'exploration-section','assessment-section','recommendation-section'].forEach(s => {
+   'delegate-section','exploration-section','assessment-section','recommendation-section'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.toggle('hidden', s !== id);
   });
@@ -49,6 +52,7 @@ function updateProgressBar(sectionId) {
     'error-section': 0,
     'welcome-section': 0,
     'prescreen-section': 0,
+    'delegate-section': 1,
     'assessment-section': 1,
     'recommendation-section': 2,
   }[sectionId] ?? 0;
@@ -244,7 +248,12 @@ const PLATFORM_ICONS = {
   m365_copilot:   'images/m365-copilot-logo.png',
   copilot_studio: 'images/copilot-studio.png',
   foundry:        'images/foundry.svg',
+  cowork:         'images/cowork.png',
+  scout:          'images/scout.svg',
 };
+
+// Destinations reached through the entry-point wizard rather than the scored wizard.
+const ENTRY_POINT_PLATFORMS = ['m365_copilot', 'cowork', 'scout'];
 
 function badgeClass(label) {
   if (label.startsWith('Strong'))   return 'badge-strong';
@@ -254,11 +263,14 @@ function badgeClass(label) {
 }
 
 
-function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge) {
+function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge, startKey) {
   const rec = apa.recommendations[platformId];
   if (!rec) return `<div class="rec-card"><p>Platform data unavailable.</p></div>`;
   const rankEntry = ranked.find(r => r.id === platformId);
-  const detailsOpen = platformId === 'm365_copilot' ? ' open' : '';
+  // Entry-point destinations are single-card results with nothing to compare against,
+  // so their accordions start expanded — the card is the whole page. Scored platform
+  // cards stay collapsed to keep the comparison scannable.
+  const detailsOpen = ENTRY_POINT_PLATFORMS.includes(platformId) ? ' open' : '';
   // showBadge is true only for scored primary cards; key factors are only meaningful in that same context
   const factors = isPrimary && showBadge ? getKeyFactors(platformId, answersMap) : [];
   const icon = PLATFORM_ICONS[platformId] || '';
@@ -278,10 +290,28 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
 
   const bestFor = (rec.best_for || []).map(f => `<li>${f}</li>`).join('');
   const watchOut = (rec.watch_out_for || []).map(f => `<li>${f}</li>`).join('');
+  // A start_here entry (chosen by the entry-point wizard) takes precedence over a
+  // static spotlight: it tells the user which surface of this platform to open first.
+  const startHere = startKey && rec.start_here ? rec.start_here[startKey] : null;
+  const spotlight = startHere || rec.spotlight;
+  const spotlightEyebrow = startHere ? 'Start Here' : 'Featured Capability';
+  const spotlightHtml = spotlight ? (() => {
+    const nameHtml = spotlight.url
+      ? `<a href="${spotlight.url}" target="_blank" rel="noopener noreferrer">${spotlight.label}</a>`
+      : spotlight.label;
+    return `
+    <div class="rec-spotlight">
+      <div class="rec-spotlight-eyebrow">${spotlightEyebrow}</div>
+      <div class="rec-spotlight-name">${nameHtml}</div>
+      <div class="rec-spotlight-tagline">${spotlight.tagline}</div>
+      <p class="rec-spotlight-description">${spotlight.description}</p>
+    </div>`;
+  })() : '';
+
   const firstPartyHtml = (rec.first_party_agents || []).length > 0 ? `
     <details class="rec-accordion"${detailsOpen}>
       <summary class="rec-accordion-trigger">
-        <span class="rec-section-title">Available First-Party Copilot Agents</span>
+        <span class="rec-section-title">${rec.first_party_label || 'Available First-Party Copilot Agents'}</span>
         <span class="rec-accordion-count">${rec.first_party_agents.length}</span>
         <svg class="rec-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
       </summary>
@@ -322,6 +352,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
       </div>
       ${descriptionHtml}
       <p class="rec-summary">${rec.summary}</p>
+      ${spotlightHtml}
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
         : ''}
@@ -353,7 +384,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge)
     </div>`;
 }
 
-const DEFAULT_TITLE = 'Agent Platform Advisor — Microsoft CAT';
+const DEFAULT_TITLE = 'Agent Platform Advisor';
 
 // === SESSION STORAGE ===
 function saveAnswersToStorage() {
@@ -456,17 +487,9 @@ function setupListeners() {
   document.getElementById('prev-btn').addEventListener('click', handlePrev);
 }
 
-function handlePrescreenYes() {
-  fastTrack = true;
-  answers = {};
-  if (typeof clarity === 'function') clarity('set', 'fast_track', 'true');
-  renderRecommendation();
-  showSection('recommendation-section');
-  pushState('recommendation-section');
-}
-
 function handlePrescreenNo() {
   fastTrack = false;
+  delegateResult = null;
   if (Object.keys(answers).length === 0) {
     currentQuestionIndex = 0;
   }
@@ -481,24 +504,155 @@ function handlePrescreenExplore() {
   pushState('exploration-section');
 }
 
+function handlePrescreenDelegate() {
+  fastTrack = false;
+  delegateResult = null;
+  delegateAnswers = {};
+  // Reset any prior selections in the static delegate section
+  document.querySelectorAll('#delegate-section .delegate-option').forEach(el => el.classList.remove('selected'));
+  ['interactive-followup', 'delegate-followup', 'reach-followup'].forEach(id => {
+    const followup = document.getElementById(id);
+    if (followup) {
+      followup.classList.remove('is-open');
+      followup.setAttribute('aria-hidden', 'true');
+    }
+  });
+  const btn = document.getElementById('delegate-next-btn');
+  if (btn) btn.disabled = true;
+  if (typeof clarity === 'function') clarity('set', 'delegate_path', 'true');
+  showSection('delegate-section');
+  pushState('delegate-section');
+}
+
+function selectDelegateOption(el, group, value) {
+  delegateAnswers[group] = value;
+  document.querySelectorAll(`#delegate-section .delegate-option[data-group="${group}"]`)
+    .forEach(o => o.classList.toggle('selected', o === el));
+
+  // The involvement answer controls which follow-up questions apply.
+  // Interactive → ask what kind of task (which Microsoft 365 Copilot surface to start with).
+  // Delegate → ask cadence first; reach is revealed only once cadence is answered.
+  if (group === 'involvement') {
+    setFollowupEnabled('interactive-followup', value === 'interactive', ['taskType']);
+    setFollowupEnabled('delegate-followup', value === 'delegate', ['cadence']);
+    setFollowupEnabled('reach-followup', false, ['reach']);
+  }
+
+  // Reach only becomes relevant once the user has told us the cadence, so we
+  // reveal it progressively instead of showing both delegate questions at once.
+  if (group === 'cadence') {
+    setFollowupEnabled('reach-followup', true, ['reach']);
+  }
+
+  const btn = document.getElementById('delegate-next-btn');
+  if (btn) btn.disabled = !isDelegateReady();
+}
+
+// Enable/disable a follow-up block, clearing its stale answers and selections when hidden.
+function setFollowupEnabled(id, enabled, groups) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('is-open', enabled);
+  el.setAttribute('aria-hidden', String(!enabled));
+  if (!enabled) {
+    groups.forEach(g => delete delegateAnswers[g]);
+    el.querySelectorAll('.delegate-option').forEach(o => o.classList.remove('selected'));
+  }
+}
+
+// Ready when interactive help has a task type, or a delegation is fully specified.
+function isDelegateReady() {
+  if (delegateAnswers.involvement === 'interactive') return !!delegateAnswers.taskType;
+  if (delegateAnswers.involvement === 'delegate') {
+    return !!(delegateAnswers.cadence && delegateAnswers.reach);
+  }
+  return false;
+}
+
+// Routing rule for the "where should I get work done" entry-point wizard:
+// Staying hands-on always lands on Microsoft 365 Copilot — Copilot Chat and the
+// built-in agents (Researcher, Analyst, Facilitator, Interpreter, …) are surfaces of
+// that one product, not separate destinations, so the task type selects which surface
+// to start with (see resolveDelegateStart) rather than which card to show.
+// When delegating: Scout wins if the work is continuous OR reaches beyond Microsoft 365;
+// Cowork wins only when the work is on demand AND scoped to Microsoft 365;
+// otherwise (undecided signals) present Cowork and Scout as a complementary pair.
+function resolveDelegateResult(involvement, taskType, cadence, reach) {
+  if (involvement === 'interactive') return 'm365_copilot';
+  if (cadence === 'continuous') return 'scout';
+  if (reach === 'cross') return 'scout';
+  if (cadence === 'ondemand' && reach === 'm365') return 'cowork';
+  return 'both';
+}
+
+// Which Microsoft 365 Copilot surface the result card should feature.
+function resolveDelegateStart(involvement, taskType) {
+  if (involvement !== 'interactive') return null;
+  return taskType === 'specialized' ? 'agents' : 'chat';
+}
+
+function finishDelegate() {
+  if (!isDelegateReady()) return;
+  delegateResult = resolveDelegateResult(
+    delegateAnswers.involvement, delegateAnswers.taskType,
+    delegateAnswers.cadence, delegateAnswers.reach);
+  delegateStart = resolveDelegateStart(delegateAnswers.involvement, delegateAnswers.taskType);
+  renderRecommendation();
+  showSection('recommendation-section');
+  pushState('recommendation-section');
+}
+
 function renderExploration() {
-  const grid = document.getElementById('exploration-grid');
-  if (!grid) return;
-  const platformOrder = ['m365_copilot', 'agent_builder', 'copilot_studio', 'foundry'];
-  grid.innerHTML = platformOrder.map(pid => {
+  const groupsContainer = document.getElementById('exploration-groups');
+  if (!groupsContainer) return;
+  const explorationGroups = [
+    {
+      title: 'Use agents',
+      description: 'Start with built-in or ready-made agents that work inside Microsoft 365 or across your work environment.',
+      platforms: ['m365_copilot', 'cowork', 'scout']
+    },
+    {
+      title: 'Build agents',
+      description: 'Choose a platform for creating, extending, governing, and operating agents for your scenario.',
+      platforms: ['agent_builder', 'copilot_studio', 'foundry']
+    }
+  ];
+  const renderCard = pid => {
     const rec = apa.recommendations[pid];
     if (!rec) return '';
     const bestFor = rec.exploration_best_for || rec.scoring_summary;
     const summary = (rec.exploration_summary || rec.summary || '').trim();
     const url = rec.resources_url || '#';
+    const spotlightChip = rec.spotlight ? (() => {
+      const nameHtml = rec.spotlight.url
+        ? `<a href="${rec.spotlight.url}" target="_blank" rel="noopener noreferrer">${rec.spotlight.label}</a>`
+        : rec.spotlight.label;
+      return `<div class="exploration-card-spotlight">
+        <span class="exploration-card-spotlight-eyebrow">Featured</span>
+        <span class="exploration-card-spotlight-name">${nameHtml}</span>
+        <span class="exploration-card-spotlight-tagline">${rec.spotlight.tagline}</span>
+      </div>`;
+    })() : '';
     return `
       <div class="exploration-card">
         <div class="exploration-card-label">${bestFor}</div>
         <h3 class="exploration-card-title">${rec.headline}</h3>
         <p class="exploration-card-summary">${summary}</p>
+        ${spotlightChip}
         <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Explore resources →</a>
       </div>`;
-  }).join('');
+  };
+  groupsContainer.innerHTML = explorationGroups.map(group => `
+    <section class="exploration-section-group" aria-labelledby="exploration-${group.title.toLowerCase().replace(/\s+/g, '-')}">
+      <div class="exploration-group-header">
+        <h3 class="exploration-group-title" id="exploration-${group.title.toLowerCase().replace(/\s+/g, '-')}">${group.title}</h3>
+        <p class="exploration-group-description">${group.description}</p>
+      </div>
+      <div class="exploration-grid">
+        ${group.platforms.map(renderCard).join('')}
+      </div>
+    </section>
+  `).join('');
 }
 
 function renderQuestion() {
@@ -614,7 +768,7 @@ function getScoreReason(platformId, ranked, answersMap) {
     const labels = getHardRuleLabels(platformId, answersMap);
     if (labels.length > 0) return labels.map(l => `⚠️ ${l}`).join('<br>');
     if (platformId === 'm365_copilot' && !fastTrack) {
-      return 'Only available via the Microsoft 365 Copilot path — excluded from custom agent assessment.';
+      return 'Only available via the entry-point wizard — excluded from custom agent assessment.';
     }
     return rec ? rec.scoring_summary : 'Not applicable for this scenario.';
   }
@@ -787,8 +941,49 @@ function showRecNav(hasSecondary) {
   alsoSep.style.display = hasSecondary ? '' : 'none';
 }
 
+// Renders the entry-point result (Copilot Chat / Cowork / Scout). Non-scored:
+// no score breakdown, no cross-question notes, no decision card — mirrors the fast-track branch.
+function renderDelegateRecommendation() {
+  const ids = delegateResult === 'both' ? ['cowork', 'scout'] : [delegateResult];
+  recommendedPlatformId = ids[0];
+
+  document.getElementById('rec-primary-card').innerHTML =
+    buildPlatformCard(ids[0], [], {}, true, false, delegateStart);
+
+  const pairBanner = document.getElementById('rec-pair-banner');
+  const secondLabel = document.getElementById('rec-second-label');
+  if (ids.length > 1) {
+    pairBanner.innerHTML =
+      '<strong>Consider both.</strong> Scout can be the always-on layer that monitors and coordinates, ' +
+      'while Cowork assembles the Microsoft 365 deliverables on demand.';
+    pairBanner.classList.remove('hidden');
+    secondLabel.textContent = 'Also consider';
+    secondLabel.classList.remove('hidden');
+    document.getElementById('rec-second-card').innerHTML =
+      buildPlatformCard(ids[1], [], {}, false, false);
+  } else {
+    pairBanner.classList.add('hidden');
+    secondLabel.classList.add('hidden');
+    document.getElementById('rec-second-card').innerHTML = '';
+  }
+
+  document.getElementById('rec-fasttrack-prompt').classList.add('hidden');
+  document.getElementById('rec-score-toggle').classList.add('hidden');
+  document.getElementById('rec-score-comparison').classList.add('hidden');
+  document.getElementById('rec-cross-notes').classList.add('hidden');
+  document.getElementById('rec-nav').style.display = 'none';
+  document.getElementById('decision-card').style.display = 'none';
+
+  updateTabTitle();
+  if (typeof clarity === 'function') clarity('set', 'platform', recommendedPlatformId);
+}
+
 function renderRecommendation() {
   clearAnswersFromStorage();
+  if (delegateResult) {
+    renderDelegateRecommendation();
+    return;
+  }
   if (fastTrack) {
     recommendedPlatformId = 'm365_copilot';
     document.getElementById('rec-primary-card').innerHTML =
@@ -910,12 +1105,17 @@ function updateTabTitle() {
   const platformMeta = (apa.meta.platforms || []).find(p => p.id === recommendedPlatformId);
   if (platformMeta) {
     document.title = `APA: ${platformMeta.label} recommended`;
+  } else if (apa.recommendations[recommendedPlatformId]) {
+    document.title = `APA: ${apa.recommendations[recommendedPlatformId].headline} recommended`;
   }
 }
 
 function restart() {
   answers = {};
   fastTrack = false;
+  delegateResult = null;
+  delegateStart = null;
+  delegateAnswers = {};
   currentQuestionIndex = 0;
   recommendedPlatformId = null;
   isURLLoaded = false;
@@ -933,6 +1133,8 @@ function restart() {
 
 function startFullAssessment() {
   fastTrack = false;
+  delegateResult = null;
+  delegateStart = null;
   answers = {};
   currentQuestionIndex = 0;
   renderQuestion();
@@ -949,6 +1151,20 @@ function parseURLParams() {
   const mode = params.get('mode') || 'card';
   originalPlatformId = params.get('r') || null;
   originalDate = params.get('d') || null;
+
+  // Entry-point path handling (Microsoft 365 Copilot / Cowork / Scout).
+  // dt=copilot_chat is a legacy alias from when Copilot Chat was its own destination;
+  // it now resolves to Microsoft 365 Copilot with the Copilot Chat surface featured.
+  const dt = params.get('dt');
+  if (dt && ['copilot_chat', 'm365_copilot', 'cowork', 'scout', 'both'].includes(dt)) {
+    delegateResult = dt === 'copilot_chat' ? 'm365_copilot' : dt;
+    const st = params.get('st');
+    delegateStart = dt === 'copilot_chat' ? 'chat'
+      : (['chat', 'agents'].includes(st) ? st : null);
+    fastTrack = false;
+    answers = {};
+    return { mode: 'card' };
+  }
 
   // Fast-track handling
   if (params.get('ft') === '1') {
@@ -995,7 +1211,10 @@ function buildShareableURL() {
   const base = window.location.origin + window.location.pathname;
   const params = new URLSearchParams();
 
-  if (fastTrack) {
+  if (delegateResult) {
+    params.set('dt', delegateResult);
+    if (delegateStart) params.set('st', delegateStart);
+  } else if (fastTrack) {
     params.set('ft', '1');
   } else {
     apa.questions.forEach(q => {
@@ -1146,7 +1365,7 @@ function copyShareLink() {
       fallback.id = 'decision-card-fallback-url';
       fallback.type = 'text';
       fallback.readOnly = true;
-      fallback.style.cssText = 'width:100%;margin-top:8px;padding:8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-mono);';
+      fallback.style.cssText = 'width:100%;margin-top:8px;padding:8px;font-size:var(--fs-mono);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-mono);';
       document.getElementById('decision-card').appendChild(fallback);
     }
     fallback.value = url;
@@ -1196,33 +1415,5 @@ function initThemeToggle() {
   });
 }
 
-// === NAV MENU (hamburger) ===
-function initNavMenu() {
-  const menu = document.getElementById('nav-menu');
-  const toggle = document.getElementById('nav-menu-toggle');
-  if (!menu || !toggle) return;
-
-  toggle.addEventListener('click', () => {
-    const open = menu.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(open));
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target)) {
-      menu.classList.remove('open');
-      toggle.setAttribute('aria-expanded', 'false');
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && menu.classList.contains('open')) {
-      menu.classList.remove('open');
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.focus();
-    }
-  });
-}
-
 document.addEventListener('DOMContentLoaded', boot);
 document.addEventListener('DOMContentLoaded', initThemeToggle);
-document.addEventListener('DOMContentLoaded', initNavMenu);
