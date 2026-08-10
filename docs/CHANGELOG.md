@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- **`TODO.md` backlog for the mid-2026 guidance & scoring overhaul.** Prioritized P0–P3 work from a deep analysis of copy, routing, and scoring against current Microsoft Learn (Cowork schedules/event-driven tasks, CS multi-agent GA, Agent Builder vs Agents Toolkit vs custom engine, CS↔Foundry discrimination). Includes iteration plan (A–D), golden-path calibration table, acceptance criteria, and file touch lists — no product behavior changes yet.
+
 ### Changed
 
 - **Refreshed platform guidance in `apa.yaml` for mid-2026 product updates** (content only — the scoring matrix is unchanged, so `docs/SCORING.md` distribution figures still hold). Verified against Microsoft Learn and June 2026 release notes that two constraints are still accurate and left them in place: the no-code **Agent Builder is still reactive Q&A/retrieval only** (no action execution or event triggers — MCP Apps add UI, not actions), and **Cowork is still Microsoft 365-only** (no desktop/shell/browser/local runtime), so its reach split with Scout is unchanged.
