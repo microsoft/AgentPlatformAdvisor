@@ -1688,8 +1688,33 @@ body {
   color: var(--link);
   font-weight: 500;
 }
+/* Conditional result callouts (SharePoint tip, Toolkit path, etc.) */
+.rec-callout {
+  background: var(--primary-xlight);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin: 10px 0;
+  font-size: var(--fs-body-sm);
+  line-height: 1.5;
+  color: var(--foreground);
+}
+.rec-callout a {
+  color: var(--link);
+  font-weight: 500;
+}
 .exploration-card--adjacent {
   border-style: dashed;
+}
+.delegate-tip {
+  font-size: var(--fs-body-sm);
+  color: var(--muted-foreground);
+  line-height: 1.45;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: var(--muted);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--primary);
 }
 
 /* ── Platform spotlight (featured capability callout) ── */

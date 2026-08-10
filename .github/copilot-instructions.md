@@ -26,13 +26,15 @@ Playwright end-to-end tests. `playwright.config.js` starts the static server its
 
 ```bash
 npm install                                              # install dependencies
-npm test                                                 # run all tests headless
+npm test                                                 # golden_paths.py then Playwright
+npm run test:golden                                      # scored G01–G05/G11–G12 only
+npm run test:e2e                                         # Playwright only
 npm run test:headed                                      # run with browser visible
 npx playwright test tests/e2e/wizard-completion.spec.js  # single test file
 npx playwright test -g "completes full wizard"           # single test by name
 ```
 
-Specs in `tests/e2e/`: `wizard-completion` (scored path), `delegate-path` (entry-point wizard), `shared-link` and `temporal-change` (URL-loaded results), `fast-track` (legacy `?ft=1`), `share-buttons`.
+Specs in `tests/e2e/`: `wizard-completion` (scored path), `delegate-path` (entry-point wizard), `golden-paths` (G01–G12 + callouts), `shared-link` and `temporal-change` (URL-loaded results), `fast-track` (legacy `?ft=1`), `share-buttons`. Scored calibration also lives in `scripts/golden_paths.py` and the table in `docs/SCORING.md`.
 
 ## Two paths through the app
 

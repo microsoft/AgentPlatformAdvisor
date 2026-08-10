@@ -189,11 +189,11 @@ Improve discrimination and coverage without necessarily adding whole products as
 
 ### P1.1 — First-class SharePoint agents guidance
 
-- [ ] Add SharePoint agents to Explore (“Use” or lightweight “Build”) and/or AB/M365 adjacency tips
-- [ ] Copy: site/library grounding; SharePoint + Teams + Copilot surfaces; owner/admin prerequisites
-- [ ] When audience is small internal + data is “one SharePoint site,” tip SharePoint agents before full CS
-- [ ] Link to official Get started with SharePoint agents docs
-- [ ] Tests: Explore renders the tip/card; optional shared-link unaffected
+- [x] Add SharePoint agents to Explore (“Use” or lightweight “Build”) and/or AB/M365 adjacency tips
+- [x] Copy: site/library grounding; SharePoint + Teams + Copilot surfaces; owner/admin prerequisites
+- [x] When audience is small internal + data is “one SharePoint site,” tip SharePoint agents before full CS
+- [x] Link to official Get started with SharePoint agents docs
+- [x] Tests: Explore renders the tip/card; optional shared-link unaffected
 
 **Depends on:** P0.2
 
@@ -201,10 +201,10 @@ Improve discrimination and coverage without necessarily adding whole products as
 
 ### P1.2 — Agents Toolkit declarative path in results
 
-- [ ] When winner is Foundry or CS but answers look like “pro-dev + M365 chat + API actions,” show a **Toolkit declarative** callout
-- [ ] When winner is AB but builder is pro-dev, suggest Toolkit for source control / plugins instead of only “use CS”
-- [ ] Document that Toolkit is unscored guidance unless a future iteration adds a fourth build dimension
-- [ ] Resources URL → Microsoft 365 Agents Toolkit Learn overview
+- [x] When winner is Foundry or CS but answers look like “pro-dev + M365 chat + API actions,” show a **Toolkit declarative** callout
+- [x] When winner is AB but builder is pro-dev, suggest Toolkit for source control / plugins instead of only “use CS”
+- [x] Document that Toolkit is unscored guidance unless a future iteration adds a fourth build dimension
+- [x] Resources URL → Microsoft 365 Agents Toolkit Learn overview
 
 **Depends on:** P0.2, P0.3
 
@@ -212,11 +212,11 @@ Improve discrimination and coverage without necessarily adding whole products as
 
 ### P1.3 — Orchestrator / control question (scored or gate)
 
-- [ ] Design one question or option set: Copilot-managed orchestrator vs own engine/models/runtime
-- [ ] Wire scores: declarative/CS favored for managed; Foundry for own runtime
-- [ ] Hard-rule interactions: none that zero CS solely for “I write code”
-- [ ] Update matrix max score if a 6th question is added (today max 15 = 5×3) — prefer replacing weak signal over blindly extending
-- [ ] Full docs + distribution refresh
+- [x] Design one question or option set: Copilot-managed orchestrator vs own engine/models/runtime
+- [x] Wire scores: declarative/CS favored for managed; Foundry for own runtime
+- [x] Hard-rule interactions: none that zero CS solely for “I write code”
+- [x] Update matrix max score if a 6th question is added (today max 15 = 5×3) — prefer replacing weak signal over blindly extending
+- [x] Full docs + distribution refresh
 
 **Depends on:** P0.3  
 **Note:** Prefer replacing or refining an existing discriminator before adding Q6.
@@ -225,13 +225,13 @@ Improve discrimination and coverage without necessarily adding whole products as
 
 ### P1.4 — Licensing, cost, and access watch-outs on every winner
 
-- [ ] M365 Copilot: seat / metering implications for chat, agents, Agent Store
-- [ ] Agent Builder: included with M365 Copilot capabilities subset; sharing limits
-- [ ] Copilot Studio: Copilot Credits drivers (already partial) — generative answers, actions, computer use, voice, graph grounding
-- [ ] Foundry: Azure consumption, hosted agent compute, networking
-- [ ] Cowork: Copilot Credits (exists) — keep accurate
-- [ ] Scout: Frontier preview gates (exists) — keep accurate; don’t imply GA
-- [ ] Optional single “constraints” multi-select later (P2) — this item is copy-only on cards
+- [x] M365 Copilot: seat / metering implications for chat, agents, Agent Store
+- [x] Agent Builder: included with M365 Copilot capabilities subset; sharing limits
+- [x] Copilot Studio: Copilot Credits drivers (already partial) — generative answers, actions, computer use, voice, graph grounding
+- [x] Foundry: Azure consumption, hosted agent compute, networking
+- [x] Cowork: Copilot Credits (exists) — keep accurate
+- [x] Scout: Frontier preview gates (exists) — keep accurate; don’t imply GA
+- [x] Optional single “constraints” multi-select later (P2) — this item is copy-only on cards
 
 **Depends on:** nothing (can parallelize with P0 after copy freeze points)
 
@@ -239,12 +239,12 @@ Improve discrimination and coverage without necessarily adding whole products as
 
 ### P1.5 — CS modern surface area honesty (preview vs GA)
 
-- [ ] Multi-agent orchestration: GA (copy already notes — verify scores per P0.3)
-- [ ] Windows 365 for Agents MCP / computer use: mark GA vs preview accurately per Learn
-- [ ] New agent experience (GitHub Copilot harness), skills, memory, Microsoft IQ: describe without overselling classic-topic parity
-- [ ] Foundry IQ connect from CS: keep **preview** labels where true
-- [ ] Agent Optimizer (Foundry): keep **preview**
-- [ ] Foundry Local wording: verify “Foundry Local on Azure Local” vs broader local/edge runtime — correct `best_for` bullet if over-narrow or over-broad
+- [x] Multi-agent orchestration: GA (copy already notes — verify scores per P0.3)
+- [x] Windows 365 for Agents MCP / computer use: mark GA vs preview accurately per Learn
+- [x] New agent experience (GitHub Copilot harness), skills, memory, Microsoft IQ: describe without overselling classic-topic parity
+- [x] Foundry IQ connect from CS: keep **preview** labels where true
+- [x] Agent Optimizer (Foundry): keep **preview**
+- [x] Foundry Local wording: verify “Foundry Local on Azure Local” vs broader local/edge runtime — correct `best_for` bullet if over-narrow or over-broad
 
 **Depends on:** P0.3 for score alignment; else copy-only
 
@@ -252,10 +252,10 @@ Improve discrimination and coverage without necessarily adding whole products as
 
 ### P1.6 — Stronger “why not the runner-up” on close CS/Foundry scores
 
-- [ ] Lean on existing `computeWhyNot` / pair banner; improve rationale strings in `apa.yaml` `valid_pairs` and generated why-not sentences
-- [ ] CS+Foundry pair rationale: when to split (CS for channels/connectors/makers; Foundry for custom retrieval/hosted code/private net)
-- [ ] Remove or stop advertising dead scored-path pairs that include always-zeroed `m365_copilot` (`valid_pairs` cleanup)
-- [ ] Ensure ±2 threshold still feels intentional after P0.3 rebalance
+- [x] Lean on existing `computeWhyNot` / pair banner; improve rationale strings in `apa.yaml` `valid_pairs` and generated why-not sentences
+- [x] CS+Foundry pair rationale: when to split (CS for channels/connectors/makers; Foundry for custom retrieval/hosted code/private net)
+- [x] Remove or stop advertising dead scored-path pairs that include always-zeroed `m365_copilot` (`valid_pairs` cleanup)
+- [x] Ensure ±2 threshold still feels intentional after P0.3 rebalance
 
 **Depends on:** P0.3
 
@@ -282,9 +282,9 @@ Add automated or documented fixtures for expected primaries:
 
 **Work:**
 
-- [ ] Encode as Playwright tests and/or a small node script that loads `apa.yaml` + scoring functions
-- [ ] Fail CI if any golden path regresses
-- [ ] Keep table in `docs/SCORING.md` as living calibration
+- [x] Encode as Playwright tests and/or a small node script that loads `apa.yaml` + scoring functions
+- [x] Fail CI if any golden path regresses
+- [x] Keep table in `docs/SCORING.md` as living calibration
 
 **Depends on:** P0.1, P0.2, P0.3
 
@@ -292,10 +292,10 @@ Add automated or documented fixtures for expected primaries:
 
 ### P1.8 — Winner–persona and access mismatch notes
 
-- [ ] CS winner + pure business user + complex APIs → partner with IT/makers note
-- [ ] Foundry winner + low-code maker (q1b) → skills/partner note (symmetric to q1a+Foundry)
-- [ ] Scout recommendation → Frontier access prerequisite note if not already on-card
-- [ ] Optional: AB winner + department-wide audience (q8c) → governance/CS graduation note
+- [x] CS winner + pure business user + complex APIs → partner with IT/makers note
+- [x] Foundry winner + low-code maker (q1b) → skills/partner note (symmetric to q1a+Foundry)
+- [x] Scout recommendation → Frontier access prerequisite note if not already on-card
+- [x] Optional: AB winner + department-wide audience (q8c) → governance/CS graduation note
 
 **Depends on:** P0.1 for Scout; P0.3 for CS/Foundry
 
@@ -303,9 +303,9 @@ Add automated or documented fixtures for expected primaries:
 
 ### P1.9 — Entry-point middle path and research disambiguation
 
-- [ ] Copy tip: many people start hands-on in Copilot Chat, then hand off to Cowork
-- [ ] Specialized task option text: “interactive deep research / analysis / facilitation” vs Cowork’s “produce a research package for me”
-- [ ] Consider optional third involvement choice only if binary testing shows confusion — default to copy tips first
+- [x] Copy tip: many people start hands-on in Copilot Chat, then hand off to Cowork
+- [x] Specialized task option text: “interactive deep research / analysis / facilitation” vs Cowork’s “produce a research package for me”
+- [x] Consider optional third involvement choice only if binary testing shows confusion — default to copy tips first
 
 **Depends on:** P0.1, P0.4
 

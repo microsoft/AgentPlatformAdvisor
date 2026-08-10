@@ -266,14 +266,55 @@ No combination produces a "best platform" below 8, so every user gets at least a
 
 Notes fire on the same logical combinations as before (background+simple Q&A, external+M365 chat, biz-user+orchestration/APIs/RAG). q1a+q4f is the new code-first orchestration note.
 
-## Golden-path checks (P0)
+## Runtime / orchestrator signal (no Q6)
+
+Q2 option labels carry the runtime discriminator without a sixth scored question:
+
+| Option | Signal |
+|---|---|
+| `q2a` | Stay on **Microsoft 365 Copilot’s orchestrator and models** |
+| `q2b` | **Own endpoints, models, or runtime control** (custom app / hosted service) |
+| `q2c` / `q2d` | Background / multi-surface — still CS or Foundry by task+data |
+
+Q4 remains the strongest task discriminator (`q4d` low-code multi-agent vs `q4f` code-first / custom runtime).
+
+## Conditional result callouts (unscored)
+
+`apa.result_callouts` + `getResultCallouts()` on the **primary scored card only**:
+
+| ID | When | Message |
+|---|---|---|
+| `sharepoint_site_tip` | Winner AB or CS; small internal + M365 content + Q&A/summarize | Consider SharePoint agents first |
+| `toolkit_m365_extensibility` | Winner CS or Foundry; pro-dev + M365 chat + actions/API-ish task | Agents Toolkit declarative may fit better |
+| `toolkit_ab_prodev` | Winner AB + pro-dev | Prefer Toolkit for pro-dev lifecycle |
+
+Toolkit is **not** a fourth scored winner.
+
+## Golden-path calibration (P0 + P1.7)
+
+Living fixtures. Scored paths: `python3 scripts/golden_paths.py` (also `npm run test:golden`). UI/entry paths: `tests/e2e/golden-paths.spec.js`.
+
+| ID | Scenario | Expected primary |
+|---|---|---|
+| G01 | Biz user, small team, M365 chat, Q&A on M365 content | Agent Builder |
+| G02 | Same as G01 / one site library | Agent Builder + SharePoint callout |
+| G03 | Maker, Dataverse + approvals + multi-channel | Copilot Studio |
+| G04 | Pro dev, API/actions in Copilot chat | CS (or Foundry) **with Toolkit callout** — not Foundry-only |
+| G05 | Pro dev, custom app + custom RAG | Foundry |
+| G06 | End user, draft/summarize interactively | M365 Copilot · Start Here: Chat |
+| G07 | End user, interactive specialized research | M365 Copilot · Start Here: agents |
+| G08 | Board pack handoff, M365 | Cowork |
+| G09 | Daily M365 briefing on a schedule | Cowork |
+| G10 | Always-on desktop + browser + local | Scout (+ Frontier access note) |
+| G11 | Background actions / computer-use style enterprise automation | Copilot Studio (not Scout) |
+| G12 | External customers on a website | CS or Foundry; AB/M365 zeroed |
+
+Additional smoke checks from P0:
 
 | Scenario | Expected |
 |---|---|
 | Daily briefing / inbox triage on a schedule, M365 only | Cowork |
 | “When a VIP emails me…”, M365 only | Cowork |
 | Always-on across desktop + M365 | Scout |
-| One-shot board pack, M365 | Cowork |
 | Coordinate multiple CS agents / A2A for a department process | CS Strong |
 | Custom app + private VNet + custom RAG + hosted code agent | Foundry |
-| Pro-dev API-plugin declarative agent in Copilot | Not Foundry-only — Toolkit guidance |

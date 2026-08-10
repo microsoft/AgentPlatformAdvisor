@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - **Adjacent build paths** in Explore and recommendation footnotes: SharePoint agents, Microsoft 365 Agents Toolkit (declarative), custom engine agents (`apa.adjacent_build_paths` + per-card `adjacent_paths`).
   - **Q4f** scored option: code-first multi-agent / custom runtime → Foundry strong; hard-zeros AB + M365.
   - Playwright coverage for recurring/event + M365 → Cowork, recurring + cross → Scout, always-on + M365 → Cowork, always-on + cross → Scout, Explore adjacent paths, and `dt=cowork` share links.
+- **P1 decision-quality wave**
+  - Conditional **`result_callouts`** on primary scored cards (SharePoint agents tip; Agents Toolkit for pro-dev + M365 chat + actions; Toolkit when AB wins for pro-dev).
+  - **Golden-path harness:** `scripts/golden_paths.py` + `tests/e2e/golden-paths.spec.js` (G01–G12); `npm run test:golden` / `npm test` runs the script first.
+  - Entry-point **delegate tips** (Chat then Cowork; interactive specialized vs Cowork research package).
+  - Richer **winner mismatch notes** (Foundry+maker, CS+biz+APIs/workflows, AB+department audience, Scout Frontier access on entry-point results).
 
 ### Changed
 
@@ -21,6 +26,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Copilot Studio vs Foundry rebalanced after multi-agent GA (P0.3).** Q4d (low-code multi-agent / long-running business orchestration) is now CS:3 / Foundry:2; Q4f covers code-first multi-agent / custom runtime (CS:1 / Foundry:3). Foundry wins on **runtime ownership**, not the keyword “multi-agent.” Distribution re-documented (~2,304 combos: CS ~81.3% / Foundry ~16.1% / AB ~2.6%).
 - **Start-page, Explore, and platform one-liners aligned (P0.4)** with recommendation truth (M365 Chat+agents+Agent Store; Cowork schedules/triggers; Scout Frontier gates; CS actions/governance; Foundry managed runtime; CS computer use vs Scout personal Autopilot).
 - **Docs sync (P0.5):** `docs/SCORING.md`, `docs/FLOWCHART.md`, `README.md`, `.github/copilot-instructions.md`; fixed stale “score 0–5” comment in `apa.js` (Not recommended is 0–3).
+- **Runtime signal via Q2 labels (P1.3):** q2a/q2b wording emphasizes Copilot orchestrator vs own endpoints/models/runtime (no new Q6).
+- **Licensing honesty (P1.4)** on AB/M365/CS/Foundry/Cowork/Scout watch-outs (seats, Copilot Credits, Azure consumption, Frontier gates).
+- **GA/preview honesty (P1.5):** CS computer use GA; new experience/memory/skills preview; Foundry IQ connect preview; Agent Optimizer preview; Foundry Local / Azure Local wording.
+- **Why-not / valid_pairs (P1.6):** dropped dead scored-path pairs with always-zeroed `m365_copilot`; stronger CS+Foundry and AB+CS pair rationale + `why_not` templates in `computeWhyNot`.
 - **Earlier mid-2026 content refresh** (still accurate under P0): Cowork scheduled prompts, Foundry Agent Optimizer / Foundry Local, CS multi-agent GA callout, M365 Agent Store + MCP Apps UI — now extended by the routing and scoring changes above.
 
 ## 2026-07-24

@@ -207,25 +207,57 @@ function getKeyFactors(platformId, answersMap) {
   return factors.slice(0, 3);
 }
 
-// Returns contextual notes for contradictory answer combinations
+// Match answer maps against a when-clause. Values may be a string or array of option ids.
+function answersMatchWhen(answersMap, when) {
+  if (!when) return true;
+  return Object.entries(when).every(([qid, expected]) => {
+    const actual = answersMap[qid];
+    if (Array.isArray(expected)) return expected.includes(actual);
+    return actual === expected;
+  });
+}
+
+// Returns contextual notes for contradictory answer combinations and winner mismatches
 function getCrossQuestionNotes(answersMap, winnerId) {
   const notes = [];
   const crossNotes = apa.scoring.cross_question_notes || [];
   crossNotes.forEach(rule => {
-    const match = Object.entries(rule.when).every(
-      ([qid, optionId]) => answersMap[qid] === optionId
-    );
-    if (match) notes.push(rule.note.trim());
+    if (answersMatchWhen(answersMap, rule.when)) notes.push(rule.note.trim());
   });
 
   const personaNotes = apa.scoring.winner_persona_notes || [];
   personaNotes.forEach(rule => {
-    if (rule.winner === winnerId && answersMap.q1 === rule.persona) {
-      notes.push(rule.note.trim());
-    }
+    if (rule.winner && rule.winner !== winnerId) return;
+    if (Array.isArray(rule.winner_in) && !rule.winner_in.includes(winnerId)) return;
+    if (rule.persona && answersMap.q1 !== rule.persona) return;
+    if (rule.when && !answersMatchWhen(answersMap, rule.when)) return;
+    notes.push(rule.note.trim());
   });
 
   return notes;
+}
+
+// Unscored adjacent-path callouts (SharePoint agents, Agents Toolkit, etc.)
+// driven by winner + answer pattern. Not scored winners — guidance only.
+function getResultCallouts(answersMap, winnerId) {
+  const callouts = apa.result_callouts || [];
+  return callouts.filter(c => {
+    if (c.winner && c.winner !== winnerId) return false;
+    if (Array.isArray(c.winner_in) && !c.winner_in.includes(winnerId)) return false;
+    if (c.when && !answersMatchWhen(answersMap, c.when)) return false;
+    return true;
+  });
+}
+
+function renderResultCallouts(answersMap, winnerId) {
+  const callouts = getResultCallouts(answersMap, winnerId);
+  if (!callouts.length) return '';
+  return callouts.map(c => {
+    const title = c.url
+      ? `<a href="${c.url}" target="_blank" rel="noopener noreferrer">${c.label}</a>`
+      : c.label;
+    return `<div class="rec-callout" data-callout-id="${c.id || ''}"><strong>${title}</strong> — ${c.summary}</div>`;
+  }).join('');
 }
 
 function renderCrossNotes(answersMap, winnerId) {
@@ -297,6 +329,11 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
       }).join('')
     : '';
 
+  // Conditional callouts only on the primary scored card (need answers + winner).
+  const calloutHtml = isPrimary && showBadge
+    ? renderResultCallouts(answersMap, platformId)
+    : '';
+
   const bestFor = (rec.best_for || []).map(f => `<li>${f}</li>`).join('');
   const watchOut = (rec.watch_out_for || []).map(f => `<li>${f}</li>`).join('');
   // A start_here entry (chosen by the entry-point wizard) takes precedence over a
@@ -365,6 +402,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
         : ''}
+      ${calloutHtml}
       ${adjacentHtml}
       ${resourcesHtml}
       ${factorsHtml}
@@ -709,6 +747,7 @@ function renderQuestion() {
   question.options.forEach(opt => {
     const div = document.createElement('div');
     div.className = 'option-card' + (answers[question.id] === opt.id ? ' selected' : '');
+    div.dataset.optionId = opt.id;
     div.setAttribute('role', 'button');
     div.setAttribute('tabindex', '0');
     const isSelected = answers[question.id] === opt.id;
@@ -982,7 +1021,8 @@ function showRecNav(hasSecondary) {
 }
 
 // Renders the entry-point result (Copilot Chat / Cowork / Scout). Non-scored:
-// no score breakdown, no cross-question notes, no decision card — mirrors the fast-track branch.
+// no score breakdown, no decision card — mirrors the fast-track branch.
+// Scout/Cowork access tips can still surface as cross-notes.
 function renderDelegateRecommendation() {
   const ids = delegateResult === 'both' ? ['cowork', 'scout'] : [delegateResult];
   recommendedPlatformId = ids[0];
@@ -995,7 +1035,7 @@ function renderDelegateRecommendation() {
   if (ids.length > 1) {
     pairBanner.innerHTML =
       '<strong>Consider both.</strong> Scout can be the always-on layer that monitors and coordinates, ' +
-      'while Cowork assembles the Microsoft 365 deliverables on demand.';
+      'while Cowork assembles Microsoft 365 deliverables (one-shot, scheduled, or event-triggered).';
     pairBanner.classList.remove('hidden');
     secondLabel.textContent = 'Also consider';
     secondLabel.classList.remove('hidden');
@@ -1010,7 +1050,8 @@ function renderDelegateRecommendation() {
   document.getElementById('rec-fasttrack-prompt').classList.add('hidden');
   document.getElementById('rec-score-toggle').classList.add('hidden');
   document.getElementById('rec-score-comparison').classList.add('hidden');
-  document.getElementById('rec-cross-notes').classList.add('hidden');
+  // Entry-point access notes (e.g. Scout Frontier gates) from winner_persona_notes
+  renderCrossNotes({}, recommendedPlatformId);
   document.getElementById('rec-nav').style.display = 'none';
   document.getElementById('decision-card').style.display = 'none';
 
@@ -1320,6 +1361,14 @@ function computeWhyNot(winner, runner, answersMap) {
   const runnerMeta = (apa.meta.platforms || []).find(p => p.id === runner.id);
   if (!winnerMeta || !runnerMeta) return null;
 
+  // Pair-specific guidance from valid_pairs (stronger than generic delta sentence)
+  const pair = (apa.scoring.tie_handling.valid_pairs || []).find(p =>
+    p.platforms.includes(winner.id) && p.platforms.includes(runner.id)
+  );
+  const pairWhy = pair && pair.why_not
+    ? pair.why_not.replace('{winner}', winnerMeta.label).replace('{runner}', runnerMeta.label)
+    : null;
+
   // Find the question where the winner most outscored the runner-up
   let bestDelta = null;
   apa.questions.forEach(q => {
@@ -1335,9 +1384,11 @@ function computeWhyNot(winner, runner, answersMap) {
     }
   });
 
-  if (!bestDelta || bestDelta.delta <= 0) return null;
+  if (!bestDelta || bestDelta.delta <= 0) return pairWhy || null;
   const dimension = Q_SHORT_LABELS[bestDelta.qId] || bestDelta.questionLabel;
-  return `${winnerMeta.label} edged out ${runnerMeta.label} on <strong>${dimension.toLowerCase()}</strong> — you selected "${bestDelta.optionLabel}".`;
+  const deltaSentence =
+    `${winnerMeta.label} edged out ${runnerMeta.label} on <strong>${dimension.toLowerCase()}</strong> — you selected "${bestDelta.optionLabel}".`;
+  return pairWhy ? `${pairWhy} ${deltaSentence}` : deltaSentence;
 }
 
 function renderDecisionCard() {

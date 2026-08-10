@@ -125,7 +125,7 @@ npm test              # headless
 npm run test:headed   # with browser visible
 ```
 
-There are 44 tests across 6 spec files covering wizard completion, shared link loading, temporal change detection, legacy fast-track links, entry-point wizard routing (including recurring/event Cowork paths and Explore adjacent paths), and share button behavior. To run a single file or test: `npx playwright test tests/e2e/delegate-path.spec.js` or `npx playwright test -g "completes full wizard"`. CI runs automatically on push and pull request via GitHub Actions.
+There are **57** Playwright tests across 7 spec files, plus a scored golden-path script (`scripts/golden_paths.py`; needs `PyYAML`). `npm test` runs the golden script first, then Playwright. Coverage includes wizard completion, shared links, temporal change, legacy fast-track, entry-point routing, share buttons, and G01–G12 golden paths (callouts, Toolkit tip, Cowork/Scout/M365). Single file: `npx playwright test tests/e2e/golden-paths.spec.js`.
 
 ## Contributing
 
