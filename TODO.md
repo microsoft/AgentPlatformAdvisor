@@ -30,33 +30,33 @@ These change *who wins* or fix actively misleading guidance. Do before polish.
 
 **Work:**
 
-- [ ] Redesign cadence options so they no longer collapse three intents into one “always-on” choice. Proposed buckets:
+- [x] Redesign cadence options so they no longer collapse three intents into one “always-on” choice. Proposed buckets:
   1. **One-shot deliverable** — finish a multi-step job and hand back the result
   2. **Recurring or event-triggered inside Microsoft 365** — schedules, inbox/Teams triggers, repeating briefings
   3. **Always-on personal Autopilot** — proactive monitoring and follow-through over time (may span environments)
-- [ ] Make **reach primary** when the work is recurring/triggered or always-on:
+- [x] Make **reach primary** when the work is recurring/triggered or always-on:
   - M365-only → **Cowork**
   - Desktop / browser / local files / shell → **Scout**
   - Unsure → **both** (complementary pair)
-- [ ] Keep Scout for proactive personal Autopilot + cross-environment + desktop app identity — not “anything that isn’t one-shot”
-- [ ] Update `resolveDelegateResult` and any comments that say `continuous → scout`
-- [ ] Rewrite cadence question title/options in `index.html` to match the new buckets (work-pattern language, not product names)
-- [ ] Extend Playwright coverage for:
+- [x] Keep Scout for proactive personal Autopilot + cross-environment + desktop app identity — not “anything that isn’t one-shot”
+- [x] Update `resolveDelegateResult` and any comments that say `continuous → scout`
+- [x] Rewrite cadence question title/options in `index.html` to match the new buckets (work-pattern language, not product names)
+- [x] Extend Playwright coverage for:
   - recurring/event + m365 → Cowork
   - recurring/event + cross → Scout
   - always-on + m365 → decide explicitly (recommend Cowork if still M365-scoped; Scout if “proactive personal Autopilot” copy is chosen — document the rule)
   - one-shot + m365 → Cowork (regression)
   - one-shot + cross → Scout (regression)
-- [ ] Update `docs/SCORING.md` entry-point routing table and `docs/FLOWCHART.md` mermaid
+- [x] Update `docs/SCORING.md` entry-point routing table and `docs/FLOWCHART.md` mermaid
 
 **Acceptance:**
 
-- [ ] Daily briefing / inbox triage on a schedule, M365 only → Cowork
-- [ ] “When a VIP emails me…” M365 only → Cowork
-- [ ] Always-on across desktop + M365 → Scout
-- [ ] One-shot board pack → Cowork
-- [ ] Existing share links `dt=cowork|scout|both` still resolve
-- [ ] All delegate-path e2e tests pass
+- [x] Daily briefing / inbox triage on a schedule, M365 only → Cowork
+- [x] “When a VIP emails me…” M365 only → Cowork
+- [x] Always-on across desktop + M365 → Scout
+- [x] One-shot board pack → Cowork
+- [x] Existing share links `dt=cowork|scout|both` still resolve
+- [x] All delegate-path e2e tests pass
 
 **Depends on:** nothing  
 **Unblocks:** P0.4 (Scout/Cowork copy alignment), P1.7 (golden paths)
@@ -71,22 +71,22 @@ These change *who wins* or fix actively misleading guidance. Do before polish.
 
 **Work:**
 
-- [ ] Reframe Agent Builder label/description as **no-code declarative agents inside Microsoft 365 Copilot** (not “all declarative agents”)
-- [ ] State the ceiling explicitly in AB `watch_out_for` / summary: Agent Builder has no Actions; Learn sends action scenarios to Copilot Studio
-- [ ] Add unscored guidance blocks (Explore tips and/or recommendation footnotes) for:
+- [x] Reframe Agent Builder label/description as **no-code declarative agents inside Microsoft 365 Copilot** (not “all declarative agents”)
+- [x] State the ceiling explicitly in AB `watch_out_for` / summary: Agent Builder has no Actions; Learn sends action scenarios to Copilot Studio
+- [x] Add unscored guidance blocks (Explore tips and/or recommendation footnotes) for:
   - **SharePoint agents** — site/library-scoped Q&A; no-code; runs in SharePoint, Teams, M365 Copilot
   - **Microsoft 365 Agents Toolkit (declarative)** — pro-code API plugins, Adaptive Cards, CI/CD, still Copilot orchestrator
   - **Custom engine agents** — bring-your-own orchestrator/models → Foundry / Agents SDK path
-- [ ] On Foundry and CS cards, add “use X instead when…” lines that point at Toolkit declarative vs custom engine
-- [ ] On AB card, add migration line: outgrow Builder → Copilot Studio; need plugins/CI-CD in Copilot → Agents Toolkit
-- [ ] Keep AB hard zeros for actions/background/external/custom app/custom RAG — still correct for the *no-code Builder* path
-- [ ] Do **not** silently give AB credit for Toolkit-only capabilities
+- [x] On Foundry and CS cards, add “use X instead when…” lines that point at Toolkit declarative vs custom engine
+- [x] On AB card, add migration line: outgrow Builder → Copilot Studio; need plugins/CI-CD in Copilot → Agents Toolkit
+- [x] Keep AB hard zeros for actions/background/external/custom app/custom RAG — still correct for the *no-code Builder* path
+- [x] Do **not** silently give AB credit for Toolkit-only capabilities
 
 **Acceptance:**
 
-- [ ] A reader can tell Builder ≠ all declarative agents after one card read
-- [ ] Explore or results surface SharePoint agents and Agents Toolkit as adjacent paths
-- [ ] No scoring change required for this item (copy/structure only) unless paired with P0.3
+- [x] A reader can tell Builder ≠ all declarative agents after one card read
+- [x] Explore or results surface SharePoint agents and Agents Toolkit as adjacent paths
+- [x] No scoring change required for this item (copy/structure only) unless paired with P0.3
 
 **Depends on:** nothing  
 **Unblocks:** P0.3, P1.5
@@ -101,24 +101,24 @@ These change *who wins* or fix actively misleading guidance. Do before polish.
 
 **Work:**
 
-- [ ] Re-anchor q4d:
+- [x] Re-anchor q4d:
   - Low-code multi-agent / child agents / A2A / long-running *business* orchestration → **CS strong (3)**
   - Code-first multi-agent, custom protocols, high-scale hosted agents → **Foundry strong (3)** — may need option split or companion signal
-- [ ] Soften automatic Foundry preference for q1c when the deployment target is M365 Copilot extensibility (pair with P0.2 Toolkit path)
-- [ ] Add or extend a **runtime / control** signal (new question *or* clearer options under task/data/persona), e.g.:
+- [x] Soften automatic Foundry preference for q1c when the deployment target is M365 Copilot extensibility (pair with P0.2 Toolkit path)
+- [x] Add or extend a **runtime / control** signal (new question *or* clearer options under task/data/persona), e.g.:
   - Stay on Microsoft 365 Copilot’s orchestrator and models (declarative / CS)
   - Need own code, models, private networking, or managed custom runtime (Foundry)
-- [ ] Review persona preference `q1d → CS over Foundry` on exact ties — keep for time-to-value, but ensure true ML/platform answers can still surface Foundry via q3f / runtime control
-- [ ] Re-run combination distribution; target fewer “CS wins everything undecided” cases without starving CS as the safe enterprise default
-- [ ] Update CS/Foundry `best_for` / `watch_out_for` so multi-agent GA and “when Foundry still wins” are consistent with scores
-- [ ] Document new distribution tables in `docs/SCORING.md`
+- [x] Review persona preference `q1d → CS over Foundry` on exact ties — keep for time-to-value, but ensure true ML/platform answers can still surface Foundry via q3f / runtime control
+- [x] Re-run combination distribution; target fewer “CS wins everything undecided” cases without starving CS as the safe enterprise default
+- [x] Update CS/Foundry `best_for` / `watch_out_for` so multi-agent GA and “when Foundry still wins” are consistent with scores
+- [x] Document new distribution tables in `docs/SCORING.md`
 
 **Acceptance:**
 
-- [ ] “Coordinate multiple CS agents / A2A for a department process” can recommend CS as Strong without requiring Foundry
-- [ ] “Custom app + private VNet + custom RAG + hosted code agent” still recommends Foundry
-- [ ] Pro-dev building an API-plugin declarative agent is not pushed to Foundry as the only answer (see P0.2)
-- [ ] Distribution re-documented; no winner below Good fit unless intentionally redesigned
+- [x] “Coordinate multiple CS agents / A2A for a department process” can recommend CS as Strong without requiring Foundry
+- [x] “Custom app + private VNet + custom RAG + hosted code agent” still recommends Foundry
+- [x] Pro-dev building an API-plugin declarative agent is not pushed to Foundry as the only answer (see P0.2)
+- [x] Distribution re-documented; no winner below Good fit unless intentionally redesigned
 
 **Depends on:** P0.2 (taxonomy language) strongly recommended first  
 **Unblocks:** P1.6, P1.7
@@ -133,7 +133,7 @@ These change *who wins* or fix actively misleading guidance. Do before polish.
 
 **Work:**
 
-- [ ] Rewrite start-page platform one-liners:
+- [x] Rewrite start-page platform one-liners:
 
   | Platform | Must convey |
   |---|---|
@@ -144,19 +144,19 @@ These change *who wins* or fix actively misleading guidance. Do before polish.
   | Copilot Studio | Governed low-code agents: actions, triggers, connectors, eval, multi-channel |
   | Microsoft Foundry | Pro-code managed runtime; custom engine/models/retrieval at Azure scale |
 
-- [ ] Align Explore `exploration_best_for` / `exploration_summary` with the same truths
-- [ ] Entry-point intro: mention Cowork can schedule/trigger inside M365; Scout is cross-environment Autopilot (after P0.1)
-- [ ] Differentiate deep research: interactive → Researcher (M365 agents surface); hand off a research deliverable → Cowork
-- [ ] Add a light “start in Chat, escalate to Cowork/agents” tip on M365 cards
-- [ ] Scout cards: Frontier enrollment / Intune / licensing gates remain prominent
-- [ ] CS vs Scout desktop: CS computer use / Windows 365 for Agents MCP = enterprise agent automation; Scout = personal desktop Autopilot
+- [x] Align Explore `exploration_best_for` / `exploration_summary` with the same truths
+- [x] Entry-point intro: mention Cowork can schedule/trigger inside M365; Scout is cross-environment Autopilot (after P0.1)
+- [x] Differentiate deep research: interactive → Researcher (M365 agents surface); hand off a research deliverable → Cowork
+- [x] Add a light “start in Chat, escalate to Cowork/agents” tip on M365 cards
+- [x] Scout cards: Frontier enrollment / Intune / licensing gates remain prominent
+- [x] CS vs Scout desktop: CS computer use / Windows 365 for Agents MCP = enterprise agent automation; Scout = personal desktop Autopilot
 
 **Acceptance:**
 
-- [ ] No start tile contradicts its recommendation card
-- [ ] Cowork tile mentions recurring or triggered work (post P0.1 language)
-- [ ] Scout tile signals preview/gated access
-- [ ] Design tokens unchanged unless copy length forces layout check
+- [x] No start tile contradicts its recommendation card
+- [x] Cowork tile mentions recurring or triggered work (post P0.1 language)
+- [x] Scout tile signals preview/gated access
+- [x] Design tokens unchanged unless copy length forces layout check
 
 **Depends on:** P0.1 for cadence wording; P0.2 for Builder/Toolkit wording  
 **Unblocks:** P2 trust/polish items
@@ -167,16 +167,16 @@ These change *who wins* or fix actively misleading guidance. Do before polish.
 
 **Work:**
 
-- [ ] `docs/SCORING.md` — entry-point table, hard rules, matrix, distribution, platform blurbs
-- [ ] `docs/FLOWCHART.md` — full mermaid for new cadence/reach and any new scored question
-- [ ] `docs/CHANGELOG.md` under `## Unreleased` — user-visible behavior changes, not just copy
-- [ ] `README.md` + `.github/copilot-instructions.md` — paths, destinations, test counts
-- [ ] Fix stale comment in `assets/apa.js` (“score 0-5” vs Not recommended 0–3) while touching results logic
+- [x] `docs/SCORING.md` — entry-point table, hard rules, matrix, distribution, platform blurbs
+- [x] `docs/FLOWCHART.md` — full mermaid for new cadence/reach and any new scored question
+- [x] `docs/CHANGELOG.md` under `## Unreleased` — user-visible behavior changes, not just copy
+- [x] `README.md` + `.github/copilot-instructions.md` — paths, destinations, test counts
+- [x] Fix stale comment in `assets/apa.js` (“score 0-5” vs Not recommended 0–3) while touching results logic
 
 **Acceptance:**
 
-- [ ] A new contributor can implement P1 from docs alone without rereading the analysis
-- [ ] Flowchart matches `resolveDelegateResult` and scored pipeline exactly
+- [x] A new contributor can implement P1 from docs alone without rereading the analysis
+- [x] Flowchart matches `resolveDelegateResult` and scored pipeline exactly
 
 **Depends on:** P0.1–P0.4  
 **Unblocks:** external review / shipping the substantial update

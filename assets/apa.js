@@ -4,7 +4,7 @@ let answers = {}; // { q1: 'q1a', q2: 'q2b', ... }
 let fastTrack = false;
 let delegateResult = null; // 'm365_copilot' | 'cowork' | 'scout' | 'both' — set on the entry-point path
 let delegateStart = null;  // 'chat' | 'agents' — which surface inside Microsoft 365 Copilot to start with
-let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
+let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'oneshot'|'recurring'|'alwayson'|'unsure', reach: 'm365'|'cross'|'unsure' }
 let currentQuestionIndex = 0;
 let listenersReady = false;
 let recommendedPlatformId = null;
@@ -288,6 +288,15 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
         Explore ${rec.headline} resources →</a>`
     : '';
 
+  const adjacentHtml = (rec.adjacent_paths || []).length > 0
+    ? rec.adjacent_paths.map(p => {
+        const title = p.url
+          ? `<a href="${p.url}" target="_blank" rel="noopener noreferrer">${p.label}</a>`
+          : p.label;
+        return `<div class="rec-adjacent-note"><strong>${title}</strong> — ${p.summary}</div>`;
+      }).join('')
+    : '';
+
   const bestFor = (rec.best_for || []).map(f => `<li>${f}</li>`).join('');
   const watchOut = (rec.watch_out_for || []).map(f => `<li>${f}</li>`).join('');
   // A start_here entry (chosen by the entry-point wizard) takes precedence over a
@@ -356,6 +365,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
         : ''}
+      ${adjacentHtml}
       ${resourcesHtml}
       ${factorsHtml}
       ${bestFor ? `<details class="rec-accordion"${detailsOpen}>
@@ -574,14 +584,20 @@ function isDelegateReady() {
 // built-in agents (Researcher, Analyst, Facilitator, Interpreter, …) are surfaces of
 // that one product, not separate destinations, so the task type selects which surface
 // to start with (see resolveDelegateStart) rather than which card to show.
-// When delegating: Scout wins if the work is continuous OR reaches beyond Microsoft 365;
-// Cowork wins only when the work is on demand AND scoped to Microsoft 365;
-// otherwise (undecided signals) present Cowork and Scout as a complementary pair.
+// When delegating, reach is primary for recurring/event and always-on work:
+//   cross-environment (desktop/browser/local/shell) → Scout
+//   Microsoft 365 only + a concrete cadence (one-shot, recurring/event, or always-on
+//     still scoped to M365) → Cowork
+//   undecided cadence or reach → both (complementary pair)
+// Scout is the personal Autopilot / cross-environment path — not "anything that isn't one-shot".
+// Legacy aliases: ondemand→oneshot, continuous→alwayson (pre-P0.1 option ids).
 function resolveDelegateResult(involvement, taskType, cadence, reach) {
   if (involvement === 'interactive') return 'm365_copilot';
-  if (cadence === 'continuous') return 'scout';
+  const c = cadence === 'ondemand' ? 'oneshot'
+    : cadence === 'continuous' ? 'alwayson'
+    : cadence;
   if (reach === 'cross') return 'scout';
-  if (cadence === 'ondemand' && reach === 'm365') return 'cowork';
+  if (reach === 'm365' && (c === 'oneshot' || c === 'recurring' || c === 'alwayson')) return 'cowork';
   return 'both';
 }
 
@@ -613,7 +629,7 @@ function renderExploration() {
     },
     {
       title: 'Build agents',
-      description: 'Choose a platform for creating, extending, governing, and operating agents for your scenario.',
+      description: 'Choose a platform for creating, extending, governing, and operating agents for your scenario. Agent Builder is the no-code declarative path inside Microsoft 365 Copilot — not every declarative or pro-code Copilot extensibility option.',
       platforms: ['agent_builder', 'copilot_studio', 'foundry']
     }
   ];
@@ -642,6 +658,30 @@ function renderExploration() {
         <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Explore resources →</a>
       </div>`;
   };
+  const renderAdjacentCard = path => {
+    if (!path) return '';
+    const url = path.url || '#';
+    return `
+      <div class="exploration-card exploration-card--adjacent">
+        <div class="exploration-card-label">${path.exploration_best_for || 'Related path'}</div>
+        <h3 class="exploration-card-title">${path.label}</h3>
+        <p class="exploration-card-summary">${(path.summary || '').trim()}</p>
+        <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Learn more →</a>
+      </div>`;
+  };
+
+  const adjacentPaths = apa.adjacent_build_paths || [];
+  const adjacentSection = adjacentPaths.length > 0 ? `
+    <section class="exploration-section-group" aria-labelledby="exploration-related-build-paths">
+      <div class="exploration-group-header">
+        <h3 class="exploration-group-title" id="exploration-related-build-paths">Related build paths</h3>
+        <p class="exploration-group-description">These are adjacent options in Microsoft's build taxonomy. They are not separate scored winners in this advisor, but they matter when Agent Builder, Copilot Studio, or Foundry alone is the wrong frame.</p>
+      </div>
+      <div class="exploration-grid">
+        ${adjacentPaths.map(renderAdjacentCard).join('')}
+      </div>
+    </section>` : '';
+
   groupsContainer.innerHTML = explorationGroups.map(group => `
     <section class="exploration-section-group" aria-labelledby="exploration-${group.title.toLowerCase().replace(/\s+/g, '-')}">
       <div class="exploration-group-header">
@@ -652,7 +692,7 @@ function renderExploration() {
         ${group.platforms.map(renderCard).join('')}
       </div>
     </section>
-  `).join('');
+  `).join('') + adjacentSection;
 }
 
 function renderQuestion() {
@@ -1022,7 +1062,7 @@ function renderRecommendation() {
   const pairBanner = document.getElementById('rec-pair-banner');
   const secondLabel = document.getElementById('rec-second-label');
 
-  // Hide secondary card when second platform is "Not recommended" (score 0-5)
+  // Hide secondary card when second platform is "Not recommended" (score 0–3)
   if (second.label === 'Not recommended') {
     pairBanner.classList.add('hidden');
     secondLabel.classList.add('hidden');

@@ -10,7 +10,7 @@ Key files:
 - `assets/apa.css` — all styles
 - `index.html` — app shell
 
-Content changes go in `apa.yaml`. UI logic goes in `assets/apa.js`. Styles go in `assets/apa.css`. Never hardcode user-facing platform copy in JS or HTML — it belongs in `apa.yaml` under `recommendations` or `questions`.
+Content changes go in `apa.yaml`. UI logic goes in `assets/apa.js`. Styles go in `assets/apa.css`. Never hardcode user-facing platform copy in JS or HTML — it belongs in `apa.yaml` under `recommendations`, `questions`, or `adjacent_build_paths`. Start-page one-liners in `index.html` must stay aligned with recommendation cards.
 
 ## Local development
 
@@ -40,7 +40,11 @@ Specs in `tests/e2e/`: `wizard-completion` (scored path), `delegate-path` (entry
 
 **Entry-point wizard** — "Help me find the right place to get work done." Non-scored routing to `m365_copilot`, `cowork`, `scout`, or a Cowork+Scout pair, based on work pattern (involvement → task type, or cadence → reach) rather than product names. Logic lives in `resolveDelegateResult()` / `resolveDelegateStart()`.
 
+Cadence options: `oneshot` | `recurring` | `alwayson` | `unsure`. **Reach is primary** for recurring/always-on: `cross` → Scout; `m365` + concrete cadence → Cowork; undecided → both. Scout is personal Autopilot / cross-environment — not “anything that isn’t one-shot.” Legacy aliases `ondemand`→`oneshot`, `continuous`→`alwayson` are accepted in JS.
+
 Copilot Chat and the built-in agents (Researcher, Analyst, Facilitator, Interpreter) are **surfaces of** Microsoft 365 Copilot, not separate destinations. The task-type answer selects a `start_here` surface (`chat` or `agents`) rendered in the "Start Here" spotlight on the single `m365_copilot` card. Do not reintroduce them as sibling platforms.
+
+**Agent Builder** is the no-code declarative path inside Microsoft 365 Copilot only — not SharePoint agents, not Agents Toolkit, not custom engine. Adjacent paths live in `apa.adjacent_build_paths` and per-card `adjacent_paths`. Q4 splits multi-agent: `q4d` low-code/business → CS strong; `q4f` code-first/custom runtime → Foundry strong.
 
 ## Scoring pipeline
 

@@ -152,21 +152,21 @@
             <img src="images/m365-copilot-logo.png" alt="Microsoft 365 Copilot" class="platform-preview-img">
           </div>
           <h3 class="platform-preview-title">Microsoft 365 Copilot</h3>
-          <p class="platform-preview-desc">Get answers, draft content, and surface insights in seconds with secure AI chat</p>
+          <p class="platform-preview-desc">Chat, Search, app-native help, and built-in agents / Agent Store — not chat only</p>
         </div>
         <div class="platform-preview">
           <div class="platform-preview-icon">
             <img src="images/cowork.png" alt="Cowork" class="platform-preview-img">
           </div>
           <h3 class="platform-preview-title">Cowork</h3>
-          <p class="platform-preview-desc">Describe the outcome you want, grounded in the work in your emails, meetings, messages, files, and data.</p>
+          <p class="platform-preview-desc">Delegate multi-step Microsoft 365 work — including schedules, event triggers, and approvals</p>
         </div>
         <div class="platform-preview">
           <div class="platform-preview-icon">
             <img src="images/scout.svg" alt="Scout" class="platform-preview-img">
           </div>
           <h3 class="platform-preview-title">Scout</h3>
-          <p class="platform-preview-desc">Use always-on agents that work autonomously, with their own identity, grounded in your enterprise data </p>
+          <p class="platform-preview-desc">Always-on personal Autopilot across desktop, browser, local files, and Microsoft 365 (Frontier preview)</p>
         </div>
       </div>
     </div>
@@ -177,21 +177,21 @@
           <img src="images/copilot.png" alt="Agent Builder" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Agent Builder</h3>
-        <p class="platform-preview-desc">Quickly build declarative agents by using natural language</p>
+        <p class="platform-preview-desc">No-code declarative agents inside Microsoft 365 Copilot — knowledge helpers, not actions or workflows</p>
       </div>
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/copilot-studio.png" alt="Copilot Studio" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Copilot Studio</h3>
-        <p class="platform-preview-desc">Create custom agents with natural language or a graphical interface</p>
+        <p class="platform-preview-desc">Governed low-code agents with actions, triggers, connectors, evaluation, and multi-channel publish</p>
       </div>
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/foundry.svg" alt="Microsoft Foundry" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Microsoft Foundry</h3>
-        <p class="platform-preview-desc">Pro-code platform to build, ground, and govern AI apps and agents at scale</p>
+        <p class="platform-preview-desc">Pro-code managed runtime for custom engines, models, retrieval, and Azure-scale controls</p>
       </div>
     </div>
     <button class="btn btn-primary btn-lg" id="start-btn">
@@ -257,6 +257,8 @@
     <p class="prescreen-description">
       Microsoft 365 Copilot, Cowork, and Scout are all places to get work done. Answer a couple of
       quick questions and we'll point you to the best entry point — and where to start inside it.
+      Cowork can run scheduled or event-triggered work inside Microsoft 365; Scout is the
+      cross-environment personal Autopilot.
     </p>
     <div class="delegate-question">
       <h3 class="delegate-question-title">How hands-on do you want to be?</h3>
@@ -287,13 +289,16 @@
     <div id="delegate-followup" class="delegate-followup" aria-hidden="true">
     <div class="delegate-followup-inner">
     <div class="delegate-question">
-      <h3 class="delegate-question-title">Should it finish and hand back, or keep working over time?</h3>
+      <h3 class="delegate-question-title">How should the work run?</h3>
       <div class="options-list">
-        <div class="option-card delegate-option" data-group="cadence" data-value="ondemand" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','ondemand')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','ondemand')}">
-          <div class="option-content"><div class="option-label">Finish a multi-step job in one go — several artifacts, or a process across systems — and hand me the result</div></div>
+        <div class="option-card delegate-option" data-group="cadence" data-value="oneshot" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','oneshot')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','oneshot')}">
+          <div class="option-content"><div class="option-label">One-shot deliverable — finish a multi-step job and hand back the result</div></div>
         </div>
-        <div class="option-card delegate-option" data-group="cadence" data-value="continuous" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','continuous')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','continuous')}">
-          <div class="option-content"><div class="option-label">Stay always-on — manage and coordinate my day, following up and acting over time</div></div>
+        <div class="option-card delegate-option" data-group="cadence" data-value="recurring" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','recurring')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','recurring')}">
+          <div class="option-content"><div class="option-label">Recurring or event-triggered — schedules, inbox/Teams triggers, or repeating briefings</div></div>
+        </div>
+        <div class="option-card delegate-option" data-group="cadence" data-value="alwayson" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','alwayson')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','alwayson')}">
+          <div class="option-content"><div class="option-label">Always-on personal Autopilot — proactive monitoring and follow-through over time</div></div>
         </div>
         <div class="option-card delegate-option" data-group="cadence" data-value="unsure" role="button" tabindex="0" onclick="selectDelegateOption(this,'cadence','unsure')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'cadence','unsure')}">
           <div class="option-content"><div class="option-label">Not sure yet</div></div>

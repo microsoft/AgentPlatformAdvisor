@@ -8,15 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- **`TODO.md` backlog for the mid-2026 guidance & scoring overhaul.** Prioritized P0–P3 work from a deep analysis of copy, routing, and scoring against current Microsoft Learn (Cowork schedules/event-driven tasks, CS multi-agent GA, Agent Builder vs Agents Toolkit vs custom engine, CS↔Foundry discrimination). Includes iteration plan (A–D), golden-path calibration table, acceptance criteria, and file touch lists — no product behavior changes yet.
+- **`TODO.md` backlog for the mid-2026 guidance & scoring overhaul.** Prioritized P0–P3 work from a deep analysis of copy, routing, and scoring against current Microsoft Learn.
+- **P0 correctness wave implemented** (routing, taxonomy, scoring, one-liners, docs).
+  - **Adjacent build paths** in Explore and recommendation footnotes: SharePoint agents, Microsoft 365 Agents Toolkit (declarative), custom engine agents (`apa.adjacent_build_paths` + per-card `adjacent_paths`).
+  - **Q4f** scored option: code-first multi-agent / custom runtime → Foundry strong; hard-zeros AB + M365.
+  - Playwright coverage for recurring/event + M365 → Cowork, recurring + cross → Scout, always-on + M365 → Cowork, always-on + cross → Scout, Explore adjacent paths, and `dt=cowork` share links.
 
 ### Changed
 
-- **Refreshed platform guidance in `apa.yaml` for mid-2026 product updates** (content only — the scoring matrix is unchanged, so `docs/SCORING.md` distribution figures still hold). Verified against Microsoft Learn and June 2026 release notes that two constraints are still accurate and left them in place: the no-code **Agent Builder is still reactive Q&A/retrieval only** (no action execution or event triggers — MCP Apps add UI, not actions), and **Cowork is still Microsoft 365-only** (no desktop/shell/browser/local runtime), so its reach split with Scout is unchanged.
-  - **Copilot Cowork now runs scheduled prompts.** Added a *Best For* line for scheduling recurring Microsoft 365 tasks (daily briefings, status roundups, inbox triage), and rewrote the "on demand and user-initiated" caution to distinguish Cowork's *scheduled/recurring* runs from Scout's *always-on, condition-monitoring* autonomy. Sourced from the Cowork overview (Learn, updated 2026-07-27).
-  - **Microsoft Foundry:** called out the **Agent Optimizer** evaluate-and-optimize loop in the lifecycle bullet and added a *Best For* line for **Foundry Local on Azure Local** (air-gapped, disconnected, or on-premises deployment).
-  - **Copilot Studio:** noted that **multi-agent orchestration is now generally available** (was preview) in the agent-to-agent orchestration bullet.
-  - **Microsoft 365 Copilot:** added the **Agent Store** as a built-in capability entry (discover and add first- and third-party agents) and noted that agents can render **interactive UI (forms and cards) inline via MCP Apps** in the Copilot Chat description.
+- **Entry-point Cowork ↔ Scout routing rebuilt (P0.1).** Cadence options are now one-shot / recurring-or-event / always-on Autopilot / unsure. **Reach is primary** for recurring and always-on work: M365-only → Cowork; desktop/browser/local/shell → Scout; undecided → both. Daily briefings and M365 event triggers no longer mis-route to Scout. Legacy option ids `ondemand`/`continuous` still accepted in `resolveDelegateResult`.
+- **Agent Builder taxonomy clarified (P0.2).** Builder is framed as **no-code declarative agents inside Microsoft 365 Copilot** only — no Actions; migration lines point to Copilot Studio, Agents Toolkit, and Foundry custom engine. Scoring still hard-zeros AB for actions/background/external/custom app/custom RAG without giving Builder Toolkit-only credit.
+- **Copilot Studio vs Foundry rebalanced after multi-agent GA (P0.3).** Q4d (low-code multi-agent / long-running business orchestration) is now CS:3 / Foundry:2; Q4f covers code-first multi-agent / custom runtime (CS:1 / Foundry:3). Foundry wins on **runtime ownership**, not the keyword “multi-agent.” Distribution re-documented (~2,304 combos: CS ~81.3% / Foundry ~16.1% / AB ~2.6%).
+- **Start-page, Explore, and platform one-liners aligned (P0.4)** with recommendation truth (M365 Chat+agents+Agent Store; Cowork schedules/triggers; Scout Frontier gates; CS actions/governance; Foundry managed runtime; CS computer use vs Scout personal Autopilot).
+- **Docs sync (P0.5):** `docs/SCORING.md`, `docs/FLOWCHART.md`, `README.md`, `.github/copilot-instructions.md`; fixed stale “score 0–5” comment in `apa.js` (Not recommended is 0–3).
+- **Earlier mid-2026 content refresh** (still accurate under P0): Cowork scheduled prompts, Foundry Agent Optimizer / Foundry Local, CS multi-agent GA callout, M365 Agent Store + MCP Apps UI — now extended by the routing and scoring changes above.
 
 ## 2026-07-24
 

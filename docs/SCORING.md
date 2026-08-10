@@ -6,12 +6,24 @@ Reference document for how the APA scoring engine works. All data is driven from
 
 | ID | Label | Description |
 |---|---|---|
-| `agent_builder` | Agent Builder | No-code declarative agents inside Microsoft 365 Copilot |
-| `m365_copilot` | Microsoft 365 Copilot | Built-in Copilot experiences — Copilot Chat, Search, app-native assistance, and Microsoft-built agents (entry-point wizard only) |
-| `copilot_studio` | Copilot Studio | Governed low-code enterprise agents with tools, workflows, triggers, computer use, evaluation, monitoring, and broad publishing |
+| `agent_builder` | Agent Builder | No-code declarative agents **inside Microsoft 365 Copilot** (not all declarative agents) |
+| `m365_copilot` | Microsoft 365 Copilot | Built-in Copilot experiences — Chat, Search, app-native assistance, Agent Store, and Microsoft-built agents (entry-point wizard only) |
+| `copilot_studio` | Copilot Studio | Governed low-code enterprise agents with tools, workflows, triggers, multi-agent (GA), computer use, evaluation, monitoring, and broad publishing |
 | `foundry` | Microsoft Foundry | Managed production agent runtime for prompt agents, hosted code agents, custom retrieval, tools, identity, observability, and Azure-scale controls |
 
 M365 Copilot is excluded from the scored assessment. It is only recommended via the entry-point wizard (or the legacy `?ft=1` / `?dt=copilot_chat` share links). In the full wizard, `m365_copilot` is always zeroed.
+
+### Adjacent build paths (unscored)
+
+Microsoft’s build taxonomy is wider than the three scored winners. Explore and recommendation footnotes surface:
+
+| Path | When |
+|---|---|
+| **SharePoint agents** | Site/library-scoped Q&A; no-code; SharePoint + Teams + M365 Copilot |
+| **Microsoft 365 Agents Toolkit (declarative)** | Pro-code API plugins, Adaptive Cards, CI/CD — still Copilot orchestrator |
+| **Custom engine agents** | Bring-your-own orchestrator/models → Foundry / Agents SDK |
+
+These are **not** scored winners. Agent Builder hard zeros for actions/background/external/custom app/custom RAG remain correct for the *no-code Builder* path only — do not credit Builder for Toolkit-only capabilities.
 
 ## Non-scored destinations: entry-point wizard (Microsoft 365 Copilot, Cowork & Scout)
 
@@ -31,24 +43,31 @@ The first question forks the flow:
   |---|---|
   | **Task type** | General help (brainstorm, find info, catch up on email/meetings, draft & edit documents) · A specialized task (deep research, data analysis, meeting facilitation, translation) |
 
-  Both answers resolve to **Microsoft 365 Copilot** (`m365_copilot`). General selects the **Copilot Chat** start surface; specialized selects the **built-in agents** start surface (Researcher, Analyst, Facilitator, Interpreter, …).
+  Both answers resolve to **Microsoft 365 Copilot** (`m365_copilot`). General selects the **Copilot Chat** start surface; specialized selects the **built-in agents** start surface (Researcher, Analyst, Facilitator, Interpreter, …). Interactive deep research → Researcher; hand off a research deliverable → Cowork (delegate path).
 
 - **Hand it off / delegate** → two follow-up questions decide between Cowork and Scout. They are asked **progressively**: Cadence appears first, and Reach is revealed only once a cadence has been answered (so both questions never show at once).
 
   | Question | Options |
   |---|---|
-  | **Cadence** (asked first) — how should the agent work? | On-demand (finish a multi-step job in one go — several artifacts or a process across systems) · Continuous (always-on, manage & coordinate my day) · Not sure |
-  | **Reach** (revealed after Cadence) — where does it need to reach? | Microsoft 365 only · Also desktop/browser/local/CLI · Not sure |
+  | **Cadence** (asked first) — how should the work run? | **One-shot deliverable** · **Recurring or event-triggered** (schedules, inbox/Teams triggers, repeating briefings) · **Always-on personal Autopilot** · Not sure |
+  | **Reach** (revealed after Cadence; **primary** for recurring/always-on) — where does it need to reach? | Microsoft 365 only · Also desktop/browser/local/CLI · Not sure |
 
 **Routing rule** (`resolveDelegateResult(involvement, taskType, cadence, reach)` in `apa.js`):
 
 | Condition | Result |
 |---|---|
 | Involvement = interactive | **Microsoft 365 Copilot** (`m365_copilot`) — `resolveDelegateStart` then picks the start surface: specialized → `agents`, general → `chat` |
-| Cadence = continuous | **Scout** |
 | Reach = cross-environment | **Scout** |
-| Cadence = on-demand **and** Reach = Microsoft 365 | **Cowork** |
-| Otherwise (undecided signals) | **Both** (Cowork + Scout), shown as a complementary pair |
+| Reach = Microsoft 365 **and** cadence ∈ {oneshot, recurring, alwayson} | **Cowork** |
+| Otherwise (undecided cadence or reach) | **Both** (Cowork + Scout), shown as a complementary pair |
+
+**Rule notes:**
+
+- Reach is primary for recurring/event and always-on work. Daily briefings, inbox triage on a schedule, and “when a VIP emails me…” that stay inside Microsoft 365 → **Cowork**.
+- Always-on + M365-scoped → **Cowork** (still M365 schedules/triggers). Always-on across desktop + M365 → **Scout**.
+- Scout is the personal Autopilot / cross-environment / desktop-app identity path — **not** “anything that isn’t one-shot.”
+- Legacy option ids `ondemand` / `continuous` still map to `oneshot` / `alwayson` inside `resolveDelegateResult` if ever passed.
+- Share links use `dt=cowork|scout|both|m365_copilot` (and legacy `dt=copilot_chat`, `ft=1`) — cadence values are not URL params.
 
 **Readiness** (`isDelegateReady` in `apa.js`): interactive requires a task type; delegate requires both cadence and reach before the wizard can finish.
 
@@ -56,7 +75,7 @@ The first question forks the flow:
 
 ## Questions and Scoring Matrix
 
-Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3).
+Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3). Q4 has six options (including the q4d / q4f multi-agent split); still one answer per question.
 
 ### Q1 — Who is building this agent?
 
@@ -67,7 +86,7 @@ Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3).
 | Professional developer | q1c | 0 | 2 | **3** |
 | Data scientist / ML engineer | q1d | 0 | 1 | **3** |
 
-CS gets 2 for q1c because it supports pro developers via YAML authoring and the VS Code extension.
+CS gets 2 for q1c because it supports pro developers via YAML authoring and the VS Code extension. Pro-dev building **API-plugin declarative agents** for M365 Copilot should also see **Agents Toolkit** guidance (unscored) — Foundry is not the only answer.
 
 ### Q8 — Who will use this agent?
 
@@ -91,11 +110,11 @@ Deployment surface is still a hard constraint. Agent Builder runs inside Microso
 | Background (event-driven) | q2c | 0 | **3** | **3** | Zeros AB |
 | Multiple / not decided | q2d | 1 | **3** | **3** | — |
 
-Foundry now scores higher for deployment flexibility because Foundry agents can publish stable endpoints, integrate with custom applications and services, and be published to Microsoft 365 Copilot or Teams. Copilot Studio remains tied or stronger when the target is low-code Microsoft 365 or Power Platform delivery.
+Foundry scores higher for deployment flexibility because Foundry agents can publish stable endpoints, integrate with custom applications and services, and be published to Microsoft 365 Copilot or Teams. Copilot Studio remains tied or stronger when the target is low-code Microsoft 365 or Power Platform delivery.
 
 ### Q4 — What should this agent do?
 
-Task complexity is the strongest discriminator between Agent Builder, Copilot Studio, and Foundry. Agent Builder now scores well for lightweight content/data-analysis capabilities enabled in declarative agents, but is still zeroed for action workflows.
+Task complexity is the strongest discriminator between Agent Builder, Copilot Studio, and Foundry. **Multi-agent is split:** low-code business orchestration favors CS (GA); code-first / custom runtime favors Foundry. Foundry should win on **runtime ownership**, not the keyword “multi-agent.”
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
@@ -103,9 +122,8 @@ Task complexity is the strongest discriminator between Agent Builder, Copilot St
 | Conversational (multi-turn) | q4b | 2 | **3** | 2 | — |
 | Create/analyze content in Copilot | q4e | **3** | 2 | 2 | — |
 | Multi-step tasks with actions | q4c | 0 | **3** | **3** | Zeros AB |
-| Complex orchestration | q4d | 0 | 2 | **3** | Zeros AB, M365 |
-
-Foundry gets 1 for q4a because it can do simple Q&A, but is usually overkill for simple knowledge scenarios. It gets 2 for q4e because code interpreter, file search, and hosted agents can support richer content/data-analysis workloads when the team needs developer control.
+| Low-code multi-agent / long-running **business** orchestration | q4d | 0 | **3** | 2 | Zeros AB, M365 |
+| Code-first multi-agent / custom protocols / high-scale hosted agents | q4f | 0 | 1 | **3** | Zeros AB, M365 |
 
 ### Q3 — What information does this agent need to access?
 
@@ -129,7 +147,8 @@ Hard rules zero out platforms before scores are summed. They represent real plat
 | Trigger | Platforms zeroed | Reason |
 |---|---|---|
 | q8b (external users) | AB, M365 | Cannot publish externally |
-| q4d (complex orchestration) | AB, M365 | Requires Copilot Studio or Foundry orchestration |
+| q4d (low-code multi-agent / business orchestration) | AB, M365 | Requires Copilot Studio or Foundry |
+| q4f (code-first multi-agent / custom runtime) | AB, M365 | Requires Foundry-class runtime ownership |
 | q4c (multi-step action workflows) | AB | Cannot submit forms, update records, or take actions across systems |
 | q2b (custom app) | AB | Can only run inside Microsoft 365 Copilot surfaces |
 | q2c (background) | AB | No event-driven or autonomous background runtime |
@@ -159,6 +178,8 @@ Persona preferences force one platform above another in ranking regardless of sc
 | 4–7 | Partial fit |
 | 0–3 | Not recommended |
 
+Secondary “Also consider” cards are hidden when the runner-up label is **Not recommended** (0–3), not 0–5.
+
 ### Step 4 — Rank and recommend
 
 Platforms are sorted by score descending. The highest-scoring platform is the primary recommendation. The second-highest is shown as "Also consider" when it is viable.
@@ -169,16 +190,16 @@ When the top two platforms score within **2 points**, they're presented as a com
 
 | Pair | Rationale |
 |---|---|
-| Copilot Studio + Foundry | Build in CS, extend with custom code in Foundry |
+| Copilot Studio + Foundry | CS for channels/connectors/makers/multi-agent business orchestration; Foundry for custom retrieval, hosted code, private net, runtime ownership |
 | M365 Copilot + Copilot Studio | M365 Copilot for end users, CS for customization |
-| Agent Builder + M365 Copilot | AB for Microsoft 365-native agents, M365 for extensibility |
+| Agent Builder + M365 Copilot | AB for no-code M365 knowledge agents, M365 for day-to-day surfaces |
 
 **Persona-based tiebreakers** — when two platforms score equally and a specific persona answer is selected, one platform is preferred:
 
 | Trigger | Platforms | Prefer | Rationale |
 |---|---|---|---|
 | q1c (professional developer) | AB, CS | CS | CS supports code-first authoring via VS Code extension |
-| q1d (data scientist / AI-ML) | CS, Foundry | CS | CS provides a faster path to production agents |
+| q1d (data scientist / AI-ML) | CS, Foundry | CS | Faster path to production; Foundry still wins via q3f / q4f / custom app / private net signals |
 
 ### Step 6 — Cross-question notes
 
@@ -188,7 +209,8 @@ Contextual warning banners when answer combinations are logically contradictory:
 |---|---|
 | q2c + q4a | Background agent doing simple Q&A — contradictory |
 | q8b + q2a | External users in Microsoft 365 Copilot chat — external users can't access your tenant |
-| q1a + q4d | Business user wants complex orchestration — requires dev skills |
+| q1a + q4d | Business user wants multi-agent business orchestration — maker/IT partnership recommended |
+| q1a + q4f | Business user wants code-first multi-agent — requires pro-dev / Foundry partnership |
 | q1a + q3c | Business user needs direct business system integration — requires technical expertise |
 | q1a + q3f | Business user needs custom retrieval architecture — requires engineering expertise |
 
@@ -198,49 +220,60 @@ When Foundry wins but the builder is a business user (q1a), a banner advises par
 
 ## Distribution Analysis
 
-Across all 1,920 possible answer combinations:
+Across all **2,304** possible answer combinations (4 × 4 × 4 × 6 × 6 after adding q4f):
 
 | Platform | Wins | % |
 |---|---:|---:|
-| Copilot Studio | 1,590 | 82.8% |
-| Foundry | 270 | 14.1% |
-| Agent Builder | 60 | 3.1% |
+| Copilot Studio | 1,874 | 81.3% |
+| Foundry | 370 | 16.1% |
+| Agent Builder | 60 | 2.6% |
 
-**Exact top-score ties:** 283 combos (14.7%) — 253 are CS/Foundry, 30 are AB/CS. **Close-score cases within 2 points:** 1,120 combos (58.3%) — most are CS/Foundry, reflecting the intentional overlap between Copilot Studio's governed low-code runtime and Foundry's developer-controlled runtime.
+Compared with the prior 1,920-combo matrix (CS 82.8% / Foundry 14.1% / AB 3.1%), CS multi-agent GA (q4d → CS:3) plus a dedicated code-first option (q4f) slightly reduces CS “undecided multi-agent” dominance while giving Foundry a clearer runtime-ownership lane.
+
+**Exact top-score ties and close (±2) cases** remain common on CS/Foundry pairs — intentional overlap between governed low-code and developer-controlled runtimes.
 
 ### When Agent Builder wins
 
-AB now wins beyond the old SharePoint/OneDrive-only path. Its sweet spot is: **business user or low-code maker, small team or undecided internal audience, Microsoft 365 Copilot surface, Q&A/conversation/content-analysis, and Microsoft 365, web/uploaded, or connector-backed knowledge**.
+AB’s sweet spot is: **business user or low-code maker, small team or undecided internal audience, Microsoft 365 Copilot surface, Q&A/conversation/content-analysis, and Microsoft 365, web/uploaded, or connector-backed knowledge**.
 
-Agent Builder still loses whenever the user needs external publishing, custom app deployment, background execution, direct business system integration, custom retrieval architecture, or action workflows that update external systems.
+Agent Builder still loses whenever the user needs external publishing, custom app deployment, background execution, direct business system integration, custom retrieval architecture, or action workflows that update external systems. Builder is **not** credited for Toolkit-only or custom-engine capabilities.
 
 ### When Foundry wins
 
-Foundry wins when answers include strong technical or production-runtime signals: pro dev or ML persona (q1c/q1d), custom app or multi-surface deployment (q2b/q2d), complex or long-running orchestration (q4d), custom retrieval architecture (q3f), external-facing scenarios, or a need for managed endpoints, hosted code agents, private networking, tracing, evaluation, and full Azure control. Copilot Studio still ties or beats Foundry for event-triggered workflows and business APIs unless the scenario clearly needs full-code control.
+Foundry wins on **runtime ownership** signals: pro dev or ML persona (q1c/q1d), custom app or multi-surface deployment (q2b/q2d), **code-first multi-agent** (q4f), custom retrieval architecture (q3f), external-facing scenarios, or a need for managed endpoints, hosted code agents, private networking, tracing, evaluation, and full Azure control.
+
+Foundry does **not** automatically win on “multi-agent” alone — low-code multi-agent / child agents / A2A business orchestration (q4d) strongly favors Copilot Studio.
+
+### When Copilot Studio wins multi-agent
+
+Coordinate multiple CS agents / A2A for a department process (q4d) can recommend CS as **Strong** without requiring Foundry. Example: maker + department + M365 chat + q4d + Dataverse → CS 15 / Foundry 8.
 
 ### Copilot Studio dominance
 
-CS remains the default recommendation for most combinations because it bridges Agent Builder's no-code Microsoft 365-native scenarios and Foundry's full-code scenarios. It wins when the user needs broader internal or external deployment, actions, branching workflows, event triggers, enterprise governance, Dataverse/custom connectors, MCP tools, computer use, evaluation, monitoring, or a safer path when scope is undecided.
+CS remains the default recommendation for most combinations because it bridges Agent Builder's no-code Microsoft 365-native scenarios and Foundry's full-code scenarios. It wins when the user needs broader internal or external deployment, actions, branching workflows, event triggers, enterprise governance, Dataverse/custom connectors, MCP tools, computer use, evaluation, monitoring, multi-agent business orchestration, or a safer path when scope is undecided.
 
 ### Score ranges when winning
 
-| Platform | Min | Max | Avg |
+| Platform | Min | Max | Avg (approx.) |
 |---|---:|---:|---:|
-| Agent Builder | 11 | 15 | 12.8 |
+| Agent Builder | 11 | 15 | 12.7 |
 | Copilot Studio | 9 | 15 | 12.4 |
-| Foundry | 10 | 15 | 12.7 |
+| Foundry | 9 | 15 | 12.4 |
 
 No combination produces a "best platform" below 8, so every user gets at least a "Good fit" recommendation.
 
 ## Cross-question note frequency
 
-| Note | Combos | % |
-|---|---:|---:|
-| Background + SimpleQA | 96 | 5.0% |
-| External + M365 Copilot chat | 120 | 6.3% |
-| BizUser + Orchestrate | 96 | 5.0% |
-| BizUser + Business APIs | 80 | 4.2% |
-| BizUser + Custom retrieval | 80 | 4.2% |
-| Foundry + BizUser (persona mismatch) | 19 | 1.0% |
+Notes fire on the same logical combinations as before (background+simple Q&A, external+M365 chat, biz-user+orchestration/APIs/RAG). q1a+q4f is the new code-first orchestration note.
 
-Notes are not mutually exclusive — a single combo can trigger multiple notes.
+## Golden-path checks (P0)
+
+| Scenario | Expected |
+|---|---|
+| Daily briefing / inbox triage on a schedule, M365 only | Cowork |
+| “When a VIP emails me…”, M365 only | Cowork |
+| Always-on across desktop + M365 | Scout |
+| One-shot board pack, M365 | Cowork |
+| Coordinate multiple CS agents / A2A for a department process | CS Strong |
+| Custom app + private VNet + custom RAG + hosted code agent | Foundry |
+| Pro-dev API-plugin declarative agent in Copilot | Not Foundry-only — Toolkit guidance |
