@@ -434,6 +434,12 @@ body {
 .prescreen-description {
   color: var(--muted-foreground);
   margin-bottom: 32px;
+  /* Cap running prose near the 70ch measure; centred text in particular
+     gets hard to track once lines run much past that. */
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 /* Prescreen option cards */
