@@ -66,6 +66,7 @@ Result links are shared externally, so **old parameter shapes must keep resolvin
 | Param | Meaning |
 |---|---|
 | `q1`, `q8`, `q2`, `q4`, `q3` | Scored-wizard answers (option IDs) |
+| `c=id1,id2` | Optional governance constraint soft boosts (e.g. `c_private_net`) |
 | `dt=m365_copilot\|cowork\|scout\|both` | Entry-point destination |
 | `st=chat\|agents` | Which M365 Copilot surface to feature |
 | `r=<platform>` + `d=YYYYMMDD` | Original recommendation + date; drive the temporal-change banner |

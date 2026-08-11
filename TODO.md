@@ -315,9 +315,9 @@ Add automated or documented fixtures for expected primaries:
 
 ### P2.1 — Optional governance / compliance constraint step
 
-- [ ] Optional multi-select or single question: regulated data, private networking, tenant-wide inventory, ALM/CI required, air-gapped
-- [ ] Soft boosts: Foundry for private net/air-gap; CS for tenant inventory/ALM/makers; never sole hard-zero without evidence
-- [ ] Docs + tests
+- [x] Optional multi-select or single question: regulated data, private networking, tenant-wide inventory, ALM/CI required, air-gapped
+- [x] Soft boosts: Foundry for private net/air-gap; CS for tenant inventory/ALM/makers; never sole hard-zero without evidence
+- [x] Docs + tests
 
 **Depends on:** P1.3 helpful but not required
 
@@ -325,9 +325,9 @@ Add automated or documented fixtures for expected primaries:
 
 ### P2.2 — User-visible “last verified” and version
 
-- [ ] Show `meta.version` and a “Guidance verified against Microsoft Learn: YYYY-MM” on results footer or welcome
-- [ ] Bump `meta.version` on substantial guidance releases (e.g. 1.1 → 1.2)
-- [ ] Link Changelog from that control (footer already has docs links — ensure discoverable)
+- [x] Show `meta.version` and a “Guidance verified against Microsoft Learn: YYYY-MM” on results footer or welcome
+- [x] Bump `meta.version` on substantial guidance releases (e.g. 1.1 → 1.2)
+- [x] Link Changelog from that control (footer already has docs links — ensure discoverable)
 
 **Depends on:** nothing
 
@@ -335,10 +335,10 @@ Add automated or documented fixtures for expected primaries:
 
 ### P2.3 — Dead code / schema cleanup
 
-- [ ] Remove or clearly mark `valid_pairs` involving `m365_copilot` on scored path
-- [ ] Align JS comment on secondary-card hide threshold with 0–3 Not recommended
-- [ ] Review `persona_preferences` q1d CS-over-AB (low bite rate) — keep, broaden, or drop
-- [ ] Confirm `fastTrack` / legacy `ft=1` / `dt=copilot_chat` still documented and tested
+- [x] Remove or clearly mark `valid_pairs` involving `m365_copilot` on scored path
+- [x] Align JS comment on secondary-card hide threshold with 0–3 Not recommended
+- [x] Review `persona_preferences` q1d CS-over-AB (low bite rate) — keep, broaden, or drop
+- [x] Confirm `fastTrack` / legacy `ft=1` / `dt=copilot_chat` still documented and tested
 
 **Depends on:** P1.6 nice-to-have together
 
@@ -346,10 +346,10 @@ Add automated or documented fixtures for expected primaries:
 
 ### P2.4 — Cross-question notes expansion
 
-- [ ] q1b + q3f (maker + custom RAG) → engineering partnership note
-- [ ] q1c + q4a only (pro-dev + simple Q&A in M365) → consider AB/Toolkit declarative over Foundry
-- [ ] continuous-style entry answers that still pick Scout while reach=m365 — only if P0.1 leaves that path
-- [ ] Keep notes rare; avoid banner fatigue
+- [x] q1b + q3f (maker + custom RAG) → engineering partnership note
+- [x] q1c + q4a only (pro-dev + simple Q&A in M365) → consider AB/Toolkit declarative over Foundry
+- [x] continuous-style entry answers that still pick Scout while reach=m365 — only if P0.1 leaves that path
+- [x] Keep notes rare; avoid banner fatigue
 
 **Depends on:** P0.1, P0.3
 
@@ -359,9 +359,9 @@ Add automated or documented fixtures for expected primaries:
 
 From `.github/improvements.md` and productization notes:
 
-- [ ] Print-friendly or PDF/markdown export of recommendation + key factors + score comparison
-- [ ] Ensure share URL remains canonical machine-readable form
-- [ ] Optional email-self is out of scope without backend — prefer client-side download
+- [x] Print-friendly or PDF/markdown export of recommendation + key factors + score comparison
+- [x] Ensure share URL remains canonical machine-readable form
+- [x] Optional email-self is out of scope without backend — prefer client-side download
 
 **Depends on:** nothing (UX track)
 
@@ -369,8 +369,8 @@ From `.github/improvements.md` and productization notes:
 
 ### P2.6 — Feedback loop
 
-- [ ] Lightweight “Was this helpful?” on results (Clarity custom tags or GitHub issue deep link with prefilled scenario)
-- [ ] Do not block main CTA; design per `docs/DESIGN.md`
+- [x] Lightweight “Was this helpful?” on results (Clarity custom tags or GitHub issue deep link with prefilled scenario)
+- [x] Do not block main CTA; design per `docs/DESIGN.md`
 
 **Depends on:** nothing (UX track)
 
@@ -378,9 +378,9 @@ From `.github/improvements.md` and productization notes:
 
 ### P2.7 — Landing / stewardship perception (productization)
 
-- [ ] Welcome experience sets use-vs-build context before first question (copy only if possible)
-- [ ] Public changelog already exists — ensure footer “Changelog” is obvious
-- [ ] Consider aka.ms or vanity URL only if ownership is available (process, not code)
+- [x] Welcome experience sets use-vs-build context before first question (copy only if possible)
+- [x] Public changelog already exists — ensure footer “Changelog” is obvious
+- [x] Consider aka.ms or vanity URL only if ownership is available (process, not code)
 
 **Depends on:** nothing
 
@@ -441,13 +441,13 @@ Focus: watch-outs, mismatch notes, verified-on date, export/feedback.
 
 ### P2
 
-- [ ] P2.1 Governance/compliance optional step
-- [ ] P2.2 Last-verified + version visible
-- [ ] P2.3 Schema/dead-code cleanup
-- [ ] P2.4 Cross-question notes expansion
-- [ ] P2.5 Stakeholder export
-- [ ] P2.6 Feedback loop
-- [ ] P2.7 Landing/stewardship perception
+- [x] P2.1 Governance/compliance optional step
+- [x] P2.2 Last-verified + version visible
+- [x] P2.3 Schema/dead-code cleanup
+- [x] P2.4 Cross-question notes expansion
+- [x] P2.5 Stakeholder export
+- [x] P2.6 Feedback loop
+- [x] P2.7 Landing/stewardship perception
 
 ### P3
 

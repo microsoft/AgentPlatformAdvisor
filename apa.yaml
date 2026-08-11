@@ -8,7 +8,9 @@
 ################################################################################
 
 meta:
-  version: "1.3"
+  version: "1.4"
+  # Shown in UI footer / results stewardship strip
+  guidance_verified: "2026-08"
   platforms:
     - id: agent_builder
       label: Agent Builder
@@ -239,6 +241,41 @@ questions:
           foundry: 3
 
 ################################################################################
+# OPTIONAL GOVERNANCE CONSTRAINTS (scored-path only)
+# Multi-select soft boosts — never hard-zero. Share link: c=id1,id2
+################################################################################
+
+optional_constraints:
+  label: Any enterprise constraints that should influence the recommendation?
+  prompt: >
+    Optional. Select all that apply, or skip. These add small soft boosts only —
+    they never disqualify a platform by themselves.
+  skip_label: None of these — continue
+  options:
+    - id: c_private_net
+      label: Private networking, VNet isolation, or private endpoints required
+      boosts:
+        foundry: 2
+    - id: c_airgap
+      label: Air-gapped, disconnected, or on-premises control plane required
+      boosts:
+        foundry: 2
+    - id: c_inventory
+      label: Tenant-wide agent inventory, DLP, or admin controls required
+      boosts:
+        copilot_studio: 2
+    - id: c_alm
+      label: ALM, environments, versioning, or CI/CD required
+      boosts:
+        copilot_studio: 1
+        foundry: 1
+    - id: c_regulated
+      label: Regulated data, strict residency, or heightened compliance
+      boosts:
+        foundry: 1
+        copilot_studio: 1
+
+################################################################################
 # SCORING ENGINE
 ################################################################################
 
@@ -275,10 +312,15 @@ scoring:
       label: "Custom retrieval architecture — Agent Builder cannot directly use custom RAG, Azure AI Search, private indexes, Foundry IQ, or engineering-managed retrieval systems"
   # Step 2 — Sum raw scores across all answered questions.
   raw_score_max: 15  # 5 questions × max score of 3
+  # Optional governance constraints may add soft boosts (never hard-zero). Cap keeps
+  # Strong fit meaningful when boosts stack.
+  constraint_boost_cap: 2
 
   # Step 2.5 — Persona preferences: soft overrides that force one platform
   # above another when a specific persona is selected. Unlike hard rules,
   # scores are preserved. A rationale message is shown to explain the override.
+  # Kept for q1d: rare path but correct when DS/ML picks AB-leaning answers without
+  # Foundry-only signals — prefer CS over AB for evaluations/model selection.
   persona_preferences:
     - when:
         q1: q1d
@@ -288,12 +330,14 @@ scoring:
         Copilot Studio is recommended over Agent Builder for data scientists and AI/ML engineers
         because it supports curated model selection, agent evaluations, Foundry IQ integration,
         code-first development via the VS Code extension, and more flexible orchestration —
-        capabilities that Agent Builder does not offer.
+        capabilities that Agent Builder does not offer. Foundry still ranks above when answers
+        show runtime ownership (custom RAG, private networking, hosted code, q4f).
 
   # Step 3 — Map raw scores to recommendation strength.
+  # Upper bound 17 allows optional constraint boosts (+0–2) on top of max 15 raw.
   recommendation_thresholds:
     - min: 12
-      max: 15
+      max: 17
       label: Strong fit
       description: This platform is well-aligned with your requirements across all dimensions.
     - min: 8
@@ -398,6 +442,22 @@ scoring:
         Custom retrieval architectures like Azure AI Search, private indexes, Foundry IQ,
         or large-scale RAG usually require engineering expertise. Consider partnering with
         your development or data platform team before building the agent.
+    - when:
+        q1: q1b
+        q3: q3f
+      note: >
+        Custom retrieval (Azure AI Search, private indexes, Foundry IQ, large-scale RAG)
+        usually needs engineering partnership even for low-code makers. Plan Foundry or
+        platform-team support for indexes, ACLs, and retrieval quality — or stay on Copilot
+        Studio connectors when simpler grounding is enough.
+    - when:
+        q1: q1c
+        q4: q4a
+      note: >
+        Professional developers building simple Q&A in Microsoft 365 often get more value
+        from Agent Builder or a Microsoft 365 Agents Toolkit declarative agent (source control,
+        API plugins, CI/CD on Copilot's orchestrator) than from a full Foundry custom engine.
+        Escalate to Foundry only when you need your own runtime, models, or retrieval architecture.
 
   # Winner mismatch notes — persona, audience, or access. Supports legacy
   # `persona:` (q1 only) or full `when:` answer maps. Also used on entry-point

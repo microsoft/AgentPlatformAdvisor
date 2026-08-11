@@ -90,3 +90,7 @@ flowchart TD
     style RESULT fill:#d4edda,stroke:#28a745
     style NOTES fill:#f8f0fb,stroke:#6f42c1
 ```
+
+## Optional constraints (scored path only)
+
+After Q3 (last scored question), users may multi-select enterprise constraints or skip. Soft boosts apply in `rankPlatforms` before results. Entry-point and legacy fast-track paths skip this step.

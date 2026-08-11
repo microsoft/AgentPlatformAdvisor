@@ -59,6 +59,10 @@ test.describe('Wizard Completion', () => {
       await page.locator('#next-btn').click();
     }
 
+    // Optional governance constraints step — skip to results
+    await expect(page.locator('#constraints-section')).toBeVisible();
+    await page.locator('#constraints-skip-btn').click();
+
     // Verify recommendation section is visible
     await expect(page.locator('#recommendation-section')).toBeVisible();
 

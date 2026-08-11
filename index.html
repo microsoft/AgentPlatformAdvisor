@@ -139,11 +139,12 @@
       Agent Platform Advisor
     </h1>
     <p class="welcome-description">
-      Answer a few questions about what you want from agents, and we'll recommend the best Microsoft platform for your agent needs.
+      Use ready-made agents to get work done, or build a custom agent — answer a few questions and we'll recommend the best Microsoft path for your scenario.
     </p>
     <p class="platform-preview-intro">
-      Here's what the advisor chooses between — select <strong>Get Started</strong> below to find your fit.
+      Two lanes: <strong>Use agents</strong> (Microsoft 365 Copilot, Cowork, Scout) and <strong>Build agents</strong> (Agent Builder, Copilot Studio, Foundry). Select <strong>Get Started</strong> to choose a lane and find your fit.
     </p>
+    <p id="welcome-guidance-meta" class="guidance-meta hidden" aria-label="Guidance version"></p>
     <div class="delegate-group">
       <div class="delegate-group-label">Use agents</div>
       <div class="platform-grid platform-grid--delegate">
@@ -366,6 +367,25 @@
     </div>
   </div>
 </div></div>
+        <div id="constraints-section" class="fade-in hidden"><div class="card">
+  <div class="card-content">
+    <div class="question-counter">Optional · enterprise constraints</div>
+    <h2 class="question-title" id="constraints-title">Any enterprise constraints?</h2>
+    <p class="question-subtitle" id="constraints-subtitle"></p>
+    <div class="options-list" id="constraints-list"></div>
+    <div class="center assessment-nav">
+      <button class="btn btn-ghost" type="button" onclick="backFromConstraints()">
+        <span class="icon icon-chevron-left"></span> Back
+      </button>
+      <button class="btn btn-ghost" type="button" id="constraints-skip-btn" onclick="skipConstraints()">
+        None of these — continue
+      </button>
+      <button class="btn btn-primary" type="button" id="constraints-continue-btn" onclick="continueFromConstraints()">
+        See recommendation <span class="icon icon-chevron-right"></span>
+      </button>
+    </div>
+  </div>
+</div></div>
         <div id="recommendation-section" class="fade-in hidden">
           <nav id="rec-nav" class="rec-nav" style="display:none">
             <a href="javascript:void(0)" onclick="document.getElementById('rec-primary-card').scrollIntoView({behavior:'smooth',block:'start'})">Recommendation</a>
@@ -402,8 +422,20 @@
             <div id="decision-card-banner" class="decision-card-banner" style="display:none" role="status" aria-live="polite"></div>
             <div id="decision-card-drift" class="decision-card-drift" style="display:none"></div>
           </div>
+          <div id="rec-guidance-meta" class="guidance-meta hidden" aria-label="Guidance version"></div>
+          <div id="rec-feedback" class="rec-feedback hidden" role="group" aria-label="Feedback">
+            <div id="feedback-question" class="feedback-question">
+              <span class="feedback-label">Was this helpful?</span>
+              <button type="button" class="btn btn-ghost btn-feedback" onclick="submitFeedback(true)">Yes</button>
+              <button type="button" class="btn btn-ghost btn-feedback" onclick="submitFeedback(false)">No</button>
+            </div>
+            <p id="feedback-thanks" class="feedback-thanks hidden"></p>
+          </div>
           <div class="center rec-actions">
-            <button class="btn btn-ghost" onclick="restart()">
+            <button class="btn btn-secondary" type="button" id="export-md-btn" onclick="downloadRecommendationMarkdown()">
+              Download markdown
+            </button>
+            <button class="btn btn-ghost" type="button" onclick="restart()">
               ↩ Start Over
             </button>
           </div>
@@ -414,14 +446,15 @@
     <div class="footer">
       Created by
       <a href="https://www.linkedin.com/in/rstandefer/">Robert Standefer</a>
+      <p id="footer-guidance-meta" class="guidance-meta footer-guidance-meta hidden" aria-label="Guidance version"></p>
       <div class="footer-doc-links" aria-label="Project documentation">
+        <a class="footer-changelog" href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
         <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/README.md" target="_blank" rel="noopener">README</a>
-        <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG</a>
         <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/FLOWCHART.md" target="_blank" rel="noopener">FLOWCHART</a>
         <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/SCORING.md" target="_blank" rel="noopener">SCORING</a>
       </div>
       <p>If you encounter a problem, please
-        <a href="https://github.com/microsoft/cat/issues/new">create an issue</a>
+        <a href="https://github.com/microsoft/AgentPlatformAdvisor/issues/new">create an issue</a>
       </p>
     </div>
 

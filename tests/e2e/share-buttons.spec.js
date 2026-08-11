@@ -22,6 +22,8 @@ async function completeWizard(page) {
     await page.locator('#next-btn').click();
   }
 
+  await expect(page.locator('#constraints-section')).toBeVisible();
+  await page.locator('#constraints-skip-btn').click();
   await expect(page.locator('#recommendation-section')).toBeVisible();
 }
 

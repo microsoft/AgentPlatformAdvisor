@@ -266,6 +266,27 @@ No combination produces a "best platform" below 8, so every user gets at least a
 
 Notes fire on the same logical combinations as before (background+simple Q&A, external+M365 chat, biz-user+orchestration/APIs/RAG). q1a+q4f is the new code-first orchestration note.
 
+
+## Optional governance constraints (P2.1)
+
+After the five scored questions, the wizard shows an **optional multi-select** (`apa.optional_constraints`). Selections add **soft boosts** only (capped by `scoring.constraint_boost_cap`, default 2). They never hard-zero a platform.
+
+| ID | Soft boost |
+|---|---|
+| `c_private_net` | Foundry +2 |
+| `c_airgap` | Foundry +2 |
+| `c_inventory` | Copilot Studio +2 |
+| `c_alm` | CS +1, Foundry +1 |
+| `c_regulated` | Foundry +1, CS +1 |
+
+Share links carry selections as `c=c_private_net,c_alm` (comma-separated). Omitted `c` means no boosts. Strong fit threshold upper bound is **17** so boosted max scores still map to Strong.
+
+Legacy share params unchanged: `ft=1`, `dt=copilot_chat`, `q*`, `dt`, `st`, `r`, `d`, `mode`.
+
+## Guidance version (P2.2)
+
+`meta.version` and `meta.guidance_verified` (YYYY-MM) render on welcome, results, and footer with a Changelog link.
+
 ## Runtime / orchestrator signal (no Q6)
 
 Q2 option labels carry the runtime discriminator without a sixth scored question:

@@ -31,6 +31,9 @@ async function answerWizard(page, answers) {
     }
     await page.locator('#next-btn').click();
   }
+  // Optional constraints step before results
+  await expect(page.locator('#constraints-section')).toBeVisible();
+  await page.locator('#constraints-skip-btn').click();
   await expect(page.locator('#recommendation-section')).toBeVisible();
 }
 

@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - **Golden-path harness:** `scripts/golden_paths.py` + `tests/e2e/golden-paths.spec.js` (G01–G12); `npm run test:golden` / `npm test` runs the script first.
   - Entry-point **delegate tips** (Chat then Cowork; interactive specialized vs Cowork research package).
   - Richer **winner mismatch notes** (Foundry+maker, CS+biz+APIs/workflows, AB+department audience, Scout Frontier access on entry-point results).
+- **P2 coverage / trust / maintainability**
+  - Optional **governance constraints** multi-select after the five scored questions (soft boosts only; share param `c=id1,id2`; never hard-zero).
+  - **Guidance version + Learn verified** strip on welcome, results, and footer (`meta.version` 1.4, `meta.guidance_verified`); Changelog link emphasized.
+  - **Markdown export** of recommendation + scores + share URL; lightweight **Was this helpful?** feedback (Clarity tags + GitHub issue deep link).
+  - Cross-question notes: maker+custom RAG; pro-dev+simple Q&A → AB/Toolkit guidance.
+  - Welcome copy frames **use vs build** lanes before Get Started.
 
 ### Changed
 

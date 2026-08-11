@@ -125,7 +125,7 @@ npm test              # headless
 npm run test:headed   # with browser visible
 ```
 
-There are **57** Playwright tests across 7 spec files, plus a scored golden-path script (`scripts/golden_paths.py`; needs `PyYAML`). `npm test` runs the golden script first, then Playwright. Coverage includes wizard completion, shared links, temporal change, legacy fast-track, entry-point routing, share buttons, and G01–G12 golden paths (callouts, Toolkit tip, Cowork/Scout/M365). Single file: `npx playwright test tests/e2e/golden-paths.spec.js`.
+There are Playwright tests across 8 spec files (including P2 constraints/export/feedback), plus a scored golden-path script (`scripts/golden_paths.py`; needs `PyYAML`). `npm test` runs the golden script first, then Playwright. Coverage includes wizard completion, optional governance constraints, shared links, temporal change, legacy fast-track, entry-point routing, share buttons, G01–G12 golden paths, and export/feedback. Single file: `npx playwright test tests/e2e/p2-features.spec.js`.
 
 ## Contributing
 
