@@ -712,6 +712,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  text-align: left;
 }
 
 .option-card:hover {
