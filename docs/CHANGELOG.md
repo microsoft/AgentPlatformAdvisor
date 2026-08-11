@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Fixed
+
+- **Design review (v3):** dark-mode accent used as *text* now uses `--primary-text` (`#2B9AEE`) so progress labels, Explore group titles, badges, and decision chrome meet WCAG AA (fills stay `#0078D4`). Theme toggle and logo hit targets ≥44px; guidance strips no longer repeat Changelog (footer nav only); stronger `:focus-visible` on path cards and decision buttons.
+
 ### Added
 
 - **`TODO.md` backlog for the mid-2026 guidance & scoring overhaul.** Prioritized P0–P3 work from a deep analysis of copy, routing, and scoring against current Microsoft Learn.

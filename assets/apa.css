@@ -16,6 +16,8 @@
   --primary-foreground: #FFFFFF;
   --primary-light: #0B5187;
   --primary-xlight: rgba(0, 120, 212, 0.08);
+  /* Text/icons on dark surfaces — #0078D4 fails AA as text (~3.7:1) */
+  --primary-text: #2B9AEE;
 
   /* Secondary / Muted */
   --secondary: rgba(0, 120, 212, 0.10);
@@ -81,6 +83,7 @@
   --primary-foreground: #FFFFFF;
   --primary-light: #BFDDF2;
   --primary-xlight: #EFF6FC;
+  --primary-text: #005A9E;
 
   /* Secondary / Muted */
   --secondary: #EFF6FC;
@@ -147,13 +150,15 @@ body {
   background-color: var(--background);
 }
 
-/* Theme toggle button */
+/* Theme toggle button — 44px minimum touch target */
 .theme-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: transparent;
@@ -226,6 +231,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-height: 44px;
 }
 
 .logo-icon {
@@ -246,10 +252,20 @@ body {
   color: var(--foreground);
   text-decoration: none;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 0;
 }
 
 .logo-text:hover {
   text-decoration: underline;
+}
+
+.logo-text:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* Button Styles */
@@ -377,7 +393,7 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0 auto 24px;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .welcome-heading {
@@ -642,7 +658,7 @@ body {
 
 .platform-preview-icon {
   font-size: 2rem;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -945,7 +961,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-mono);
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0;
@@ -983,7 +999,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-mono);
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 8px;
@@ -1036,7 +1052,7 @@ body {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .exploration-card-spotlight-name {
   font-size: var(--fs-body-sm);
@@ -1262,7 +1278,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-mono);
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-text);
   background: var(--primary-xlight);
   padding: 2px 8px;
   border-radius: var(--radius-full);
@@ -1299,7 +1315,7 @@ body {
   font-weight: 500;
 }
 .progress-step.active {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .progress-step.complete {
   color: var(--muted-foreground);
@@ -1361,7 +1377,7 @@ body {
   margin-left: 8px;
 }
 .badge-strong   { background: var(--success-bg); color: var(--success); }
-.badge-good     { background: var(--primary-xlight); color: var(--primary); }
+.badge-good     { background: var(--primary-xlight); color: var(--primary-text); }
 .badge-possible { background: var(--warning-bg); color: var(--warning); }
 .badge-not      { background: var(--muted); color: var(--muted-foreground); }
 .rec-description {
@@ -1412,7 +1428,7 @@ body {
   gap: 8px;
   margin-bottom: 16px;
 }
-.rec-list li::before { content: "• "; color: var(--primary); }
+.rec-list li::before { content: "• "; color: var(--primary-text); }
 .rec-list li { font-size: var(--fs-body-sm); color: var(--foreground); }
 .rec-list li a {
   color: var(--link);
@@ -1786,7 +1802,7 @@ body {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 6px;
 }
 .rec-spotlight-name {
@@ -1806,7 +1822,7 @@ body {
 .rec-spotlight-tagline {
   font-size: var(--fs-caption);
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 8px;
 }
 .rec-spotlight-description {
@@ -1909,8 +1925,16 @@ body {
   background: transparent;
 }
 .btn-decision:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ring-focus);
+}
+
+/* Prescreen path cards already use .option-card:focus-visible; reinforce hit clarity */
+.prescreen-option:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ring-focus);
 }
 .btn-decision:disabled {
   opacity: 0.5;
@@ -1919,7 +1943,7 @@ body {
 
 .btn-decision-primary {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .btn-decision-primary:hover:not(:disabled) {
   background: var(--primary-xlight);

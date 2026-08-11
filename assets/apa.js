@@ -1577,11 +1577,11 @@ function renderGuidanceMeta(elId) {
   if (!el || !apa || !apa.meta) return;
   const ver = apa.meta.version || '';
   const verified = apa.meta.guidance_verified || '';
-  const changelog = 'https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/CHANGELOG.md';
+  // Changelog lives once in the footer nav — do not repeat it on every guidance strip.
   el.innerHTML =
     `<span class="guidance-meta-text">Guidance v${ver}` +
     (verified ? ` · Verified against Microsoft Learn: ${verified}` : '') +
-    `</span> · <a href="${changelog}" target="_blank" rel="noopener noreferrer">Changelog</a>`;
+    `</span>`;
   el.classList.remove('hidden');
 }
 
