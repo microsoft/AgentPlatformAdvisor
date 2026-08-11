@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **Design review round 2 (v3):** seven findings from `/design-review`, audited against `docs/DESIGN.md`.
+  - **Prescreen routing cards no longer carry off-system color.** The three cards were tinted indigo (`#5B5FC7`/`#9EA2F0`), `--success` green, and `--warning` amber via icon badges and 3px colored left borders. Indigo isn't in the palette and violet-as-AI-signal is on the anti-slop list; `--success`/`--warning` are state colors, not routing colors; colored-left-border-on-card is itself an anti-slop pattern. Badges are now neutral and take the single blue signal on hover/focus.
+  - **Option card text is left-aligned.** Cards inherited `text-align: center` from `.card-content--centered`, so copy was centered beside a left-aligned icon with no shared left edge to scan down.
+  - **Mobile header no longer wraps to three rows.** At 375px the progress bar wrapped and pushed the theme toggle onto its own orphan row. Logo + toggle now hold one row, progress bar takes a full-width row below.
+  - **Entry-point question titles moved onto the type scale.** `.delegate-question-title` used the `--fs-body-lg` *body* token (18px), leaving the question barely larger than the paragraph above it; now `--fs-subhead`. The scored wizard's `.question-title` keeps `--fs-heading`.
+  - **Last two off-token font sizes removed.** `.rec-platform-name` (the winning platform, the most important string on the results page) was a literal `1.5rem`, below the heading token — now `--fs-heading`. The mobile `.question-title` shrink to `1.375rem` is deleted outright, since DESIGN.md permits mobile reduction only for display/title.
+  - **Per-question fit grid no longer encodes state by opacity alone.** Strong/moderate/weak were one blue at 100/55/25% in same-size dots, labelled only by a `title` tooltip (invisible on touch, unreliable for AT). Dot size now varies (12/9/6px) and every cell carries `role="img"` + an `aria-label` naming question, platform, and score.
+  - **Prescreen prose capped at a readable measure.** The entry-point intro ran ~114 characters per centered line against DESIGN.md's ~70ch cap; now `max-width: 60ch`.
 - **Design review (v3):** dark-mode accent used as *text* now uses `--primary-text` (`#2B9AEE`) so progress labels, Explore group titles, badges, and decision chrome meet WCAG AA (fills stay `#0078D4`). Theme toggle and logo hit targets ≥44px; guidance strips no longer repeat Changelog (footer nav only); stronger `:focus-visible` on path cards and decision buttons.
 
 ### Added
