@@ -1163,6 +1163,26 @@ body {
     gap: 8px;
   }
 
+  /* Keep the logo and theme toggle on one row and give the progress bar
+     its own full-width row, instead of letting the toggle wrap alone. */
+  .header-content > .logo {
+    order: 1;
+  }
+
+  .header-content > .header-actions {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .header-content > #progress-bar {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .header-content > #progress-bar .progress-bar {
+    justify-content: center;
+  }
+
   .logo-text {
     font-size: var(--fs-body);
   }
