@@ -1195,10 +1195,6 @@ body {
     width: 16px;
   }
 
-  .question-title {
-    font-size: 1.375rem;
-  }
-
   .platform-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1353,7 +1349,7 @@ body {
   object-fit: contain;
 }
 .rec-platform-name {
-  font-size: 1.5rem;
+  font-size: var(--fs-heading);
   font-weight: 700;
   color: var(--foreground);
   letter-spacing: -0.01em;
