@@ -438,7 +438,6 @@ body {
 
 /* Prescreen option cards */
 .prescreen-option {
-  border-left: 3px solid transparent;
   padding: 20px;
   align-items: center;
   transition: background-color 0.15s, border-color 0.15s;
@@ -456,45 +455,15 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.prescreen-option-icon--custom {
-  background: rgba(76, 195, 138, 0.12);
-  color: var(--success);
-}
-.prescreen-option--custom {
-  border-left-color: var(--success);
-}
-
-.prescreen-option-icon--explore {
-  background: rgba(242, 201, 76, 0.10);
-  color: #E8C839;
-}
-.prescreen-option--explore {
-  border-left-color: var(--warning);
-}
-
-[data-theme="light"] .prescreen-option-icon--custom {
-  background: #DFF6DD;
-}
-[data-theme="light"] .prescreen-option-icon--explore {
-  background: #FFF4CE;
-  color: #8A6914;
-}
-
-.prescreen-option-icon--delegate {
-  background: rgba(91, 95, 199, 0.18);
-  color: #9EA2F0;
-}
-.prescreen-option--delegate {
-  border-left-color: #7B7FC7;
-}
-[data-theme="light"] .prescreen-option-icon--delegate {
-  background: #ECEBFB;
-  color: #5B5FC7;
-}
-[data-theme="light"] .prescreen-option--delegate {
-  border-left-color: #5B5FC7;
+.prescreen-option:hover .prescreen-option-icon,
+.prescreen-option:focus-visible .prescreen-option-icon {
+  background: var(--secondary);
+  color: var(--primary-text);
 }
 
 /* Cowork / Scout micro-decision */
