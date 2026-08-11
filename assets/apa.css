@@ -472,7 +472,7 @@ body {
   margin-bottom: 28px;
 }
 .delegate-question-title {
-  font-size: var(--fs-body-lg);
+  font-size: var(--fs-subhead);
   font-weight: 600;
   margin: 0 0 12px;
   color: var(--foreground);
