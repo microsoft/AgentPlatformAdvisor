@@ -1032,11 +1032,11 @@ function buildPerQuestionGrid(answersMap) {
     const shortLabel = Q_SHORT_LABELS[q.id] || q.label;
 
     const cells = platforms.map(p => {
-      if (zeroed[p.id]) return '<td class="pq-cell"><span class="pq-dot pq-zeroed" title="Disqualified">—</span></td>';
+      if (zeroed[p.id]) return `<td class="pq-cell"><span class="pq-dot pq-zeroed" role="img" aria-label="${shortLabel}, ${p.label}: disqualified" title="Disqualified">—</span></td>`;
       const score = option.scores[p.id] ?? 0;
       const cls = score === 3 ? 'pq-strong' : score === 2 ? 'pq-moderate' : score === 1 ? 'pq-weak' : 'pq-none';
       const title = score === 3 ? 'Strong fit' : score === 2 ? 'Moderate fit' : score === 1 ? 'Weak fit' : 'No fit';
-      return `<td class="pq-cell"><span class="pq-dot ${cls}" title="${title} (${score}/3)"></span></td>`;
+      return `<td class="pq-cell"><span class="pq-dot ${cls}" role="img" aria-label="${shortLabel}, ${p.label}: ${title} (${score} of 3)" title="${title} (${score}/3)"></span></td>`;
     }).join('');
 
     return `<tr><td class="pq-label">${shortLabel}</td>${cells}</tr>`;

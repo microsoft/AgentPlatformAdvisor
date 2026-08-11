@@ -1613,16 +1613,22 @@ body {
   height: 12px;
   border-radius: 9999px;
 }
+/* Fit strength is encoded by dot size as well as tint, so the four states
+   stay distinguishable without relying on opacity alone. */
 .pq-dot.pq-strong {
   background: var(--primary);
 }
 .pq-dot.pq-moderate {
   background: var(--primary);
-  opacity: 0.55;
+  opacity: 0.8;
+  width: 9px;
+  height: 9px;
 }
 .pq-dot.pq-weak {
   background: var(--primary);
-  opacity: 0.25;
+  opacity: 0.55;
+  width: 6px;
+  height: 6px;
 }
 .pq-dot.pq-none {
   background: var(--muted);
