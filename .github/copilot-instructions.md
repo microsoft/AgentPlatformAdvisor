@@ -26,6 +26,7 @@ Playwright end-to-end tests. `playwright.config.js` starts the static server its
 
 ```bash
 npm install                                              # install dependencies
+python3 -m pip install -r requirements.txt               # PyYAML, needed by the golden-path script
 npm test                                                 # golden_paths.py then Playwright
 npm run test:golden                                      # scored G01–G05/G11–G12 only
 npm run test:e2e                                         # Playwright only
@@ -34,7 +35,11 @@ npx playwright test tests/e2e/wizard-completion.spec.js  # single test file
 npx playwright test -g "completes full wizard"           # single test by name
 ```
 
-Specs in `tests/e2e/`: `wizard-completion` (scored path), `delegate-path` (entry-point wizard), `golden-paths` (G01–G12 + callouts), `shared-link` and `temporal-change` (URL-loaded results), `fast-track` (legacy `?ft=1`), `share-buttons`. Scored calibration also lives in `scripts/golden_paths.py` and the table in `docs/SCORING.md`.
+`npm test` runs `scripts/golden_paths.py` first, so without PyYAML it fails before Playwright ever starts.
+
+Specs live in `tests/e2e/`. The ones worth knowing before you change behavior: `wizard-completion` (scored path), `delegate-path` (entry-point wizard), `golden-paths` (G01–G12 + callouts), `shared-link` / `temporal-change` (URL-loaded results), `share-link-integrity` and `temporal-banner-xss` (URL param validation — see "Share links are untrusted input"), `meta-tags` (social/SEO invariants), `coverage-gaps`, `touch-targets`, and `feedback-a11y`. Scored calibration also lives in `scripts/golden_paths.py` and the table in `docs/SCORING.md`.
+
+Writing tests here has two recurring traps. **Loose regexes mask regressions** — `/Copilot Chat|Start here/i` passes on generic text, so assert exact `.rec-platform-name` plus something distinguishing. And a **probe must live in `tests/e2e/`** to match `testDir`, or Playwright reports "No tests found." When you add a regression guard, prove it is non-vacuous: temporarily restore the broken code, confirm the test fails, then restore the fix.
 
 ## Two paths through the app
 
@@ -75,6 +80,17 @@ Result links are shared externally, so **old parameter shapes must keep resolvin
 
 Answers also persist in `sessionStorage` under `apa-answers`; URL params always win over stored answers.
 
+### Share links are untrusted input
+
+Every param above arrives from a URL a stranger may have edited, and two real security bugs have already come from treating them as trusted. Validate at the boundary in `parseURLParams()`:
+
+- **Validate answer option IDs per question, not against one flat set.** `getZeroedPlatforms()` iterates `Object.values(answersMap)` with no question context, so hard rules fire on option ID alone. An ID smuggled into the wrong question (`?q1=q3f`) scores nothing but still triggers its hard rule and silently changes the winner. `validOptionIdsByQuestion` is a `Map<qId, Set<optionId>>`; mismatches route into the existing `hasDrift` path.
+- **`d=` must match `^\d{8}$`,** and `formatDateDisplay()` re-validates and range-checks rather than trusting its caller. It previously returned the year straight from input into an `innerHTML` template, which was a live DOM XSS.
+- **Any code path setting `fastTrack = true` must also force `return { mode: 'card' }`.** `fastTrack` suppresses `zeroed['m365_copilot']`, so a fast-track flag combined with `mode=wizard` lets M365 Copilot win a scored wizard it must never enter.
+- **Prefer building DOM nodes over `innerHTML`** anywhere a URL value is involved. `renderLastUpdated()` is the pattern to copy: trusted source *plus* a regex guard.
+
+Guarded by `tests/e2e/share-link-integrity.spec.js` and `tests/e2e/temporal-banner-xss.spec.js`.
+
 ## Design System
 
 Always read `docs/DESIGN.md` before making any visual or UI decision. Fonts, colors, spacing, radius, shadows, motion, and aesthetic direction are defined there. Do not deviate without explicit user approval. In QA mode, flag any code that doesn't match `docs/DESIGN.md`.
@@ -88,8 +104,11 @@ Key constraints:
 
 ## Conventions
 
-- Always update `docs/CHANGELOG.md` after making changes. Sections are dated by commit date (`## 2026-07-24`); work in progress sits under `## Unreleased` until it's committed.
+- Always update `docs/CHANGELOG.md` after making changes. Sections are dated by the commit date (`## 2026-07-24`), newest first. A second batch landing the same day gets `## 2026-08-12 (later)` above the first. **Do not add an `## Unreleased` section** — it was deliberately removed, and entries go straight under their date.
 - Always update `docs/FLOWCHART.md` and `docs/SCORING.md` after changes that affect user flow or scoring logic.
 - Question IDs in `apa.yaml` are not sequential (e.g., `q1, q8, q2, q4, q3`) — they preserve identity across schema changes. Display order is the array order in `apa.yaml`, not the numeric ID.
 - Entry-point cards (`ENTRY_POINT_PLATFORMS` in `apa.js`) render their accordions expanded; scored comparison cards stay collapsed.
 - In tests, don't identify a recommendation card by a headline substring alone — several destinations share "Microsoft 365 Copilot" wording. Assert exact `.rec-platform-name` text plus something distinguishing.
+- **The `<head>` metadata is user-facing copy.** `og:description` must stay identical to the `#welcome-section .welcome-description` text, since share links mean more people meet this app through a Teams/Slack unfurl than through the start page. Exactly one `description` meta may be declared, and `og:title` / `og:site_name` must match `<title>`. Pinned by `tests/e2e/meta-tags.spec.js`.
+- **Bump `meta.last_updated` in `apa.yaml` whenever content changes.** It renders as the footer "Last updated" date and is hand-maintained, so editing copy without bumping it silently misstates freshness. There is no CI guard yet (`TODO.md` P3.7).
+- Verify user-visible changes against the rendered page, not just the diff — this is a runtime-assembled app, so a string can be correct in one file and stale in another that also ships it.
