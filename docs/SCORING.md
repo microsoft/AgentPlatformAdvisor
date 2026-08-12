@@ -290,7 +290,9 @@ The URL is public and hand-editable, so `parseURLParams` treats it as untrusted:
 - **Option ids are validated per question, not globally.** Hard rules key off the option id alone (`getZeroedPlatforms` iterates `Object.values(answers)` with no question context), so validating against one flat set of all option ids let `?q1=q3f` apply q3f's disqualification while contributing zero score for q1 — silently changing the winner. Each `q*` param is now checked against only its own question's option set; a mismatch is dropped and flagged as schema drift.
 - **`ft=1` always resolves to card mode.** `fastTrack` suppresses the rule that zeroes `m365_copilot`, so `?ft=1&mode=wizard` would otherwise replay the scored wizard with M365 Copilot still in the running.
 
-Guarded by `tests/e2e/share-link-integrity.spec.js`.
+- **`d=` is rejected unless it is exactly 8 digits.** It reached the temporal-change banner through `innerHTML`, and `formatDateDisplay` returned the year straight from the input, so the parameter could inject markup. It is now validated at the boundary, validated again in `formatDateDisplay` (including real-calendar-date checks), and the banner is built from DOM nodes rather than an HTML string.
+
+Guarded by `tests/e2e/share-link-integrity.spec.js` and `tests/e2e/temporal-banner-xss.spec.js`.
 
 ## Guidance version (P2.2)
 
