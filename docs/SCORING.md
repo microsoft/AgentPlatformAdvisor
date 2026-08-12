@@ -283,6 +283,15 @@ Share links carry selections as `c=c_private_net,c_alm` (comma-separated). Omitt
 
 Legacy share params unchanged: `ft=1`, `dt=copilot_chat`, `q*`, `dt`, `st`, `r`, `d`, `mode`.
 
+### Share links are untrusted input
+
+The URL is public and hand-editable, so `parseURLParams` treats it as untrusted:
+
+- **Option ids are validated per question, not globally.** Hard rules key off the option id alone (`getZeroedPlatforms` iterates `Object.values(answers)` with no question context), so validating against one flat set of all option ids let `?q1=q3f` apply q3f's disqualification while contributing zero score for q1 — silently changing the winner. Each `q*` param is now checked against only its own question's option set; a mismatch is dropped and flagged as schema drift.
+- **`ft=1` always resolves to card mode.** `fastTrack` suppresses the rule that zeroes `m365_copilot`, so `?ft=1&mode=wizard` would otherwise replay the scored wizard with M365 Copilot still in the running.
+
+Guarded by `tests/e2e/share-link-integrity.spec.js`.
+
 ## Guidance version (P2.2)
 
 `meta.version` and `meta.guidance_verified` (YYYY-MM) render once, on the recommendation card, where freshness can change a decision. The footer carries the Changelog link. (Design review round 3 removed the duplicate welcome and footer strips — the last two rendered within one viewport of each other on the result page.)

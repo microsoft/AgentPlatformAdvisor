@@ -1356,18 +1356,25 @@ function parseURLParams() {
     return { mode: 'card' };
   }
 
-  // Fast-track handling (legacy ft=1 → M365 Copilot card)
+  // Fast-track handling (legacy ft=1 → M365 Copilot card).
+  // Force card mode like dt= does: fastTrack suppresses the m365_copilot
+  // zeroing rule, so letting ft=1 fall through to mode=wizard would replay the
+  // scored wizard with M365 Copilot still in the running, which it never is.
   if (params.get('ft') === '1') {
     fastTrack = true;
     answers = {};
     selectedConstraints = [];
-    return { mode };
+    return { mode: 'card' };
   }
 
-  // Build answers from URL params
-  const questionIds = new Set(apa.questions.map(q => q.id));
-  const validOptionIds = new Set();
-  apa.questions.forEach(q => q.options.forEach(o => validOptionIds.add(o.id)));
+  // Build answers from URL params.
+  // Option ids must be validated PER QUESTION, not against one global set:
+  // hard rules key off the option id alone (see getZeroedPlatforms), so a link
+  // like ?q1=q3f would smuggle q3f's disqualification into the q1 slot, score
+  // zero for q1, and silently hand back a different winner.
+  const validOptionIdsByQuestion = new Map(
+    apa.questions.map(q => [q.id, new Set(q.options.map(o => o.id))])
+  );
 
   // Optional governance constraints: c=c_private_net,c_alm
   const validConstraintIds = new Set(
@@ -1383,13 +1390,14 @@ function parseURLParams() {
   let hasValidAnswer = false;
   let hasDrift = false;
 
-  questionIds.forEach(qId => {
+  validOptionIdsByQuestion.forEach((validForQuestion, qId) => {
     const value = params.get(qId);
-    if (value && validOptionIds.has(value)) {
+    if (value && validForQuestion.has(value)) {
       answers[qId] = value;
       hasValidAnswer = true;
     } else if (value) {
-      // Unknown option — schema drift, ignore
+      // Unknown option, or an option belonging to a different question —
+      // schema drift or a tampered link. Ignore it.
       hasDrift = true;
     }
   });
