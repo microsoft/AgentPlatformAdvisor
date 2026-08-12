@@ -219,6 +219,26 @@ function rankPlatforms(answersMap, constraintIds) {
   return ranked;
 }
 
+// Reduces a display string carrying inline markup (e.g. <strong>) to plain text
+// for the markdown export.
+//
+// A single s.replace(/<[^>]+>/g, '') pass is not enough, and looping is not
+// enough either. Stripping a complete tag can expose a new one
+// ("<scr<b>ipt>"), so removal has to run until the string stops changing. An
+// UNTERMINATED tag has no closing ">" at all, so the pattern never matches it
+// and "<b><script" survives any number of passes — hence the final sweep of
+// orphan angle brackets. The guarantee callers rely on is that the result
+// cannot contain "<" or ">".
+function stripHtmlTags(value) {
+  let out = String(value);
+  let prev;
+  do {
+    prev = out;
+    out = out.replace(/<[^>]*>/g, '');
+  } while (out !== prev);
+  return out.replace(/[<>]/g, '');
+}
+
 // Returns up to 3 bullet strings summarising key scoring factors (or disqualifying rules) for the given platform
 function getKeyFactors(platformId, answersMap) {
   const factors = [];
@@ -1691,7 +1711,7 @@ function downloadRecommendationMarkdown() {
     const factors = getKeyFactors(recommendedPlatformId, answers);
     if (factors.length) {
       lines.push('### Why this was recommended', '');
-      factors.forEach(f => lines.push(`- ${f.replace(/<[^>]+>/g, '')}`));
+      factors.forEach(f => lines.push(`- ${stripHtmlTags(f)}`));
       lines.push('');
     }
   }

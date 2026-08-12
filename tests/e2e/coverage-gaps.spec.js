@@ -166,3 +166,48 @@ test.describe('Coverage gaps for v3 result extras and constraints', () => {
     await expect(page.locator('#feedback-thanks a')).toHaveCount(0);
   });
 });
+
+test.describe('Markdown export strips markup completely', () => {
+  // The export previously used a single s.replace(/<[^>]+>/g, '') pass, which
+  // CodeQL flagged as incomplete multi-character sanitization (js/incomplete-
+  // multi-character-sanitization, high). Two distinct bypasses exist, and the
+  // obvious "loop until stable" fix only closes the first:
+  //   nested   — "<scr<b>ipt>" exposes a new tag once the inner one is removed
+  //   unterminated — "<b><script" has no closing ">", so the pattern never
+  //                  matches it and it survives any number of passes
+  const CASES = [
+    ['<strong>Copilot Studio</strong>', 'Copilot Studio'],
+    ['plain text', 'plain text'],
+    ['<scr<b>ipt>', 'ipt'],
+    ['<<script>script>alert(1)', 'scriptalert(1)'],
+    ['<b><script', 'script'],
+    ['<script', 'script'],
+    ['<img src=x onerror=alert(1)', 'img src=x onerror=alert(1)'],
+  ];
+
+  test('no input can leave an angle bracket behind', async ({ page }) => {
+    await page.goto('/');
+    for (const [input, expected] of CASES) {
+      const out = await page.evaluate(s => stripHtmlTags(s), input);
+      expect(out, `stripHtmlTags(${JSON.stringify(input)})`).toBe(expected);
+      expect(out, `${JSON.stringify(input)} must not leave < or >`).not.toMatch(/[<>]/);
+    }
+  });
+
+  test('exported markdown carries no markup', async ({ page }) => {
+    await page.goto('/?q1=q1c&q8=q8a&q2=q2d&q4=q4b&q3=q3b&r=copilot_studio&mode=card');
+    await expect(page.locator('#recommendation-section')).toBeVisible();
+
+    // apa.yaml persona rationales embed anchor tags; the export must be plain text.
+    const md = await page.evaluate(() => {
+      let captured = '';
+      const realCreate = URL.createObjectURL;
+      URL.createObjectURL = blob => { captured = blob; return 'blob:stub'; };
+      try { downloadRecommendationMarkdown(); } finally { URL.createObjectURL = realCreate; }
+      return captured ? captured.text() : '';
+    });
+
+    expect(md.length, 'export produced no content').toBeGreaterThan(0);
+    expect(md, 'markdown export must not contain HTML tags').not.toMatch(/<[a-zA-Z/]/);
+  });
+});
