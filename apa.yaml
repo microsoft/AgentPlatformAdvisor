@@ -933,6 +933,33 @@ recommendations:
       - Use Microsoft 365 Copilot (Copilot Chat) instead when you just want to ask and iterate yourself
 
 ################################################################################
+# Explore page groups — the two lanes on "Explore ways to use or build agents".
+# Copy lives here, not in renderExploration(), so platform wording stays in one
+# place. `platforms` are recommendation ids, rendered in the order listed.
+################################################################################
+
+exploration_groups:
+  - title: Use agents
+    description: >-
+      Start with built-in or ready-made agents that work inside Microsoft 365 or
+      across your work environment.
+    platforms: [m365_copilot, cowork, scout]
+  - title: Build agents
+    description: >-
+      Choose a platform for creating, extending, governing, and operating agents for
+      your scenario. Agent Builder is the no-code declarative path inside Microsoft 365
+      Copilot — not every declarative or pro-code Copilot extensibility option.
+    platforms: [agent_builder, copilot_studio, foundry]
+
+# Header for the unscored adjacent_build_paths lane on the same page.
+exploration_adjacent_group:
+  title: Related build paths
+  description: >-
+    These are adjacent options in Microsoft's build taxonomy. They are not separate
+    scored winners in this advisor, but they matter when Agent Builder, Copilot Studio,
+    or Foundry alone is not the right solution.
+
+################################################################################
 # Adjacent build paths (unscored) — surfaced in Explore and as card footnotes.
 # Not separate scored winners; clarify Builder ≠ all declarative agents.
 ################################################################################

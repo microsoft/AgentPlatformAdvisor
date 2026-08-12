@@ -52,3 +52,30 @@ test.describe('Explore cards are clickable edge to edge', () => {
     await expect(link).toHaveAttribute('href', /https?:\/\//);
   });
 });
+
+// The Explore lanes are driven by apa.yaml (exploration_groups /
+// exploration_adjacent_group). A missing or renamed key would render an empty
+// page rather than throwing, so assert the lanes and their platforms explicitly.
+test.describe('Explore groups render from apa.yaml', () => {
+  test('both lanes render with their headers and platform cards', async ({ page }) => {
+    await gotoExplore(page);
+
+    const groups = page.locator('#exploration-groups .exploration-section-group');
+    await expect(groups).toHaveCount(3); // Use, Build, Related build paths
+
+    const titles = page.locator('#exploration-groups .exploration-group-title');
+    await expect(titles).toHaveText(['Use agents', 'Build agents', 'Related build paths']);
+
+    for (let i = 0; i < 3; i++) {
+      await expect(
+        groups.nth(i).locator('.exploration-group-description'),
+        'each lane needs its description copy'
+      ).not.toBeEmpty();
+    }
+
+    // Scored platforms, in apa.yaml order.
+    await expect(groups.nth(0).locator('.exploration-card')).toHaveCount(3);
+    await expect(groups.nth(1).locator('.exploration-card')).toHaveCount(3);
+    await expect(groups.nth(1)).toContainText('Agent Builder');
+  });
+});

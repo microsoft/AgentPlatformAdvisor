@@ -1054,47 +1054,6 @@ body {
   text-decoration: underline;
 }
 
-/* ── Compact spotlight chip on exploration cards ── */
-.exploration-card-spotlight {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: var(--primary-xlight);
-  border: 1px solid var(--primary-light);
-  border-left: 3px solid var(--primary);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  margin-bottom: 16px;
-}
-.exploration-card-spotlight-eyebrow {
-  font-family: var(--font-mono);
-  font-size: var(--fs-mono-sm);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--primary-text);
-}
-.exploration-card-spotlight-name {
-  font-size: var(--fs-body-sm);
-  font-weight: 700;
-  color: var(--foreground);
-}
-.exploration-card-spotlight-name a {
-  position: relative;
-  z-index: 1;
-  color: var(--foreground);
-  text-decoration: none;
-}
-.exploration-card-spotlight-name a:hover {
-  color: var(--link);
-  text-decoration: underline;
-}
-.exploration-card-spotlight-tagline {
-  font-size: var(--fs-mono);
-  color: var(--muted-foreground);
-  line-height: 1.4;
-}
-
 .exploration-cta {
   text-align: center;
   padding-top: 8px;

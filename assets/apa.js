@@ -709,40 +709,22 @@ function finishDelegate() {
 function renderExploration() {
   const groupsContainer = document.getElementById('exploration-groups');
   if (!groupsContainer) return;
-  const explorationGroups = [
-    {
-      title: 'Use agents',
-      description: 'Start with built-in or ready-made agents that work inside Microsoft 365 or across your work environment.',
-      platforms: ['m365_copilot', 'cowork', 'scout']
-    },
-    {
-      title: 'Build agents',
-      description: 'Choose a platform for creating, extending, governing, and operating agents for your scenario. Agent Builder is the no-code declarative path inside Microsoft 365 Copilot — not every declarative or pro-code Copilot extensibility option.',
-      platforms: ['agent_builder', 'copilot_studio', 'foundry']
-    }
-  ];
+  const explorationGroups = apa.exploration_groups || [];
   const renderCard = pid => {
     const rec = apa.recommendations[pid];
     if (!rec) return '';
     const bestFor = rec.exploration_best_for || rec.scoring_summary;
     const summary = (rec.exploration_summary || rec.summary || '').trim();
     const url = rec.resources_url || '#';
-    const spotlightChip = rec.spotlight ? (() => {
-      const nameHtml = rec.spotlight.url
-        ? `<a href="${rec.spotlight.url}" target="_blank" rel="noopener noreferrer">${rec.spotlight.label}</a>`
-        : rec.spotlight.label;
-      return `<div class="exploration-card-spotlight">
-        <span class="exploration-card-spotlight-eyebrow">Featured</span>
-        <span class="exploration-card-spotlight-name">${nameHtml}</span>
-        <span class="exploration-card-spotlight-tagline">${rec.spotlight.tagline}</span>
-      </div>`;
-    })() : '';
+    // Exactly one link per card: the whole card is a stretched link to the
+    // resources site. A second link inside would sit on top of the stretched
+    // one and split the click target, so any future "featured" treatment has
+    // to render as text, not an anchor.
     return `
       <div class="exploration-card">
         <div class="exploration-card-label">${bestFor}</div>
         <h3 class="exploration-card-title">${rec.headline}</h3>
         <p class="exploration-card-summary">${summary}</p>
-        ${spotlightChip}
         <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Explore resources →</a>
       </div>`;
   };
@@ -759,11 +741,12 @@ function renderExploration() {
   };
 
   const adjacentPaths = apa.adjacent_build_paths || [];
+  const adjacentGroup = apa.exploration_adjacent_group || {};
   const adjacentSection = adjacentPaths.length > 0 ? `
     <section class="exploration-section-group" aria-labelledby="exploration-related-build-paths">
       <div class="exploration-group-header">
-        <h3 class="exploration-group-title" id="exploration-related-build-paths">Related build paths</h3>
-        <p class="exploration-group-description">These are adjacent options in Microsoft's build taxonomy. They are not separate scored winners in this advisor, but they matter when Agent Builder, Copilot Studio, or Foundry alone is not the right solution.</p>
+        <h3 class="exploration-group-title" id="exploration-related-build-paths">${adjacentGroup.title || ''}</h3>
+        <p class="exploration-group-description">${adjacentGroup.description || ''}</p>
       </div>
       <div class="exploration-grid">
         ${adjacentPaths.map(renderAdjacentCard).join('')}
@@ -907,11 +890,6 @@ function finishConstraintsAndRecommend() {
   renderRecommendation();
   showSection('recommendation-section');
   pushState('recommendation-section');
-}
-
-function skipConstraints() {
-  selectedConstraints = [];
-  finishConstraintsAndRecommend();
 }
 
 // Single CTA continues in both states; nothing is selected when the label
