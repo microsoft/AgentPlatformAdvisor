@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## 2026-08-12 (later)
 
+### Changed
+
+- **Reworded the welcome description so it matches the two paths the app actually offers.** It read "Answer a few questions about what you want from agents, and we'll recommend the best Microsoft platform for your agent needs" — build-framed copy sitting directly above a preview grid split into **Use agents** and **Build agents**, and one screen ahead of a prescreen that offers "find the right place to get work done" as its first option. The page contradicted the element beneath it and quietly presupposed the reader was building something. It now reads "Answer a few questions and we'll point you to the right place to get work done with an agent, or the right Microsoft platform to build one," which keeps "platform" on the build half where it is accurate (Agent Builder, Copilot Studio, Foundry are platforms; Microsoft 365 Copilot, Cowork, and Scout are destinations) and reuses the verbs already used by the prescreen options and the grid labels, so the start page stops introducing a third vocabulary for the same fork.
+
 ### Security
 
 - **Fixed a DOM XSS in the temporal-change banner (CodeQL `js/xss`, high).** The banner was built with `innerHTML` while interpolating `formatDateDisplay(originalDate)`, and `originalDate` is the `d=` share-link parameter. `formatDateDisplay` parsed the month and day as integers but returned the **year raw** via `substring(0, 4)`, so four attacker-chosen characters reached the DOM as markup. Reproduced in Chromium: `?d=<img0101` injected a real `IMG` element, and because the injected tag absorbed the following text as attributes, it swallowed the "Retake assessment" link — the banner lost its only control. Share links are pasted around by people who did not build them, which is exactly the delivery path this needs.
