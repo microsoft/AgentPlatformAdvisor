@@ -4,6 +4,14 @@ All notable changes to Agent Platform Advisor are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), organized by repository commit date.
 
+## 2026-08-12 (later)
+
+### Security
+
+- **Fixed a DOM XSS in the temporal-change banner (CodeQL `js/xss`, high).** The banner was built with `innerHTML` while interpolating `formatDateDisplay(originalDate)`, and `originalDate` is the `d=` share-link parameter. `formatDateDisplay` parsed the month and day as integers but returned the **year raw** via `substring(0, 4)`, so four attacker-chosen characters reached the DOM as markup. Reproduced in Chromium: `?d=<img0101` injected a real `IMG` element, and because the injected tag absorbed the following text as attributes, it swallowed the "Retake assessment" link — the banner lost its only control. Share links are pasted around by people who did not build them, which is exactly the delivery path this needs.
+
+  Fixed in three layers, so no single mistake reopens it: `d=` is rejected at the URL boundary unless it matches `^\d{8}$`; `formatDateDisplay` now validates the whole string, range-checks the month and day, rejects dates that don't exist (`20260231`), and never returns input-derived text; and the banner is assembled from DOM nodes with `textContent` plus a real anchor, so the date is never parsed as markup. The inline `onclick` became an `addEventListener`. Guarded by `tests/e2e/temporal-banner-xss.spec.js`, which asserts the anchor is the only element the banner may contain, that the retake link survives every payload *and still works*, and that impossible dates are refused. All four tests were proven non-vacuous by restoring the vulnerable code.
+
 ## 2026-08-12
 
 ### Added

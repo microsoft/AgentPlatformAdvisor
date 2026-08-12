@@ -1360,7 +1360,10 @@ function parseURLParams() {
 
   const mode = params.get('mode') || 'card';
   originalPlatformId = params.get('r') || null;
-  originalDate = params.get('d') || null;
+  // d= is documented as YYYYMMDD. Reject anything else at the boundary so a
+  // malformed value can't travel further into the app.
+  const rawDate = params.get('d');
+  originalDate = rawDate && /^\d{8}$/.test(rawDate) ? rawDate : null;
 
   // Entry-point path handling (Microsoft 365 Copilot / Cowork / Scout).
   // dt=copilot_chat is a legacy alias from when Copilot Chat was its own destination;
@@ -1469,13 +1472,32 @@ function formatDate(date) {
   return `${y}${m}${d}`;
 }
 
+// Formats a YYYYMMDD share-link date for display. Returns '' for anything that
+// is not a real calendar date.
+//
+// The month and day were already parsed as integers, but the year was returned
+// straight from the input via substring(0, 4) — so the d= URL param put four
+// attacker-chosen characters into the page. An out-of-range month also rendered
+// literal "undefined" via months[m - 1]. Both are handled here rather than only
+// at the call site, so the next caller inherits the guarantee.
 function formatDateDisplay(yyyymmdd) {
-  if (!yyyymmdd || yyyymmdd.length !== 8) return '';
-  const y = yyyymmdd.substring(0, 4);
-  const m = parseInt(yyyymmdd.substring(4, 6), 10);
-  const d = parseInt(yyyymmdd.substring(6, 8), 10);
+  const raw = String(yyyymmdd == null ? '' : yyyymmdd);
+  const parts = raw.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (!parts) return '';
+
+  const year = Number(parts[1]);
+  const month = Number(parts[2]);
+  const day = Number(parts[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return '';
+
+  // Reject dates that don't exist, e.g. 20260231.
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (parsed.getUTCFullYear() !== year
+    || parsed.getUTCMonth() !== month - 1
+    || parsed.getUTCDate() !== day) return '';
+
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${months[m - 1]} ${d}, ${y}`;
+  return `${months[month - 1]} ${day}, ${year}`;
 }
 
 // Compute key factors using delta algorithm: (winning_platform_score − best_runner_up_score)
@@ -1554,8 +1576,17 @@ function renderDecisionCard() {
   // Temporal change banner
   const bannerEl = document.getElementById('decision-card-banner');
   if (isURLLoaded && originalPlatformId && originalPlatformId !== recommendedPlatformId) {
-    const dateStr = originalDate ? formatDateDisplay(originalDate) : 'a previous visit';
-    bannerEl.innerHTML = `Your recommendation has changed since ${dateStr}. The platform landscape has been updated. <a href="javascript:void(0)" onclick="restart()">Retake assessment →</a>`;
+    const dateStr = (originalDate && formatDateDisplay(originalDate)) || 'a previous visit';
+    // Built as nodes, not an innerHTML template. dateStr derives from the d=
+    // URL param, and share links are pasted around by people who did not build
+    // them, so it never gets to be parsed as markup.
+    bannerEl.textContent =
+      `Your recommendation has changed since ${dateStr}. The platform landscape has been updated. `;
+    const retakeLink = document.createElement('a');
+    retakeLink.href = 'javascript:void(0)';
+    retakeLink.textContent = 'Retake assessment →';
+    retakeLink.addEventListener('click', restart);
+    bannerEl.appendChild(retakeLink);
     bannerEl.style.display = '';
     if (typeof clarity === 'function') clarity('set', 'temporal_change', 'true');
   } else {
