@@ -795,8 +795,8 @@ recommendations:
       - Pro-dev building API plugins or CI/CD declarative agents for Microsoft 365 Copilot should also evaluate Microsoft 365 Agents Toolkit before defaulting to Foundry
     adjacent_paths:
       - label: Use Microsoft 365 Agents Toolkit instead when…
-        summary: You are a pro developer shipping declarative agents or API plugins into Microsoft 365 Copilot with source control, Adaptive Cards, and CI/CD — still on Copilot's orchestrator (unscored adjacent path).
-        url: https://learn.microsoft.com/microsoft-365/copilot/extensibility/agents-overview
+        summary: You are a pro developer shipping declarative agents or API plugins into Microsoft 365 Copilot with source control and CI/CD — still on Copilot's orchestrator.
+        url: https://learn.microsoft.com/microsoftteams/platform/toolkit/overview-agents-toolkit
       - label: Use Foundry instead when…
         summary: You need your own code runtime, models, private networking, custom retrieval architecture, or high-scale hosted agents — runtime ownership, not just multi-agent.
         url: https://microsoft.github.io/agent-resources/microsoft-foundry/
@@ -852,8 +852,8 @@ recommendations:
       - Use Agent Builder for simple no-code Microsoft 365 Copilot knowledge agents
     adjacent_paths:
       - label: Use Microsoft 365 Agents Toolkit instead when…
-        summary: You need pro-code declarative agents or API plugins inside Microsoft 365 Copilot (Adaptive Cards, CI/CD) without bringing your own orchestrator.
-        url: https://learn.microsoft.com/microsoft-365/copilot/extensibility/agents-overview
+        summary: You need pro-code declarative agents or API plugins inside Microsoft 365 Copilot without bringing your own orchestrator.
+        url: https://learn.microsoft.com/microsoftteams/platform/toolkit/overview-agents-toolkit
       - label: Use Copilot Studio instead when…
         summary: Makers need governed actions, connectors, channels, and multi-agent business orchestration without owning Azure runtime plumbing.
         url: https://microsoft.github.io/agent-resources/copilot-studio/
