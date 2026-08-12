@@ -125,7 +125,7 @@ npm test              # headless
 npm run test:headed   # with browser visible
 ```
 
-There are 94 Playwright tests across 15 spec files (including P2 constraints/export/feedback, share-link integrity, and temporal-banner XSS), plus a scored golden-path script (`scripts/golden_paths.py`, which needs `PyYAML` — install with `python3 -m pip install -r requirements.txt`). `npm test` runs the golden script first, then Playwright. Coverage includes wizard completion, optional governance constraints, shared links, temporal change, legacy fast-track, entry-point routing, share buttons, G01–G12 golden paths, share-link parameter validation, temporal-banner injection guards, and export/feedback. Single file: `npx playwright test tests/e2e/p2-features.spec.js`.
+There are 98 Playwright tests across 16 spec files (including P2 constraints/export/feedback, share-link integrity, temporal-banner XSS, and social/SEO metadata), plus a scored golden-path script (`scripts/golden_paths.py`, which needs `PyYAML` — install with `python3 -m pip install -r requirements.txt`). `npm test` runs the golden script first, then Playwright. Coverage includes wizard completion, optional governance constraints, shared links, temporal change, legacy fast-track, entry-point routing, share buttons, G01–G12 golden paths, share-link parameter validation, temporal-banner injection guards, social/SEO metadata, and export/feedback. Single file: `npx playwright test tests/e2e/p2-features.spec.js`.
 
 ## Contributing
 
