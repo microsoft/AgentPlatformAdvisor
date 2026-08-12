@@ -9,7 +9,13 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:  # pragma: no cover - environment guard
+    sys.exit(
+        "golden_paths.py needs PyYAML.\n"
+        "Install it with:  python3 -m pip install -r requirements.txt"
+    )
 
 ROOT = Path(__file__).resolve().parents[1]
 APA_PATH = ROOT / "apa.yaml"

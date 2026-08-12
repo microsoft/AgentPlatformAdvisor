@@ -1,0 +1,4 @@
+# Only needed to run scripts/golden_paths.py (the scored calibration harness,
+# which `npm test` runs before Playwright). The app itself has no build step
+# and no Python dependency.
+PyYAML>=6.0
