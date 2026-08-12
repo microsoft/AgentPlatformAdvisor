@@ -10,7 +10,7 @@ Key files:
 - `assets/apa.css` — all styles
 - `index.html` — app shell
 
-Content changes go in `apa.yaml`. UI logic goes in `assets/apa.js`. Styles go in `assets/apa.css`. Never hardcode user-facing platform copy in JS or HTML — it belongs in `apa.yaml` under `recommendations`, `questions`, or `adjacent_build_paths`. Start-page one-liners in `index.html` must stay aligned with recommendation cards.
+Content changes go in `apa.yaml`. UI logic goes in `assets/apa.js`. Styles go in `assets/apa.css`. Never hardcode user-facing platform copy in JS or HTML — it belongs in `apa.yaml` under `recommendations`, `questions`, `adjacent_build_paths`, or (for the Explore grid) `exploration_groups` / `exploration_adjacent_group`. Start-page one-liners in `index.html` must stay aligned with recommendation cards.
 
 ## Local development
 

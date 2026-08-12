@@ -76,6 +76,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Why-not / valid_pairs (P1.6):** dropped dead scored-path pairs with always-zeroed `m365_copilot`; stronger CS+Foundry and AB+CS pair rationale + `why_not` templates in `computeWhyNot`.
 - **Earlier mid-2026 content refresh** (still accurate under P0): Cowork scheduled prompts, Foundry Agent Optimizer / Foundry Local, CS multi-agent GA callout, M365 Agent Store + MCP Apps UI — now extended by the routing and scoring changes above.
 
+### For contributors
+
+- **Explore group titles and descriptions moved out of `renderExploration()` and into `apa.yaml`** (`exploration_groups`, `exploration_adjacent_group`), matching the rule that user-facing platform copy never lives in JS. Also removed two dead paths found in review: the unreachable `rec.spotlight` branch in `renderCard()` (Explore cards settled on one link each) plus its 41 lines of orphaned CSS, and `skipConstraints()`, which had zero references. A new structural test asserts all three Explore lanes, their exact titles, non-empty descriptions, and per-lane card counts, so a missing YAML key fails loudly instead of silently rendering an empty lane.
+
 ## 2026-07-24
 
 ### Changed
