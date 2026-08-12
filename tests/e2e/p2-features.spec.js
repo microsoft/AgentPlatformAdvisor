@@ -44,7 +44,8 @@ test.describe('P2 features', () => {
     await expect(page.locator('#recommendation-section')).toBeVisible();
     const shareUrl = await page.evaluate(() => buildShareableURL());
     expect(shareUrl).toContain('c=');
-    expect(shareUrl).toMatch(/c_private_net/);
+    const roundTripped = new URL(shareUrl).searchParams.get('c').split(',').sort();
+    expect(roundTripped).toEqual(['c_airgap', 'c_private_net']);
   });
 
   test('results show feedback, export, and version strip', async ({ page }) => {

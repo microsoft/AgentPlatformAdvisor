@@ -13,9 +13,12 @@ async function shortTargets(page) {
       .filter(el => {
         if (el.offsetParent === null) return false;
         const r = el.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && r.height < min;
+        return r.width > 0 && r.height > 0 && (r.width < min || r.height < min);
       })
-      .map(el => `${el.id || el.className} (${Math.round(el.getBoundingClientRect().height)}px) "${(el.textContent || '').trim().slice(0, 40)}"`);
+      .map(el => {
+        const r = el.getBoundingClientRect();
+        return `${el.id || el.className} (${Math.round(r.width)}×${Math.round(r.height)}px) "${(el.textContent || '').trim().slice(0, 40)}"`;
+      });
   }, { sel: CONTROL_SELECTOR, min: MIN_TARGET_PX });
 }
 

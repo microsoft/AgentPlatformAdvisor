@@ -116,13 +116,13 @@ test.describe('Golden paths — entry point', () => {
   test('G06 interactive general → M365 Copilot Chat start', async ({ page }) => {
     await answerEntryPoint(page, { involvement: 'interactive', taskType: 'general' });
     await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText('Microsoft 365 Copilot');
-    await expect(page.locator('#rec-primary-card')).toContainText(/Copilot Chat|Start here/i);
+    await expect(page.locator('#rec-primary-card .rec-spotlight-name')).toContainText('Copilot Chat');
   });
 
   test('G07 interactive specialized → M365 agents start', async ({ page }) => {
     await answerEntryPoint(page, { involvement: 'interactive', taskType: 'specialized' });
     await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText('Microsoft 365 Copilot');
-    await expect(page.locator('#rec-primary-card')).toContainText(/Researcher|built-in agents|Start here/i);
+    await expect(page.locator('#rec-primary-card .rec-spotlight-name')).toContainText('Researcher');
   });
 
   test('G08 one-shot M365 → Cowork', async ({ page }) => {
