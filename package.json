@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "npx playwright test",
+    "test": "python3 scripts/golden_paths.py && npx playwright test",
+    "test:golden": "python3 scripts/golden_paths.py",
+    "test:e2e": "npx playwright test",
     "test:headed": "npx playwright test --headed"
   },
   "devDependencies": {

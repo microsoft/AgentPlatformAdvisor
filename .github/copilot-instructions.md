@@ -10,7 +10,7 @@ Key files:
 - `assets/apa.css` — all styles
 - `index.html` — app shell
 
-Content changes go in `apa.yaml`. UI logic goes in `assets/apa.js`. Styles go in `assets/apa.css`. Never hardcode user-facing platform copy in JS or HTML — it belongs in `apa.yaml` under `recommendations` or `questions`.
+Content changes go in `apa.yaml`. UI logic goes in `assets/apa.js`. Styles go in `assets/apa.css`. Never hardcode user-facing platform copy in JS or HTML — it belongs in `apa.yaml` under `recommendations`, `questions`, `adjacent_build_paths`, or (for the Explore grid) `exploration_groups` / `exploration_adjacent_group`. Start-page one-liners in `index.html` must stay aligned with recommendation cards.
 
 ## Local development
 
@@ -26,13 +26,15 @@ Playwright end-to-end tests. `playwright.config.js` starts the static server its
 
 ```bash
 npm install                                              # install dependencies
-npm test                                                 # run all tests headless
+npm test                                                 # golden_paths.py then Playwright
+npm run test:golden                                      # scored G01–G05/G11–G12 only
+npm run test:e2e                                         # Playwright only
 npm run test:headed                                      # run with browser visible
 npx playwright test tests/e2e/wizard-completion.spec.js  # single test file
 npx playwright test -g "completes full wizard"           # single test by name
 ```
 
-Specs in `tests/e2e/`: `wizard-completion` (scored path), `delegate-path` (entry-point wizard), `shared-link` and `temporal-change` (URL-loaded results), `fast-track` (legacy `?ft=1`), `share-buttons`.
+Specs in `tests/e2e/`: `wizard-completion` (scored path), `delegate-path` (entry-point wizard), `golden-paths` (G01–G12 + callouts), `shared-link` and `temporal-change` (URL-loaded results), `fast-track` (legacy `?ft=1`), `share-buttons`. Scored calibration also lives in `scripts/golden_paths.py` and the table in `docs/SCORING.md`.
 
 ## Two paths through the app
 
@@ -40,7 +42,11 @@ Specs in `tests/e2e/`: `wizard-completion` (scored path), `delegate-path` (entry
 
 **Entry-point wizard** — "Help me find the right place to get work done." Non-scored routing to `m365_copilot`, `cowork`, `scout`, or a Cowork+Scout pair, based on work pattern (involvement → task type, or cadence → reach) rather than product names. Logic lives in `resolveDelegateResult()` / `resolveDelegateStart()`.
 
+Cadence options: `oneshot` | `recurring` | `alwayson` | `unsure`. **Reach is primary** for recurring/always-on: `cross` → Scout; `m365` + concrete cadence → Cowork; undecided → both. Scout is personal Autopilot / cross-environment — not “anything that isn’t one-shot.” Legacy aliases `ondemand`→`oneshot`, `continuous`→`alwayson` are accepted in JS.
+
 Copilot Chat and the built-in agents (Researcher, Analyst, Facilitator, Interpreter) are **surfaces of** Microsoft 365 Copilot, not separate destinations. The task-type answer selects a `start_here` surface (`chat` or `agents`) rendered in the "Start Here" spotlight on the single `m365_copilot` card. Do not reintroduce them as sibling platforms.
+
+**Agent Builder** is the no-code declarative path inside Microsoft 365 Copilot only — not SharePoint agents, not Agents Toolkit, not custom engine. Adjacent paths live in `apa.adjacent_build_paths` and per-card `adjacent_paths`. Q4 splits multi-agent: `q4d` low-code/business → CS strong; `q4f` code-first/custom runtime → Foundry strong.
 
 ## Scoring pipeline
 
@@ -60,6 +66,7 @@ Result links are shared externally, so **old parameter shapes must keep resolvin
 | Param | Meaning |
 |---|---|
 | `q1`, `q8`, `q2`, `q4`, `q3` | Scored-wizard answers (option IDs) |
+| `c=id1,id2` | Optional governance constraint soft boosts (e.g. `c_private_net`) |
 | `dt=m365_copilot\|cowork\|scout\|both` | Entry-point destination |
 | `st=chat\|agents` | Which M365 Copilot surface to feature |
 | `r=<platform>` + `d=YYYYMMDD` | Original recommendation + date; drive the temporal-change banner |

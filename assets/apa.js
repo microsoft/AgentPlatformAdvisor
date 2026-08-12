@@ -1,21 +1,25 @@
 // === STATE ===
 let apa = null; // populated from YAML
 let answers = {}; // { q1: 'q1a', q2: 'q2b', ... }
+// Optional multi-select governance constraint ids (soft boosts only), e.g. ['c_private_net']
+let selectedConstraints = [];
 let fastTrack = false;
 let delegateResult = null; // 'm365_copilot' | 'cowork' | 'scout' | 'both' — set on the entry-point path
 let delegateStart = null;  // 'chat' | 'agents' — which surface inside Microsoft 365 Copilot to start with
-let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
+let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'oneshot'|'recurring'|'alwayson'|'unsure', reach: 'm365'|'cross'|'unsure' }
 let currentQuestionIndex = 0;
 let listenersReady = false;
 let recommendedPlatformId = null;
 let isURLLoaded = false; // true when loaded from shared URL params
 let originalPlatformId = null; // from &r= URL param for temporal comparison
 let originalDate = null; // from &d= URL param
+let feedbackSubmitted = false;
 
 // === UTILITIES ===
 function showSection(id) {
   ['loading-section','error-section','welcome-section','prescreen-section',
-   'delegate-section','exploration-section','assessment-section','recommendation-section'].forEach(s => {
+   'delegate-section','exploration-section','assessment-section','constraints-section',
+   'recommendation-section'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.toggle('hidden', s !== id);
   });
@@ -37,6 +41,8 @@ window.addEventListener('popstate', (e) => {
   if (state.section === 'assessment-section' && state.questionIndex != null) {
     currentQuestionIndex = state.questionIndex;
     renderQuestion();
+  } else if (state.section === 'constraints-section') {
+    renderConstraintsStep();
   } else if (state.section === 'recommendation-section') {
     renderRecommendation();
   } else if (state.section === 'exploration-section') {
@@ -54,6 +60,7 @@ function updateProgressBar(sectionId) {
     'prescreen-section': 0,
     'delegate-section': 1,
     'assessment-section': 1,
+    'constraints-section': 1,
     'recommendation-section': 2,
   }[sectionId] ?? 0;
 
@@ -125,6 +132,39 @@ function sumRawScores(answersMap, questions, zeroed) {
   return totals;
 }
 
+// Soft boosts from optional governance constraints (never hard-zero).
+// constraintIds defaults to session selectedConstraints.
+function applyConstraintBoosts(totals, zeroed, constraintIds) {
+  const ids = constraintIds || selectedConstraints || [];
+  const opts = (apa.optional_constraints && apa.optional_constraints.options) || [];
+  const byId = Object.fromEntries(opts.map(o => [o.id, o]));
+  const cap = apa.scoring.constraint_boost_cap ?? 2;
+  const boosts = Object.fromEntries(Object.keys(totals).map(k => [k, 0]));
+
+  ids.forEach(cid => {
+    const opt = byId[cid];
+    if (!opt || !opt.boosts) return;
+    Object.entries(opt.boosts).forEach(([pid, amt]) => {
+      if (zeroed[pid]) return;
+      if (boosts[pid] == null) boosts[pid] = 0;
+      boosts[pid] += amt;
+    });
+  });
+
+  Object.keys(totals).forEach(pid => {
+    const b = Math.min(boosts[pid] || 0, cap);
+    totals[pid] += b;
+  });
+  return boosts;
+}
+
+function getConstraintLabels(constraintIds) {
+  const ids = constraintIds || selectedConstraints || [];
+  const opts = (apa.optional_constraints && apa.optional_constraints.options) || [];
+  const byId = Object.fromEntries(opts.map(o => [o.id, o]));
+  return ids.map(id => byId[id]?.label).filter(Boolean);
+}
+
 function getThresholdLabel(score, thresholds) {
   const rounded = Math.round(score);
   const t = thresholds.find(t => rounded >= t.min && rounded <= t.max);
@@ -132,10 +172,11 @@ function getThresholdLabel(score, thresholds) {
 }
 
 // Returns platforms sorted by final score descending: [{id, score, label}, ...]
-function rankPlatforms(answersMap) {
+function rankPlatforms(answersMap, constraintIds) {
   const zeroed = getZeroedPlatforms(answersMap);
   const questions = apa.questions.filter(q => answersMap[q.id]); // only answered
   const final = sumRawScores(answersMap, questions, zeroed);
+  applyConstraintBoosts(final, zeroed, constraintIds);
 
   const tiebreakers = apa.scoring.tie_handling.tiebreakers || [];
 
@@ -178,6 +219,26 @@ function rankPlatforms(answersMap) {
   return ranked;
 }
 
+// Reduces a display string carrying inline markup (e.g. <strong>) to plain text
+// for the markdown export.
+//
+// A single s.replace(/<[^>]+>/g, '') pass is not enough, and looping is not
+// enough either. Stripping a complete tag can expose a new one
+// ("<scr<b>ipt>"), so removal has to run until the string stops changing. An
+// UNTERMINATED tag has no closing ">" at all, so the pattern never matches it
+// and "<b><script" survives any number of passes — hence the final sweep of
+// orphan angle brackets. The guarantee callers rely on is that the result
+// cannot contain "<" or ">".
+function stripHtmlTags(value) {
+  let out = String(value);
+  let prev;
+  do {
+    prev = out;
+    out = out.replace(/<[^>]*>/g, '');
+  } while (out !== prev);
+  return out.replace(/[<>]/g, '');
+}
+
 // Returns up to 3 bullet strings summarising key scoring factors (or disqualifying rules) for the given platform
 function getKeyFactors(platformId, answersMap) {
   const factors = [];
@@ -190,6 +251,14 @@ function getKeyFactors(platformId, answersMap) {
       ([qId, optId]) => answersMap[qId] === optId
     );
     if (match) factors.push(`💡 ${pref.rationale.trim()}`);
+  });
+
+  // 0b. Governance constraint soft boosts that helped this platform
+  const cOpts = (apa.optional_constraints && apa.optional_constraints.options) || [];
+  selectedConstraints.forEach(cid => {
+    const opt = cOpts.find(o => o.id === cid);
+    const amt = opt && opt.boosts ? opt.boosts[platformId] : 0;
+    if (amt) factors.push(`🔒 Constraint soft boost (+${amt}): ${opt.label}`);
   });
 
   // 1. All hard rules that zeroed this platform
@@ -207,25 +276,57 @@ function getKeyFactors(platformId, answersMap) {
   return factors.slice(0, 3);
 }
 
-// Returns contextual notes for contradictory answer combinations
+// Match answer maps against a when-clause. Values may be a string or array of option ids.
+function answersMatchWhen(answersMap, when) {
+  if (!when) return true;
+  return Object.entries(when).every(([qid, expected]) => {
+    const actual = answersMap[qid];
+    if (Array.isArray(expected)) return expected.includes(actual);
+    return actual === expected;
+  });
+}
+
+// Returns contextual notes for contradictory answer combinations and winner mismatches
 function getCrossQuestionNotes(answersMap, winnerId) {
   const notes = [];
   const crossNotes = apa.scoring.cross_question_notes || [];
   crossNotes.forEach(rule => {
-    const match = Object.entries(rule.when).every(
-      ([qid, optionId]) => answersMap[qid] === optionId
-    );
-    if (match) notes.push(rule.note.trim());
+    if (answersMatchWhen(answersMap, rule.when)) notes.push(rule.note.trim());
   });
 
   const personaNotes = apa.scoring.winner_persona_notes || [];
   personaNotes.forEach(rule => {
-    if (rule.winner === winnerId && answersMap.q1 === rule.persona) {
-      notes.push(rule.note.trim());
-    }
+    if (rule.winner && rule.winner !== winnerId) return;
+    if (Array.isArray(rule.winner_in) && !rule.winner_in.includes(winnerId)) return;
+    if (rule.persona && answersMap.q1 !== rule.persona) return;
+    if (rule.when && !answersMatchWhen(answersMap, rule.when)) return;
+    notes.push(rule.note.trim());
   });
 
   return notes;
+}
+
+// Unscored adjacent-path callouts (SharePoint agents, Agents Toolkit, etc.)
+// driven by winner + answer pattern. Not scored winners — guidance only.
+function getResultCallouts(answersMap, winnerId) {
+  const callouts = apa.result_callouts || [];
+  return callouts.filter(c => {
+    if (c.winner && c.winner !== winnerId) return false;
+    if (Array.isArray(c.winner_in) && !c.winner_in.includes(winnerId)) return false;
+    if (c.when && !answersMatchWhen(answersMap, c.when)) return false;
+    return true;
+  });
+}
+
+function renderResultCallouts(answersMap, winnerId) {
+  const callouts = getResultCallouts(answersMap, winnerId);
+  if (!callouts.length) return '';
+  return callouts.map(c => {
+    const title = c.url
+      ? `<a href="${c.url}" target="_blank" rel="noopener noreferrer">${c.label}</a>`
+      : c.label;
+    return `<div class="rec-callout" data-callout-id="${c.id || ''}"><strong>${title}</strong> — ${c.summary}</div>`;
+  }).join('');
 }
 
 function renderCrossNotes(answersMap, winnerId) {
@@ -280,12 +381,26 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
     : '';
 
   const factorsHtml = factors.length > 0 ? `
-    <div class="rec-section-title">Why this was recommended</div>
+    <div class="rec-section-title rec-section-title--spaced">Why this was recommended</div>
     <ul class="rec-list">${factors.map(f => `<li>${f}</li>`).join('')}</ul>` : '';
 
   const resourcesHtml = rec.resources_url
     ? `<a class="rec-resources-link" href="${rec.resources_url}" target="_blank" rel="noopener noreferrer">
         Explore ${rec.headline} resources →</a>`
+    : '';
+
+  const adjacentHtml = (rec.adjacent_paths || []).length > 0
+    ? rec.adjacent_paths.map(p => {
+        const title = p.url
+          ? `<a href="${p.url}" target="_blank" rel="noopener noreferrer">${p.label}</a>`
+          : p.label;
+        return `<div class="rec-adjacent-note"><strong>${title}</strong> — ${p.summary}</div>`;
+      }).join('')
+    : '';
+
+  // Conditional callouts only on the primary scored card (need answers + winner).
+  const calloutHtml = isPrimary && showBadge
+    ? renderResultCallouts(answersMap, platformId)
     : '';
 
   const bestFor = (rec.best_for || []).map(f => `<li>${f}</li>`).join('');
@@ -356,8 +471,10 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
         : ''}
-      ${resourcesHtml}
+      ${calloutHtml}
       ${factorsHtml}
+      ${adjacentHtml}
+      ${resourcesHtml}
       ${bestFor ? `<details class="rec-accordion"${detailsOpen}>
         <summary class="rec-accordion-trigger">
           <span class="rec-section-title">Best For</span>
@@ -431,6 +548,7 @@ async function boot() {
       throw new Error('Missing "meta.platforms"');
 
     setupListeners();
+    renderLastUpdated();
 
     // Check for URL params (shared link) — URL params always win over sessionStorage
     const urlResult = parseURLParams();
@@ -574,14 +692,20 @@ function isDelegateReady() {
 // built-in agents (Researcher, Analyst, Facilitator, Interpreter, …) are surfaces of
 // that one product, not separate destinations, so the task type selects which surface
 // to start with (see resolveDelegateStart) rather than which card to show.
-// When delegating: Scout wins if the work is continuous OR reaches beyond Microsoft 365;
-// Cowork wins only when the work is on demand AND scoped to Microsoft 365;
-// otherwise (undecided signals) present Cowork and Scout as a complementary pair.
+// When delegating, reach is primary for recurring/event and always-on work:
+//   cross-environment (desktop/browser/local/shell) → Scout
+//   Microsoft 365 only + a concrete cadence (one-shot, recurring/event, or always-on
+//     still scoped to M365) → Cowork
+//   undecided cadence or reach → both (complementary pair)
+// Scout is the personal Autopilot / cross-environment path — not "anything that isn't one-shot".
+// Legacy aliases: ondemand→oneshot, continuous→alwayson (pre-P0.1 option ids).
 function resolveDelegateResult(involvement, taskType, cadence, reach) {
   if (involvement === 'interactive') return 'm365_copilot';
-  if (cadence === 'continuous') return 'scout';
+  const c = cadence === 'ondemand' ? 'oneshot'
+    : cadence === 'continuous' ? 'alwayson'
+    : cadence;
   if (reach === 'cross') return 'scout';
-  if (cadence === 'ondemand' && reach === 'm365') return 'cowork';
+  if (reach === 'm365' && (c === 'oneshot' || c === 'recurring' || c === 'alwayson')) return 'cowork';
   return 'both';
 }
 
@@ -605,43 +729,50 @@ function finishDelegate() {
 function renderExploration() {
   const groupsContainer = document.getElementById('exploration-groups');
   if (!groupsContainer) return;
-  const explorationGroups = [
-    {
-      title: 'Use agents',
-      description: 'Start with built-in or ready-made agents that work inside Microsoft 365 or across your work environment.',
-      platforms: ['m365_copilot', 'cowork', 'scout']
-    },
-    {
-      title: 'Build agents',
-      description: 'Choose a platform for creating, extending, governing, and operating agents for your scenario.',
-      platforms: ['agent_builder', 'copilot_studio', 'foundry']
-    }
-  ];
+  const explorationGroups = apa.exploration_groups || [];
   const renderCard = pid => {
     const rec = apa.recommendations[pid];
     if (!rec) return '';
     const bestFor = rec.exploration_best_for || rec.scoring_summary;
     const summary = (rec.exploration_summary || rec.summary || '').trim();
     const url = rec.resources_url || '#';
-    const spotlightChip = rec.spotlight ? (() => {
-      const nameHtml = rec.spotlight.url
-        ? `<a href="${rec.spotlight.url}" target="_blank" rel="noopener noreferrer">${rec.spotlight.label}</a>`
-        : rec.spotlight.label;
-      return `<div class="exploration-card-spotlight">
-        <span class="exploration-card-spotlight-eyebrow">Featured</span>
-        <span class="exploration-card-spotlight-name">${nameHtml}</span>
-        <span class="exploration-card-spotlight-tagline">${rec.spotlight.tagline}</span>
-      </div>`;
-    })() : '';
+    // Exactly one link per card: the whole card is a stretched link to the
+    // resources site. A second link inside would sit on top of the stretched
+    // one and split the click target, so any future "featured" treatment has
+    // to render as text, not an anchor.
     return `
       <div class="exploration-card">
         <div class="exploration-card-label">${bestFor}</div>
         <h3 class="exploration-card-title">${rec.headline}</h3>
         <p class="exploration-card-summary">${summary}</p>
-        ${spotlightChip}
         <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Explore resources →</a>
       </div>`;
   };
+  const renderAdjacentCard = path => {
+    if (!path) return '';
+    const url = path.url || '#';
+    return `
+      <div class="exploration-card exploration-card--adjacent">
+        <div class="exploration-card-label">${path.exploration_best_for || 'Related path'}</div>
+        <h3 class="exploration-card-title">${path.label}</h3>
+        <p class="exploration-card-summary">${(path.summary || '').trim()}</p>
+        <a href="${url}" target="_blank" rel="noopener noreferrer" class="exploration-card-link">Learn more →</a>
+      </div>`;
+  };
+
+  const adjacentPaths = apa.adjacent_build_paths || [];
+  const adjacentGroup = apa.exploration_adjacent_group || {};
+  const adjacentSection = adjacentPaths.length > 0 ? `
+    <section class="exploration-section-group" aria-labelledby="exploration-related-build-paths">
+      <div class="exploration-group-header">
+        <h3 class="exploration-group-title" id="exploration-related-build-paths">${adjacentGroup.title || ''}</h3>
+        <p class="exploration-group-description">${adjacentGroup.description || ''}</p>
+      </div>
+      <div class="exploration-grid">
+        ${adjacentPaths.map(renderAdjacentCard).join('')}
+      </div>
+    </section>` : '';
+
   groupsContainer.innerHTML = explorationGroups.map(group => `
     <section class="exploration-section-group" aria-labelledby="exploration-${group.title.toLowerCase().replace(/\s+/g, '-')}">
       <div class="exploration-group-header">
@@ -652,7 +783,7 @@ function renderExploration() {
         ${group.platforms.map(renderCard).join('')}
       </div>
     </section>
-  `).join('');
+  `).join('') + adjacentSection;
 }
 
 function renderQuestion() {
@@ -669,6 +800,7 @@ function renderQuestion() {
   question.options.forEach(opt => {
     const div = document.createElement('div');
     div.className = 'option-card' + (answers[question.id] === opt.id ? ' selected' : '');
+    div.dataset.optionId = opt.id;
     div.setAttribute('role', 'button');
     div.setAttribute('tabindex', '0');
     const isSelected = answers[question.id] === opt.id;
@@ -701,16 +833,15 @@ function renderQuestion() {
 }
 
 function handleNext() {
-  const question = apa.questions[currentQuestionIndex];
-
   if (currentQuestionIndex < apa.questions.length - 1) {
     currentQuestionIndex++;
     renderQuestion();
     pushState('assessment-section', currentQuestionIndex);
   } else {
-    renderRecommendation();
-    showSection('recommendation-section');
-    pushState('recommendation-section');
+    // Optional governance constraints step (skippable) before results
+    renderConstraintsStep();
+    showSection('constraints-section');
+    pushState('constraints-section');
   }
 }
 
@@ -723,6 +854,75 @@ function handlePrev() {
     showSection('prescreen-section');
     pushState('prescreen-section');
   }
+}
+
+// === OPTIONAL GOVERNANCE CONSTRAINTS ===
+function renderConstraintsStep() {
+  const cfg = apa.optional_constraints;
+  if (!cfg) {
+    finishConstraintsAndRecommend();
+    return;
+  }
+  document.getElementById('constraints-title').textContent = cfg.label;
+  document.getElementById('constraints-subtitle').textContent = cfg.prompt || '';
+  const list = document.getElementById('constraints-list');
+  list.innerHTML = '';
+  cfg.options.forEach(opt => {
+    const selected = selectedConstraints.includes(opt.id);
+    const div = document.createElement('div');
+    div.className = 'option-card' + (selected ? ' selected' : '');
+    div.dataset.constraintId = opt.id;
+    div.setAttribute('role', 'checkbox');
+    div.setAttribute('tabindex', '0');
+    div.setAttribute('aria-checked', String(selected));
+    div.innerHTML = `
+      <div class="option-radio-indicator" aria-hidden="true">
+        <div class="option-radio-outer">${selected ? '<div class="option-radio-inner"></div>' : ''}</div>
+      </div>
+      <div class="option-content">
+        <div class="option-label">${opt.label}</div>
+      </div>`;
+    const toggle = () => {
+      if (selectedConstraints.includes(opt.id)) {
+        selectedConstraints = selectedConstraints.filter(id => id !== opt.id);
+      } else {
+        selectedConstraints = [...selectedConstraints, opt.id];
+      }
+      renderConstraintsStep();
+    };
+    div.addEventListener('click', toggle);
+    div.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+    list.appendChild(div);
+  });
+  // One CTA, labelled for what will actually happen. Two buttons with the same
+  // effect made the user weigh a choice that has no consequence.
+  const cta = document.getElementById('constraints-continue-btn');
+  if (cta) {
+    cta.innerHTML = selectedConstraints.length
+      ? 'See recommendation <span class="icon icon-chevron-right"></span>'
+      : `${cfg.skip_label || 'None of these — continue'} <span class="icon icon-chevron-right"></span>`;
+  }
+}
+
+function finishConstraintsAndRecommend() {
+  renderRecommendation();
+  showSection('recommendation-section');
+  pushState('recommendation-section');
+}
+
+// Single CTA continues in both states; nothing is selected when the label
+// still reads "None of these", so no explicit clear is needed here.
+function continueFromConstraints() {
+  finishConstraintsAndRecommend();
+}
+
+function backFromConstraints() {
+  currentQuestionIndex = apa.questions.length - 1;
+  renderQuestion();
+  showSection('assessment-section');
+  pushState('assessment-section', currentQuestionIndex);
 }
 
 // === SCORE COMPARISON ===
@@ -838,11 +1038,11 @@ function buildPerQuestionGrid(answersMap) {
     const shortLabel = Q_SHORT_LABELS[q.id] || q.label;
 
     const cells = platforms.map(p => {
-      if (zeroed[p.id]) return '<td class="pq-cell"><span class="pq-dot pq-zeroed" title="Disqualified">—</span></td>';
+      if (zeroed[p.id]) return `<td class="pq-cell"><span class="pq-dot pq-zeroed" role="img" aria-label="${shortLabel}, ${p.label}: disqualified" title="Disqualified">—</span></td>`;
       const score = option.scores[p.id] ?? 0;
       const cls = score === 3 ? 'pq-strong' : score === 2 ? 'pq-moderate' : score === 1 ? 'pq-weak' : 'pq-none';
       const title = score === 3 ? 'Strong fit' : score === 2 ? 'Moderate fit' : score === 1 ? 'Weak fit' : 'No fit';
-      return `<td class="pq-cell"><span class="pq-dot ${cls}" title="${title} (${score}/3)"></span></td>`;
+      return `<td class="pq-cell"><span class="pq-dot ${cls}" role="img" aria-label="${shortLabel}, ${p.label}: ${title} (${score} of 3)" title="${title} (${score}/3)"></span></td>`;
     }).join('');
 
     return `<tr><td class="pq-label">${shortLabel}</td>${cells}</tr>`;
@@ -856,7 +1056,7 @@ function buildPerQuestionGrid(answersMap) {
 }
 
 function buildScoreComparison(ranked, answersMap) {
-  const maxScore = apa.scoring.raw_score_max || 15;
+  const maxScore = (apa.scoring.raw_score_max || 15) + (apa.scoring.constraint_boost_cap || 0);
   const zeroed = getZeroedPlatforms(answersMap);
 
   const rows = apa.meta.platforms
@@ -942,7 +1142,8 @@ function showRecNav(hasSecondary) {
 }
 
 // Renders the entry-point result (Copilot Chat / Cowork / Scout). Non-scored:
-// no score breakdown, no cross-question notes, no decision card — mirrors the fast-track branch.
+// no score breakdown, no decision card — mirrors the fast-track branch.
+// Scout/Cowork access tips can still surface as cross-notes.
 function renderDelegateRecommendation() {
   const ids = delegateResult === 'both' ? ['cowork', 'scout'] : [delegateResult];
   recommendedPlatformId = ids[0];
@@ -955,7 +1156,7 @@ function renderDelegateRecommendation() {
   if (ids.length > 1) {
     pairBanner.innerHTML =
       '<strong>Consider both.</strong> Scout can be the always-on layer that monitors and coordinates, ' +
-      'while Cowork assembles the Microsoft 365 deliverables on demand.';
+      'while Cowork assembles Microsoft 365 deliverables (one-shot, scheduled, or event-triggered).';
     pairBanner.classList.remove('hidden');
     secondLabel.textContent = 'Also consider';
     secondLabel.classList.remove('hidden');
@@ -970,12 +1171,14 @@ function renderDelegateRecommendation() {
   document.getElementById('rec-fasttrack-prompt').classList.add('hidden');
   document.getElementById('rec-score-toggle').classList.add('hidden');
   document.getElementById('rec-score-comparison').classList.add('hidden');
-  document.getElementById('rec-cross-notes').classList.add('hidden');
+  // Entry-point access notes (e.g. Scout Frontier gates) from winner_persona_notes
+  renderCrossNotes({}, recommendedPlatformId);
   document.getElementById('rec-nav').style.display = 'none';
   document.getElementById('decision-card').style.display = 'none';
 
   updateTabTitle();
   if (typeof clarity === 'function') clarity('set', 'platform', recommendedPlatformId);
+  renderResultExtras();
 }
 
 function renderRecommendation() {
@@ -1000,6 +1203,7 @@ function renderRecommendation() {
     if (typeof clarity === 'function') clarity('set', 'platform', recommendedPlatformId);
     renderCrossNotes(answers, recommendedPlatformId);
     renderDecisionCard();
+    renderResultExtras();
     return;
   }
 
@@ -1022,7 +1226,7 @@ function renderRecommendation() {
   const pairBanner = document.getElementById('rec-pair-banner');
   const secondLabel = document.getElementById('rec-second-label');
 
-  // Hide secondary card when second platform is "Not recommended" (score 0-5)
+  // Hide secondary card when second platform is "Not recommended" (score 0–3)
   if (second.label === 'Not recommended') {
     pairBanner.classList.add('hidden');
     secondLabel.classList.add('hidden');
@@ -1042,6 +1246,7 @@ function renderRecommendation() {
     }
     renderCrossNotes(answers, recommendedPlatformId);
     renderDecisionCard();
+    renderResultExtras();
     return;
   }
 
@@ -1098,6 +1303,7 @@ function renderRecommendation() {
   }
   renderCrossNotes(answers, recommendedPlatformId);
   renderDecisionCard();
+  renderResultExtras();
 }
 
 function updateTabTitle() {
@@ -1112,6 +1318,8 @@ function updateTabTitle() {
 
 function restart() {
   answers = {};
+  selectedConstraints = [];
+  feedbackSubmitted = false;
   fastTrack = false;
   delegateResult = null;
   delegateStart = null;
@@ -1136,6 +1344,8 @@ function startFullAssessment() {
   delegateResult = null;
   delegateStart = null;
   answers = {};
+  selectedConstraints = [];
+  feedbackSubmitted = false;
   currentQuestionIndex = 0;
   renderQuestion();
   showSection('assessment-section');
@@ -1166,28 +1376,48 @@ function parseURLParams() {
     return { mode: 'card' };
   }
 
-  // Fast-track handling
+  // Fast-track handling (legacy ft=1 → M365 Copilot card).
+  // Force card mode like dt= does: fastTrack suppresses the m365_copilot
+  // zeroing rule, so letting ft=1 fall through to mode=wizard would replay the
+  // scored wizard with M365 Copilot still in the running, which it never is.
   if (params.get('ft') === '1') {
     fastTrack = true;
     answers = {};
-    return { mode };
+    selectedConstraints = [];
+    return { mode: 'card' };
   }
 
-  // Build answers from URL params
-  const questionIds = new Set(apa.questions.map(q => q.id));
-  const validOptionIds = new Set();
-  apa.questions.forEach(q => q.options.forEach(o => validOptionIds.add(o.id)));
+  // Build answers from URL params.
+  // Option ids must be validated PER QUESTION, not against one global set:
+  // hard rules key off the option id alone (see getZeroedPlatforms), so a link
+  // like ?q1=q3f would smuggle q3f's disqualification into the q1 slot, score
+  // zero for q1, and silently hand back a different winner.
+  const validOptionIdsByQuestion = new Map(
+    apa.questions.map(q => [q.id, new Set(q.options.map(o => o.id))])
+  );
+
+  // Optional governance constraints: c=c_private_net,c_alm
+  const validConstraintIds = new Set(
+    ((apa.optional_constraints && apa.optional_constraints.options) || []).map(o => o.id)
+  );
+  const cParam = params.get('c');
+  if (cParam) {
+    selectedConstraints = cParam.split(',').map(s => s.trim()).filter(id => validConstraintIds.has(id));
+  } else {
+    selectedConstraints = [];
+  }
 
   let hasValidAnswer = false;
   let hasDrift = false;
 
-  questionIds.forEach(qId => {
+  validOptionIdsByQuestion.forEach((validForQuestion, qId) => {
     const value = params.get(qId);
-    if (value && validOptionIds.has(value)) {
+    if (value && validForQuestion.has(value)) {
       answers[qId] = value;
       hasValidAnswer = true;
     } else if (value) {
-      // Unknown option — schema drift, ignore
+      // Unknown option, or an option belonging to a different question —
+      // schema drift or a tampered link. Ignore it.
       hasDrift = true;
     }
   });
@@ -1220,6 +1450,9 @@ function buildShareableURL() {
     apa.questions.forEach(q => {
       if (answers[q.id]) params.set(q.id, answers[q.id]);
     });
+    if (selectedConstraints.length) {
+      params.set('c', selectedConstraints.join(','));
+    }
   }
 
   params.set('r', recommendedPlatformId || '');
@@ -1280,6 +1513,14 @@ function computeWhyNot(winner, runner, answersMap) {
   const runnerMeta = (apa.meta.platforms || []).find(p => p.id === runner.id);
   if (!winnerMeta || !runnerMeta) return null;
 
+  // Pair-specific guidance from valid_pairs (stronger than generic delta sentence)
+  const pair = (apa.scoring.tie_handling.valid_pairs || []).find(p =>
+    p.platforms.includes(winner.id) && p.platforms.includes(runner.id)
+  );
+  const pairWhy = pair && pair.why_not
+    ? pair.why_not.replace('{winner}', winnerMeta.label).replace('{runner}', runnerMeta.label)
+    : null;
+
   // Find the question where the winner most outscored the runner-up
   let bestDelta = null;
   apa.questions.forEach(q => {
@@ -1295,9 +1536,11 @@ function computeWhyNot(winner, runner, answersMap) {
     }
   });
 
-  if (!bestDelta || bestDelta.delta <= 0) return null;
+  if (!bestDelta || bestDelta.delta <= 0) return pairWhy || null;
   const dimension = Q_SHORT_LABELS[bestDelta.qId] || bestDelta.questionLabel;
-  return `${winnerMeta.label} edged out ${runnerMeta.label} on <strong>${dimension.toLowerCase()}</strong> — you selected "${bestDelta.optionLabel}".`;
+  const deltaSentence =
+    `${winnerMeta.label} edged out ${runnerMeta.label} on <strong>${dimension.toLowerCase()}</strong> — you selected "${bestDelta.optionLabel}".`;
+  return pairWhy ? `${pairWhy} ${deltaSentence}` : deltaSentence;
 }
 
 function renderDecisionCard() {
@@ -1333,6 +1576,192 @@ function renderDecisionCard() {
     || bannerEl.style.display !== 'none'
     || driftEl.style.display !== 'none';
   card.style.display = hasVisibleContent ? '' : 'none';
+}
+
+// Guidance version strip, export, feedback — shown on every result
+function renderResultExtras() {
+  renderGuidanceMeta('rec-guidance-meta');
+  resetFeedbackUI();
+  const exportBtn = document.getElementById('export-md-btn');
+  if (exportBtn) exportBtn.classList.toggle('hidden', !recommendedPlatformId);
+}
+
+function renderGuidanceMeta(elId) {
+  const el = document.getElementById(elId);
+  if (!el || !apa || !apa.meta) return;
+  const ver = apa.meta.version || '';
+  const verified = apa.meta.guidance_verified || '';
+  // Changelog lives once in the footer nav — do not repeat it on every guidance strip.
+  el.innerHTML =
+    `<span class="guidance-meta-text">Guidance v${ver}` +
+    (verified ? ` · Verified against Microsoft Learn: ${verified}` : '') +
+    `</span>`;
+  el.classList.remove('hidden');
+}
+
+// Footer "Last updated" date. Parsed as UTC so the displayed day doesn't shift
+// west of Greenwich, where `new Date('2026-08-12')` would render as Aug 11.
+function renderLastUpdated() {
+  const el = document.getElementById('footer-last-updated');
+  if (!el || !apa || !apa.meta || !apa.meta.last_updated) return;
+  const raw = String(apa.meta.last_updated).trim();
+  const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return;
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  if (isNaN(d.getTime())) return;
+  const label = d.toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
+  });
+  el.innerHTML = `Last updated: <time datetime="${raw}">${label}</time>`;
+  el.classList.remove('hidden');
+}
+
+function resetFeedbackUI() {
+  feedbackSubmitted = false;
+  const wrap = document.getElementById('rec-feedback');
+  if (!wrap) return;
+  wrap.classList.remove('hidden');
+  const q = document.getElementById('feedback-question');
+  const thanks = document.getElementById('feedback-thanks');
+  if (q) q.classList.remove('hidden');
+  if (thanks) {
+    thanks.classList.add('hidden');
+    thanks.textContent = '';
+  }
+}
+
+function submitFeedback(helpful) {
+  if (feedbackSubmitted) return;
+  feedbackSubmitted = true;
+  if (typeof clarity === 'function') {
+    clarity('set', 'feedback_helpful', helpful ? 'yes' : 'no');
+    if (recommendedPlatformId) clarity('set', 'feedback_platform', recommendedPlatformId);
+  }
+  const q = document.getElementById('feedback-question');
+  const thanks = document.getElementById('feedback-thanks');
+  // Activating the button removes it, which drops focus to <body>. Move focus to
+  // the confirmation only for keyboard users, so a mouse click isn't hijacked.
+  const fromKeyboard = !!(q && document.activeElement && q.contains(document.activeElement)
+    && typeof document.activeElement.matches === 'function'
+    && document.activeElement.matches(':focus-visible'));
+  if (q) q.classList.add('hidden');
+  if (thanks) {
+    const message = helpful
+      ? 'Thanks — glad it helped.'
+      : `Thanks for the signal. <a href="${buildFeedbackIssueURL()}" target="_blank" rel="noopener noreferrer">Open a GitHub issue</a> with this scenario if something looked wrong.`;
+    // Unhide (and take focus) before writing the text: a live region only
+    // announces changes made while it is already in the accessibility tree.
+    thanks.classList.remove('hidden');
+    if (fromKeyboard) thanks.focus();
+    thanks.innerHTML = message;
+  }
+}
+
+function buildFeedbackIssueURL() {
+  const title = encodeURIComponent('APA feedback: recommendation not helpful');
+  const lines = [
+    '## Scenario',
+    `- Recommended: ${recommendedPlatformId || 'n/a'}`,
+    `- Guidance version: ${apa?.meta?.version || 'n/a'}`,
+    '',
+    '### Answers',
+  ];
+  if (delegateResult) {
+    lines.push(`- Entry-point destination: ${delegateResult}`);
+    if (delegateStart) lines.push(`- Start surface: ${delegateStart}`);
+  } else {
+    Object.entries(answers).forEach(([k, v]) => lines.push(`- ${k}: ${v}`));
+    if (selectedConstraints.length) {
+      lines.push(`- Constraints: ${selectedConstraints.join(', ')}`);
+    }
+  }
+  lines.push('', '### What was wrong?', '', '(please describe)', '', `Share URL: ${buildShareableURL()}`);
+  const body = encodeURIComponent(lines.join('\n'));
+  return `https://github.com/microsoft/AgentPlatformAdvisor/issues/new?title=${title}&body=${body}`;
+}
+
+function downloadRecommendationMarkdown() {
+  if (!recommendedPlatformId || !apa) return;
+  const rec = apa.recommendations[recommendedPlatformId];
+  const headline = rec ? rec.headline : recommendedPlatformId;
+  const ranked = (!delegateResult && !fastTrack) ? rankPlatforms(answers) : [];
+  const lines = [
+    `# Agent Platform Advisor — ${headline}`,
+    '',
+    `Guidance version: ${apa.meta.version || 'n/a'}`,
+    apa.meta.guidance_verified ? `Verified against Microsoft Learn: ${apa.meta.guidance_verified}` : '',
+    `Generated: ${new Date().toISOString().slice(0, 10)}`,
+    '',
+    `## Recommendation`,
+    '',
+    `**${headline}**`,
+    rec?.summary ? '' : '',
+    rec?.summary ? rec.summary.trim() : '',
+    '',
+  ].filter(l => l !== undefined);
+
+  if (ranked.length) {
+    const top = ranked.find(r => r.id === recommendedPlatformId) || ranked[0];
+    lines.push(`Fit: ${top.label} (${top.score})`, '');
+    lines.push('### Score comparison', '');
+    ranked.filter(r => r.id !== 'm365_copilot').forEach(r => {
+      lines.push(`- ${apa.recommendations[r.id]?.headline || r.id}: ${r.score} — ${r.label}`);
+    });
+    lines.push('');
+    const factors = getKeyFactors(recommendedPlatformId, answers);
+    if (factors.length) {
+      lines.push('### Why this was recommended', '');
+      factors.forEach(f => lines.push(`- ${stripHtmlTags(f)}`));
+      lines.push('');
+    }
+  }
+
+  if (selectedConstraints.length) {
+    lines.push('### Enterprise constraints selected', '');
+    getConstraintLabels().forEach(l => lines.push(`- ${l}`));
+    lines.push('');
+  }
+
+  if (rec?.best_for?.length) {
+    lines.push('### Best for', '');
+    rec.best_for.forEach(b => lines.push(`- ${b}`));
+    lines.push('');
+  }
+  if (rec?.watch_out_for?.length) {
+    lines.push('### Important considerations', '');
+    rec.watch_out_for.forEach(b => lines.push(`- ${b}`));
+    lines.push('');
+  }
+
+  lines.push('### Share link (canonical)', '', buildShareableURL(), '');
+  lines.push('---', 'Generated by [Agent Platform Advisor](https://microsoft.github.io/AgentPlatformAdvisor/).');
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `apa-recommendation-${recommendedPlatformId}.md`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 0);
+  confirmExportDownload();
+  if (typeof clarity === 'function') clarity('set', 'export_md', 'true');
+}
+
+// Browser download chrome is unreliable (hidden shelves, mobile share sheets),
+// so confirm the export on the control the user actually pressed.
+function confirmExportDownload() {
+  const btn = document.getElementById('export-md-btn');
+  if (!btn || btn.dataset.confirming === 'true') return;
+  const original = btn.textContent;
+  btn.dataset.confirming = 'true';
+  btn.textContent = 'Downloaded ✓';
+  setTimeout(() => {
+    btn.textContent = original;
+    delete btn.dataset.confirming;
+  }, 2000);
 }
 
 // === SHARE & DOWNLOAD ===

@@ -17,27 +17,29 @@ The start page presents ways to use or build agents:
 
 | Intent | Destination | Best for |
 |---|---|---|
-| Use | Microsoft 365 Copilot | Built-in, permission-aware chat, search, app-native Copilot, Pages, Notebooks, and Microsoft-built agents |
-| Delegate | Copilot Cowork | On-demand multi-step Microsoft 365 work with approval checkpoints |
-| Delegate | Microsoft Scout | Always-on, proactive work across desktop, browser, local files, shell, and Microsoft 365 |
-| Build | Agent Builder | No-code Microsoft 365 Copilot agents for small-team knowledge, web, file, and connector-backed scenarios |
-| Build | Copilot Studio | Governed low-code agents with tools, workflows, triggers, evaluation, monitoring, and broad deployment |
-| Build | Microsoft Foundry | Code-first production agents with managed runtime, custom retrieval, identity, networking, observability, and Azure-scale controls |
+| Use | Microsoft 365 Copilot | Chat, Search, app-native help, built-in agents, and Agent Store — not chat only |
+| Delegate | Copilot Cowork | Multi-step Microsoft 365 work: one-shot deliverables, schedules, event triggers, approvals |
+| Delegate | Microsoft Scout | Always-on personal Autopilot across desktop, browser, local files, shell, and Microsoft 365 (Frontier preview) |
+| Build | Agent Builder | No-code declarative agents inside Microsoft 365 Copilot (knowledge helpers — not actions/workflows) |
+| Build | Copilot Studio | Governed low-code agents: actions, triggers, connectors, multi-agent (GA), eval, multi-channel |
+| Build | Microsoft Foundry | Pro-code managed runtime: custom engine/models/retrieval, identity, networking, Azure-scale controls |
+
+Explore also surfaces **adjacent (unscored) build paths**: SharePoint agents, Microsoft 365 Agents Toolkit (declarative), and custom engine agents.
 
 ## User paths
 
 From **Get Started**, users choose one of three paths:
 
-1. **Entry-point wizard** ("Help me find the right place to get work done") — asks how hands-on you want to be, then routes to Microsoft 365 Copilot (featuring either Copilot Chat or its built-in agents), Cowork, Scout, or a Cowork+Scout pair. Non-scored.
+1. **Entry-point wizard** ("Help me find the right place to get work done") — asks how hands-on you want to be, then routes to Microsoft 365 Copilot (featuring either Copilot Chat or its built-in agents), Cowork, Scout, or a Cowork+Scout pair. Non-scored. Delegate path: cadence (one-shot / recurring-or-event / always-on) then reach; **reach is primary** for recurring and always-on (M365 → Cowork, cross-environment → Scout).
 2. **Custom agent assessment** — runs the scored 5-question wizard for Agent Builder, Copilot Studio, and Foundry.
-3. **Explore what's possible** — compares ways to use or build agents before deciding whether to take the assessment.
+3. **Explore what's possible** — compares ways to use or build agents, plus adjacent paths (SharePoint agents, Agents Toolkit, custom engine).
 
 The custom agent assessment asks about:
 
 - Who is building the agent: business user, low-code maker, professional developer, or data scientist/AI engineer
 - Who will use it: small internal team, broad internal audience, external users, or undecided
 - Where users will interact with it: Microsoft 365 Copilot chat, custom app, background/event-triggered runtime, or multiple places
-- What the agent should do: Q&A, multi-turn conversation, content/data analysis, multi-step action workflows, or complex orchestration
+- What the agent should do: Q&A, multi-turn conversation, content/data analysis, multi-step action workflows, low-code multi-agent / business orchestration, or code-first multi-agent / custom runtime
 - What information it needs: Microsoft 365 content, connector-backed systems, Dataverse/custom APIs, public web/uploaded files, or custom retrieval architecture
 
 After completing a path, users get:
@@ -81,7 +83,7 @@ There are two recommendation modes:
 
 1. **Entry-point wizard** is non-scored. It first asks how hands-on the user wants to be:
    - Hands-on → **Microsoft 365 Copilot**, plus a task-type question that picks the starting surface: general help -> Copilot Chat; a specialized job (research, data, meetings, translation) -> a built-in agent (Researcher, Analyst, Facilitator, Interpreter)
-   - Hand it off → cadence + reach questions: continuous work or cross-environment reach -> Scout; on-demand work inside Microsoft 365 -> Cowork; undecided signals -> both
+   - Hand it off → cadence (one-shot / recurring-or-event / always-on) + reach: cross-environment → Scout; Microsoft 365 + concrete cadence → Cowork; undecided → both
 
    Copilot Chat and the built-in agents are surfaces *of* Microsoft 365 Copilot, not competing destinations, so the hands-on path always produces a single Microsoft 365 Copilot card.
 2. **Custom agent assessment** is scored across Agent Builder, Copilot Studio, and Foundry:
@@ -123,7 +125,7 @@ npm test              # headless
 npm run test:headed   # with browser visible
 ```
 
-There are 39 tests across 6 spec files covering wizard completion, shared link loading, temporal change detection, legacy fast-track links, entry-point wizard routing, and share button behavior. To run a single file or test: `npx playwright test tests/e2e/delegate-path.spec.js` or `npx playwright test -g "completes full wizard"`. CI runs automatically on push and pull request via GitHub Actions.
+There are 88 Playwright tests across 14 spec files (including P2 constraints/export/feedback and share-link integrity), plus a scored golden-path script (`scripts/golden_paths.py`, which needs `PyYAML` — install with `python3 -m pip install -r requirements.txt`). `npm test` runs the golden script first, then Playwright. Coverage includes wizard completion, optional governance constraints, shared links, temporal change, legacy fast-track, entry-point routing, share buttons, G01–G12 golden paths, share-link parameter validation, and export/feedback. Single file: `npx playwright test tests/e2e/p2-features.spec.js`.
 
 ## Contributing
 

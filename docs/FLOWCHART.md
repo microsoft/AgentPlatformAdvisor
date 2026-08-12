@@ -3,23 +3,23 @@ flowchart TD
     START([Start]) --> PRESCREEN{"**Prescreen: Where would you like to begin?**"}
 
     PRESCREEN -->|Help me find the right place to get work done| DELEGATE{"**Entry-point wizard**\nWhere should you get this work done?\n(non-scored)"}
-    PRESCREEN -->|Explore what's possible| EXPLORE["Explore grid\n(all platforms + Cowork + Scout)"]
+    PRESCREEN -->|Explore what's possible| EXPLORE["Explore grid\n(all platforms + Cowork + Scout\n+ adjacent build paths)"]
     PRESCREEN -->|Build a custom agent| Q1
 
     DELEGATE -->|"Involvement: stay hands-on / iterate"| INTERACTIVE{"**Interactive follow-up**\nWhat kind of task?"}
     DELEGATE -->|"Involvement: hand it off"| DELEGATE2{"**Delegate follow-up**\nCadence (asked first)"}
     INTERACTIVE -->|"General help"| CHAT["**Microsoft 365 Copilot**\nStart Here: Copilot Chat\nAsk, summarize, draft in the flow of work"]
     INTERACTIVE -->|"Specialized job (research, data, meetings, translation)"| M365AGENTS["**Microsoft 365 Copilot**\nStart Here: built-in agents\nResearcher · Analyst · Facilitator · Interpreter …"]
-    DELEGATE2 -->|"Any cadence answered → reveal Reach"| REACH{"**Reach**\nWhere does it need to reach?"}
-    REACH -->|"Cadence: continuous OR Reach: cross-environment"| SCOUT["**Microsoft Scout**\nAlways-on Autopilot across desktop, browser, M365\n(Frontier preview)"]
-    REACH -->|"Cadence: on-demand AND Reach: Microsoft 365"| COWORK["**Copilot Cowork**\nOn-demand multi-step M365 deliverables"]
-    REACH -->|"Undecided signals"| BOTH["**Both** — complementary pair\nScout monitors · Cowork delivers"]
+    DELEGATE2 -->|"Any cadence answered → reveal Reach"| REACH{"**Reach**\nWhere does it need to reach?\n(primary for recurring / always-on)"}
+    REACH -->|"Reach: cross-environment\n(desktop / browser / local / shell)"| SCOUT["**Microsoft Scout**\nAlways-on personal Autopilot\nacross desktop, browser, M365\n(Frontier preview)"]
+    REACH -->|"Reach: Microsoft 365\nAND cadence is oneshot, recurring, or alwayson"| COWORK["**Copilot Cowork**\nOne-shot, scheduled, or event-triggered\nMicrosoft 365 deliverables"]
+    REACH -->|"Undecided cadence or reach"| BOTH["**Both** — complementary pair\nScout monitors · Cowork delivers"]
 
     Q1["**Q1: Who is building this agent?**"]
     Q1 -->|Business user / no code| Q1A["AB:3 · CS:1 · Foundry:0"]
     Q1 -->|Low-code maker / IT pro| Q1B["AB:1 · CS:3 · Foundry:0"]
-    Q1 -->|"🔀 Professional developer"| Q1C["AB:0 · CS:2 · Foundry:3\n→ TIEBREAKER: AB tie → prefer CS"]
-    Q1 -->|"🔀 Data scientist / AI-ML"| Q1D["AB:0 · CS:1 · Foundry:3\n→ PERSONA PREF: CS always over AB\n→ TIEBREAKER: CS/Foundry tie → prefer CS"]
+    Q1 -->|"🔀 Professional developer"| Q1C["AB:0 · CS:2 · Foundry:3\n→ TIEBREAKER: AB tie → prefer CS\n→ Toolkit path for declarative plugins"]
+    Q1 -->|"🔀 Data scientist / AI-ML"| Q1D["AB:0 · CS:1 · Foundry:3\n→ PERSONA PREF: CS always over AB\n→ TIEBREAKER: CS/Foundry tie → prefer CS\n  (Foundry still wins on q3f/q4f/runtime)"]
 
     Q1A & Q1B & Q1C & Q1D --> Q8
 
@@ -44,9 +44,10 @@ flowchart TD
     Q4 -->|Multi-turn conversation| Q4B["AB:2 · CS:3 · Foundry:2"]
     Q4 -->|Create/analyze content in Copilot| Q4E["AB:3 · CS:2 · Foundry:2"]
     Q4 -->|"⚠️ Multi-step action workflows"| Q4C["AB:0 · CS:3 · Foundry:3\n→ HARD RULE: AB=0"]
-    Q4 -->|"⚠️ Complex workflows / multi-agent"| Q4D["AB:0 · CS:2 · Foundry:3\n→ HARD RULE: AB=0"]
+    Q4 -->|"⚠️ Low-code multi-agent / long-running business orchestration"| Q4D["AB:0 · CS:3 · Foundry:2\n→ HARD RULE: AB=0\n(CS multi-agent GA)"]
+    Q4 -->|"⚠️ Code-first multi-agent / custom runtime"| Q4F["AB:0 · CS:1 · Foundry:3\n→ HARD RULE: AB=0"]
 
-    Q4A & Q4B & Q4E & Q4C & Q4D --> Q3
+    Q4A & Q4B & Q4E & Q4C & Q4D & Q4F --> Q3
 
     Q3["**Q3: What information does the agent need?**"]
     Q3 -->|Microsoft 365 content| Q3A["AB:3 · CS:2 · Foundry:1"]
@@ -64,7 +65,7 @@ flowchart TD
 
     PREF --> RESULT["**Recommendation Thresholds**\n12–15: Strong fit\n8–11: Good fit\n4–7: Partial fit\n0–3: Not recommended"]
 
-    RESULT --> NOTES["**Post-processing**\nCross-question contradiction notes\nWinner-persona mismatch warnings\nTie handling → complementary pairs"]
+    RESULT --> NOTES["**Post-processing**\nCross-question contradiction notes\nWinner-persona mismatch warnings\nTie handling → complementary pairs\nAdjacent-path footnotes (Toolkit, SharePoint, custom engine)"]
 
     style Q1C fill:#e8f0fe,stroke:#4a86e8
     style Q1D fill:#e8f0fe,stroke:#4a86e8
@@ -81,6 +82,7 @@ flowchart TD
     style Q2C fill:#fff3cd,stroke:#ffc107
     style Q4C fill:#fff3cd,stroke:#ffc107
     style Q4D fill:#fff3cd,stroke:#ffc107
+    style Q4F fill:#fff3cd,stroke:#ffc107
     style Q3C fill:#fff3cd,stroke:#ffc107
     style Q3F fill:#fff3cd,stroke:#ffc107
     style SCORE fill:#e8f4fd,stroke:#0078D4
@@ -88,3 +90,7 @@ flowchart TD
     style RESULT fill:#d4edda,stroke:#28a745
     style NOTES fill:#f8f0fb,stroke:#6f42c1
 ```
+
+## Optional constraints (scored path only)
+
+After Q3 (last scored question), users may multi-select enterprise constraints or continue without any. Soft boosts apply in `rankPlatforms` before results. Entry-point and legacy fast-track paths skip this step. A single CTA (`#constraints-continue-btn`) relabels between "None of these — continue" and "See recommendation" based on selection state; the separate skip button was removed in design review round 3 because both buttons had the same effect.

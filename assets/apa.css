@@ -16,6 +16,8 @@
   --primary-foreground: #FFFFFF;
   --primary-light: #0B5187;
   --primary-xlight: rgba(0, 120, 212, 0.08);
+  /* Text/icons on dark surfaces — #0078D4 fails AA as text (~3.7:1) */
+  --primary-text: #2B9AEE;
 
   /* Secondary / Muted */
   --secondary: rgba(0, 120, 212, 0.10);
@@ -81,6 +83,7 @@
   --primary-foreground: #FFFFFF;
   --primary-light: #BFDDF2;
   --primary-xlight: #EFF6FC;
+  --primary-text: #005A9E;
 
   /* Secondary / Muted */
   --secondary: #EFF6FC;
@@ -147,13 +150,15 @@ body {
   background-color: var(--background);
 }
 
-/* Theme toggle button */
+/* Theme toggle button — 44px minimum touch target */
 .theme-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: transparent;
@@ -226,6 +231,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-height: 44px;
 }
 
 .logo-icon {
@@ -246,10 +252,20 @@ body {
   color: var(--foreground);
   text-decoration: none;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 0;
 }
 
 .logo-text:hover {
   text-decoration: underline;
+}
+
+.logo-text:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* Button Styles */
@@ -257,6 +273,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 44px;
   border-radius: var(--radius-sm);
   font-size: var(--fs-body-sm);
   font-weight: 500;
@@ -377,7 +394,7 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0 auto 24px;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .welcome-heading {
@@ -418,11 +435,16 @@ body {
 .prescreen-description {
   color: var(--muted-foreground);
   margin-bottom: 32px;
+  /* Cap running prose near the 70ch measure; centred text in particular
+     gets hard to track once lines run much past that. */
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 /* Prescreen option cards */
 .prescreen-option {
-  border-left: 3px solid transparent;
   padding: 20px;
   align-items: center;
   transition: background-color 0.15s, border-color 0.15s;
@@ -440,45 +462,15 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.prescreen-option-icon--custom {
-  background: rgba(76, 195, 138, 0.12);
-  color: var(--success);
-}
-.prescreen-option--custom {
-  border-left-color: var(--success);
-}
-
-.prescreen-option-icon--explore {
-  background: rgba(242, 201, 76, 0.10);
-  color: #E8C839;
-}
-.prescreen-option--explore {
-  border-left-color: var(--warning);
-}
-
-[data-theme="light"] .prescreen-option-icon--custom {
-  background: #DFF6DD;
-}
-[data-theme="light"] .prescreen-option-icon--explore {
-  background: #FFF4CE;
-  color: #8A6914;
-}
-
-.prescreen-option-icon--delegate {
-  background: rgba(91, 95, 199, 0.18);
-  color: #9EA2F0;
-}
-.prescreen-option--delegate {
-  border-left-color: #7B7FC7;
-}
-[data-theme="light"] .prescreen-option-icon--delegate {
-  background: #ECEBFB;
-  color: #5B5FC7;
-}
-[data-theme="light"] .prescreen-option--delegate {
-  border-left-color: #5B5FC7;
+.prescreen-option:hover .prescreen-option-icon,
+.prescreen-option:focus-visible .prescreen-option-icon {
+  background: var(--secondary);
+  color: var(--primary-text);
 }
 
 /* Cowork / Scout micro-decision */
@@ -487,7 +479,7 @@ body {
   margin-bottom: 28px;
 }
 .delegate-question-title {
-  font-size: var(--fs-body-lg);
+  font-size: var(--fs-subhead);
   font-weight: 600;
   margin: 0 0 12px;
   color: var(--foreground);
@@ -541,6 +533,57 @@ body {
 }
 
 /* Recommendation actions */
+.guidance-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  color: var(--muted-foreground);
+  line-height: 1.45;
+  margin: 12px 0 0;
+}
+.guidance-meta a {
+  color: var(--link);
+  font-weight: 500;
+}
+.footer-last-updated {
+  margin: 4px 0 0;
+}
+.rec-feedback {
+  margin: 20px auto 8px;
+  max-width: 40rem;
+  text-align: center;
+  padding: 12px 16px;
+  background: var(--muted);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.feedback-question {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.feedback-label {
+  font-size: var(--fs-body-sm);
+  color: var(--foreground);
+  margin-right: 4px;
+}
+.btn-feedback {
+  min-width: 4.5rem;
+}
+.feedback-thanks {
+  font-size: var(--fs-body-sm);
+  color: var(--muted-foreground);
+  margin: 0;
+  line-height: 1.45;
+}
+.feedback-thanks a {
+  color: var(--link);
+}
+.footer-changelog {
+  font-weight: 600;
+  color: var(--link) !important;
+}
 .rec-actions {
   margin-top: 24px;
   gap: 12px;
@@ -591,7 +634,7 @@ body {
 
 .platform-preview-icon {
   font-size: 2rem;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -676,6 +719,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  text-align: left;
 }
 
 .option-card:hover {
@@ -727,6 +771,22 @@ body {
 
 .option-card:hover .option-radio-outer {
   border-color: var(--primary);
+}
+
+/* Multi-select (role="checkbox") cards use a square box with a checkmark so the
+   shape matches the announced role. A circle reads as "pick exactly one". */
+.option-card[role="checkbox"] .option-radio-outer {
+  border-radius: var(--radius-sm);
+}
+
+.option-card[role="checkbox"] .option-radio-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 0;
+  background: transparent;
+  border-right: 2px solid var(--primary-foreground);
+  border-bottom: 2px solid var(--primary-foreground);
+  transform: rotate(45deg) translate(-1px, -1px);
 }
 
 .option-content {
@@ -894,7 +954,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-mono);
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0;
@@ -914,6 +974,7 @@ body {
 }
 
 .exploration-card {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -921,18 +982,25 @@ body {
   text-align: left;
   box-shadow: var(--shadow-md);
   transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
 }
 
-.exploration-card:hover {
+.exploration-card:hover,
+.exploration-card:focus-within {
   border-color: var(--primary-light);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.exploration-card:focus-within {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 .exploration-card-label {
   font-family: var(--font-mono);
   font-size: var(--fs-mono);
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 8px;
@@ -962,48 +1030,28 @@ body {
   padding: 12px 0;
 }
 
-.exploration-card-link:hover {
+/* Stretched link: the whole card is the click target, but the anchor stays the
+   focusable element so keyboard order and screen-reader link text are unchanged. */
+.exploration-card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.exploration-card-link:focus-visible {
+  outline: none;
+}
+
+.exploration-card:hover .exploration-card-link,
+.exploration-card:focus-within .exploration-card-link {
   color: var(--link-hover);
   text-decoration: underline;
 }
 
-/* ── Compact spotlight chip on exploration cards ── */
-.exploration-card-spotlight {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: var(--primary-xlight);
-  border: 1px solid var(--primary-light);
-  border-left: 3px solid var(--primary);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  margin-bottom: 16px;
-}
-.exploration-card-spotlight-eyebrow {
-  font-family: var(--font-mono);
-  font-size: var(--fs-mono-sm);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--primary);
-}
-.exploration-card-spotlight-name {
-  font-size: var(--fs-body-sm);
-  font-weight: 700;
-  color: var(--foreground);
-}
-.exploration-card-spotlight-name a {
-  color: var(--foreground);
-  text-decoration: none;
-}
-.exploration-card-spotlight-name a:hover {
-  color: var(--link);
+.exploration-card-link:hover {
+  color: var(--link-hover);
   text-decoration: underline;
-}
-.exploration-card-spotlight-tagline {
-  font-size: var(--fs-mono);
-  color: var(--muted-foreground);
-  line-height: 1.4;
 }
 
 .exploration-cta {
@@ -1053,7 +1101,10 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   gap: 8px 16px;
-  margin-top: 4px;
+  margin-top: 8px;
+}
+.footer-doc-links a {
+  margin: 0;
 }
 /* Separator */
 .separator {
@@ -1123,6 +1174,26 @@ body {
     gap: 8px;
   }
 
+  /* Keep the logo and theme toggle on one row and give the progress bar
+     its own full-width row, instead of letting the toggle wrap alone. */
+  .header-content > .logo {
+    order: 1;
+  }
+
+  .header-content > .header-actions {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .header-content > #progress-bar {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .header-content > #progress-bar .progress-bar {
+    justify-content: center;
+  }
+
   .logo-text {
     font-size: var(--fs-body);
   }
@@ -1133,10 +1204,6 @@ body {
 
   .progress-connector {
     width: 16px;
-  }
-
-  .question-title {
-    font-size: 1.375rem;
   }
 
   .platform-grid {
@@ -1208,7 +1275,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--fs-mono);
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-text);
   background: var(--primary-xlight);
   padding: 2px 8px;
   border-radius: var(--radius-full);
@@ -1245,7 +1312,7 @@ body {
   font-weight: 500;
 }
 .progress-step.active {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .progress-step.complete {
   color: var(--muted-foreground);
@@ -1293,7 +1360,7 @@ body {
   object-fit: contain;
 }
 .rec-platform-name {
-  font-size: 1.5rem;
+  font-size: var(--fs-heading);
   font-weight: 700;
   color: var(--foreground);
   letter-spacing: -0.01em;
@@ -1307,7 +1374,7 @@ body {
   margin-left: 8px;
 }
 .badge-strong   { background: var(--success-bg); color: var(--success); }
-.badge-good     { background: var(--primary-xlight); color: var(--primary); }
+.badge-good     { background: var(--primary-xlight); color: var(--primary-text); }
 .badge-possible { background: var(--warning-bg); color: var(--warning); }
 .badge-not      { background: var(--muted); color: var(--muted-foreground); }
 .rec-description {
@@ -1351,6 +1418,12 @@ body {
   color: var(--muted-foreground);
   margin-bottom: 8px;
 }
+
+/* A heading must sit closer to the section it introduces than to whatever
+   precedes it. Needed where the reasoning block follows a conditional callout. */
+.rec-section-title--spaced {
+  margin-top: 24px;
+}
 .rec-list {
   list-style: none;
   display: flex;
@@ -1358,7 +1431,7 @@ body {
   gap: 8px;
   margin-bottom: 16px;
 }
-.rec-list li::before { content: "• "; color: var(--primary); }
+.rec-list li::before { content: "• "; color: var(--primary-text); }
 .rec-list li { font-size: var(--fs-body-sm); color: var(--foreground); }
 .rec-list li a {
   color: var(--link);
@@ -1557,16 +1630,22 @@ body {
   height: 12px;
   border-radius: 9999px;
 }
+/* Fit strength is encoded by dot size as well as tint, so the four states
+   stay distinguishable without relying on opacity alone. */
 .pq-dot.pq-strong {
   background: var(--primary);
 }
 .pq-dot.pq-moderate {
   background: var(--primary);
-  opacity: 0.55;
+  opacity: 0.8;
+  width: 9px;
+  height: 9px;
 }
 .pq-dot.pq-weak {
   background: var(--primary);
-  opacity: 0.25;
+  opacity: 0.55;
+  width: 6px;
+  height: 6px;
 }
 .pq-dot.pq-none {
   background: var(--muted);
@@ -1673,11 +1752,61 @@ body {
   font-weight: 500;
 }
 
+/* Adjacent / migration path footnotes on recommendation cards.
+   Lower emphasis than .rec-callout: neutral surface, no accent. Hierarchy comes
+   from tint and label weight, not a colored left rule (see DESIGN.md anti-slop). */
+.rec-adjacent-note {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin: 10px 0;
+  font-size: var(--fs-body-sm);
+  line-height: 1.5;
+  color: var(--foreground);
+}
+.rec-adjacent-note a {
+  color: var(--link);
+  font-weight: 500;
+}
+/* Conditional result callouts (SharePoint tip, Toolkit path, etc.) — highest
+   emphasis advisory block: accent tint plus a heavier label. */
+.rec-callout {
+  background: var(--primary-xlight);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin: 10px 0;
+  font-size: var(--fs-body-sm);
+  line-height: 1.5;
+  color: var(--foreground);
+}
+.rec-callout > strong,
+.rec-callout > strong a {
+  font-weight: 600;
+}
+.rec-callout a {
+  color: var(--link);
+  font-weight: 500;
+}
+.exploration-card--adjacent {
+  border-style: dashed;
+}
+.delegate-tip {
+  font-size: var(--fs-body-sm);
+  color: var(--muted-foreground);
+  line-height: 1.45;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: var(--muted);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
 /* ── Platform spotlight (featured capability callout) ── */
 .rec-spotlight {
   background: var(--primary-xlight);
   border: 1px solid var(--primary-light);
-  border-left: 4px solid var(--primary);
   border-radius: var(--radius);
   padding: 16px 20px;
   margin: 16px 0 20px;
@@ -1688,7 +1817,7 @@ body {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 6px;
 }
 .rec-spotlight-name {
@@ -1708,7 +1837,7 @@ body {
 .rec-spotlight-tagline {
   font-size: var(--fs-caption);
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 8px;
 }
 .rec-spotlight-description {
@@ -1811,8 +1940,16 @@ body {
   background: transparent;
 }
 .btn-decision:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ring-focus);
+}
+
+/* Prescreen path cards already use .option-card:focus-visible; reinforce hit clarity */
+.prescreen-option:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ring-focus);
 }
 .btn-decision:disabled {
   opacity: 0.5;
@@ -1821,7 +1958,7 @@ body {
 
 .btn-decision-primary {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 .btn-decision-primary:hover:not(:disabled) {
   background: var(--primary-xlight);
