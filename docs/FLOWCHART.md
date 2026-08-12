@@ -93,4 +93,4 @@ flowchart TD
 
 ## Optional constraints (scored path only)
 
-After Q3 (last scored question), users may multi-select enterprise constraints or skip. Soft boosts apply in `rankPlatforms` before results. Entry-point and legacy fast-track paths skip this step.
+After Q3 (last scored question), users may multi-select enterprise constraints or continue without any. Soft boosts apply in `rankPlatforms` before results. Entry-point and legacy fast-track paths skip this step. A single CTA (`#constraints-continue-btn`) relabels between "None of these — continue" and "See recommendation" based on selection state; the separate skip button was removed in design review round 3 because both buttons had the same effect.

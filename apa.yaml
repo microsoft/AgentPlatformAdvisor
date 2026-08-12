@@ -11,6 +11,8 @@ meta:
   version: "1.4"
   # Shown in UI footer / results stewardship strip
   guidance_verified: "2026-08"
+  # ISO date shown as "Last updated" in the footer. Bump when content changes.
+  last_updated: "2026-08-12"
   platforms:
     - id: agent_builder
       label: Agent Builder

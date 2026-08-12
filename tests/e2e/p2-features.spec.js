@@ -2,15 +2,14 @@
 const { test, expect } = require('@playwright/test');
 
 test.describe('P2 features', () => {
-  test('welcome shows use-vs-build context and guidance version', async ({ page }) => {
+  test('welcome shows use-vs-build context and links the changelog', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#welcome-section')).toBeVisible();
     await expect(page.locator('#welcome-section')).toContainText(/Use ready-made agents|Build agents/i);
-    await expect(page.locator('#welcome-guidance-meta')).toBeVisible();
-    await expect(page.locator('#welcome-guidance-meta')).toContainText(/Guidance v/);
-    await expect(page.locator('#welcome-guidance-meta')).toContainText(/Changelog/i);
     await expect(page.locator('.footer-changelog')).toBeVisible();
-    await expect(page.locator('#footer-guidance-meta')).toContainText(/Microsoft Learn/i);
+    // The guidance version strip is deliberately shown once, on the result card,
+    // where freshness actually changes a decision — not on welcome or in the footer.
+    await expect(page.locator('.guidance-meta:visible')).toHaveCount(0);
   });
 
   test('optional constraints soft-boost Foundry for private networking', async ({ page }) => {

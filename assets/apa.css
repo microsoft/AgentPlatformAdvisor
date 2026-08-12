@@ -273,6 +273,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 44px;
   border-radius: var(--radius-sm);
   font-size: var(--fs-body-sm);
   font-weight: 500;
@@ -543,8 +544,8 @@ body {
   color: var(--link);
   font-weight: 500;
 }
-.footer-guidance-meta {
-  margin: 8px 0 4px;
+.footer-last-updated {
+  margin: 4px 0 0;
 }
 .rec-feedback {
   margin: 20px auto 8px;
@@ -772,6 +773,22 @@ body {
   border-color: var(--primary);
 }
 
+/* Multi-select (role="checkbox") cards use a square box with a checkmark so the
+   shape matches the announced role. A circle reads as "pick exactly one". */
+.option-card[role="checkbox"] .option-radio-outer {
+  border-radius: var(--radius-sm);
+}
+
+.option-card[role="checkbox"] .option-radio-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 0;
+  background: transparent;
+  border-right: 2px solid var(--primary-foreground);
+  border-bottom: 2px solid var(--primary-foreground);
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
 .option-content {
   flex: 1;
 }
@@ -957,6 +974,7 @@ body {
 }
 
 .exploration-card {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -964,11 +982,18 @@ body {
   text-align: left;
   box-shadow: var(--shadow-md);
   transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
 }
 
-.exploration-card:hover {
+.exploration-card:hover,
+.exploration-card:focus-within {
   border-color: var(--primary-light);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.exploration-card:focus-within {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 .exploration-card-label {
@@ -1005,6 +1030,25 @@ body {
   padding: 12px 0;
 }
 
+/* Stretched link: the whole card is the click target, but the anchor stays the
+   focusable element so keyboard order and screen-reader link text are unchanged. */
+.exploration-card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.exploration-card-link:focus-visible {
+  outline: none;
+}
+
+.exploration-card:hover .exploration-card-link,
+.exploration-card:focus-within .exploration-card-link {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
 .exploration-card-link:hover {
   color: var(--link-hover);
   text-decoration: underline;
@@ -1036,6 +1080,8 @@ body {
   color: var(--foreground);
 }
 .exploration-card-spotlight-name a {
+  position: relative;
+  z-index: 1;
   color: var(--foreground);
   text-decoration: none;
 }
@@ -1413,6 +1459,12 @@ body {
   color: var(--muted-foreground);
   margin-bottom: 8px;
 }
+
+/* A heading must sit closer to the section it introduces than to whatever
+   precedes it. Needed where the reasoning block follows a conditional callout. */
+.rec-section-title--spaced {
+  margin-top: 24px;
+}
 .rec-list {
   list-style: none;
   display: flex;
@@ -1741,10 +1793,12 @@ body {
   font-weight: 500;
 }
 
-/* Adjacent / migration path footnotes on recommendation cards */
+/* Adjacent / migration path footnotes on recommendation cards.
+   Lower emphasis than .rec-callout: neutral surface, no accent. Hierarchy comes
+   from tint and label weight, not a colored left rule (see DESIGN.md anti-slop). */
 .rec-adjacent-note {
   background: var(--muted);
-  border-left: 3px solid var(--border-strong, var(--border));
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 12px 16px;
   margin: 10px 0;
@@ -1756,16 +1810,21 @@ body {
   color: var(--link);
   font-weight: 500;
 }
-/* Conditional result callouts (SharePoint tip, Toolkit path, etc.) */
+/* Conditional result callouts (SharePoint tip, Toolkit path, etc.) — highest
+   emphasis advisory block: accent tint plus a heavier label. */
 .rec-callout {
   background: var(--primary-xlight);
-  border-left: 3px solid var(--primary);
+  border: 1px solid var(--primary-light);
   border-radius: var(--radius);
   padding: 12px 16px;
   margin: 10px 0;
   font-size: var(--fs-body-sm);
   line-height: 1.5;
   color: var(--foreground);
+}
+.rec-callout > strong,
+.rec-callout > strong a {
+  font-weight: 600;
 }
 .rec-callout a {
   color: var(--link);
@@ -1782,14 +1841,13 @@ body {
   padding: 10px 14px;
   background: var(--muted);
   border-radius: var(--radius);
-  border-left: 3px solid var(--primary);
+  border: 1px solid var(--border);
 }
 
 /* ── Platform spotlight (featured capability callout) ── */
 .rec-spotlight {
   background: var(--primary-xlight);
   border: 1px solid var(--primary-light);
-  border-left: 4px solid var(--primary);
   border-radius: var(--radius);
   padding: 16px 20px;
   margin: 16px 0 20px;

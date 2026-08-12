@@ -361,7 +361,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
     : '';
 
   const factorsHtml = factors.length > 0 ? `
-    <div class="rec-section-title">Why this was recommended</div>
+    <div class="rec-section-title rec-section-title--spaced">Why this was recommended</div>
     <ul class="rec-list">${factors.map(f => `<li>${f}</li>`).join('')}</ul>` : '';
 
   const resourcesHtml = rec.resources_url
@@ -452,9 +452,9 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
         : ''}
       ${calloutHtml}
+      ${factorsHtml}
       ${adjacentHtml}
       ${resourcesHtml}
-      ${factorsHtml}
       ${bestFor ? `<details class="rec-accordion"${detailsOpen}>
         <summary class="rec-accordion-trigger">
           <span class="rec-section-title">Best For</span>
@@ -528,8 +528,7 @@ async function boot() {
       throw new Error('Missing "meta.platforms"');
 
     setupListeners();
-    renderGuidanceMeta('welcome-guidance-meta');
-    renderGuidanceMeta('footer-guidance-meta');
+    renderLastUpdated();
 
     // Check for URL params (shared link) — URL params always win over sessionStorage
     const urlResult = parseURLParams();
@@ -764,7 +763,7 @@ function renderExploration() {
     <section class="exploration-section-group" aria-labelledby="exploration-related-build-paths">
       <div class="exploration-group-header">
         <h3 class="exploration-group-title" id="exploration-related-build-paths">Related build paths</h3>
-        <p class="exploration-group-description">These are adjacent options in Microsoft's build taxonomy. They are not separate scored winners in this advisor, but they matter when Agent Builder, Copilot Studio, or Foundry alone is the wrong frame.</p>
+        <p class="exploration-group-description">These are adjacent options in Microsoft's build taxonomy. They are not separate scored winners in this advisor, but they matter when Agent Builder, Copilot Studio, or Foundry alone is not the right solution.</p>
       </div>
       <div class="exploration-grid">
         ${adjacentPaths.map(renderAdjacentCard).join('')}
@@ -894,7 +893,14 @@ function renderConstraintsStep() {
     });
     list.appendChild(div);
   });
-  document.getElementById('constraints-skip-btn').textContent = cfg.skip_label || 'Skip';
+  // One CTA, labelled for what will actually happen. Two buttons with the same
+  // effect made the user weigh a choice that has no consequence.
+  const cta = document.getElementById('constraints-continue-btn');
+  if (cta) {
+    cta.innerHTML = selectedConstraints.length
+      ? 'See recommendation <span class="icon icon-chevron-right"></span>'
+      : `${cfg.skip_label || 'None of these — continue'} <span class="icon icon-chevron-right"></span>`;
+  }
 }
 
 function finishConstraintsAndRecommend() {
@@ -908,6 +914,8 @@ function skipConstraints() {
   finishConstraintsAndRecommend();
 }
 
+// Single CTA continues in both states; nothing is selected when the label
+// still reads "None of these", so no explicit clear is needed here.
 function continueFromConstraints() {
   finishConstraintsAndRecommend();
 }
@@ -1585,6 +1593,23 @@ function renderGuidanceMeta(elId) {
   el.classList.remove('hidden');
 }
 
+// Footer "Last updated" date. Parsed as UTC so the displayed day doesn't shift
+// west of Greenwich, where `new Date('2026-08-12')` would render as Aug 11.
+function renderLastUpdated() {
+  const el = document.getElementById('footer-last-updated');
+  if (!el || !apa || !apa.meta || !apa.meta.last_updated) return;
+  const raw = String(apa.meta.last_updated).trim();
+  const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return;
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  if (isNaN(d.getTime())) return;
+  const label = d.toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
+  });
+  el.innerHTML = `Last updated: <time datetime="${raw}">${label}</time>`;
+  el.classList.remove('hidden');
+}
+
 function resetFeedbackUI() {
   feedbackSubmitted = false;
   const wrap = document.getElementById('rec-feedback');
@@ -1608,16 +1633,21 @@ function submitFeedback(helpful) {
   }
   const q = document.getElementById('feedback-question');
   const thanks = document.getElementById('feedback-thanks');
+  // Activating the button removes it, which drops focus to <body>. Move focus to
+  // the confirmation only for keyboard users, so a mouse click isn't hijacked.
+  const fromKeyboard = !!(q && document.activeElement && q.contains(document.activeElement)
+    && typeof document.activeElement.matches === 'function'
+    && document.activeElement.matches(':focus-visible'));
   if (q) q.classList.add('hidden');
   if (thanks) {
-    if (helpful) {
-      thanks.innerHTML = 'Thanks — glad it helped.';
-    } else {
-      const issueUrl = buildFeedbackIssueURL();
-      thanks.innerHTML =
-        `Thanks for the signal. <a href="${issueUrl}" target="_blank" rel="noopener noreferrer">Open a GitHub issue</a> with this scenario if something looked wrong.`;
-    }
+    const message = helpful
+      ? 'Thanks — glad it helped.'
+      : `Thanks for the signal. <a href="${buildFeedbackIssueURL()}" target="_blank" rel="noopener noreferrer">Open a GitHub issue</a> with this scenario if something looked wrong.`;
+    // Unhide (and take focus) before writing the text: a live region only
+    // announces changes made while it is already in the accessibility tree.
     thanks.classList.remove('hidden');
+    if (fromKeyboard) thanks.focus();
+    thanks.innerHTML = message;
   }
 }
 
@@ -1710,7 +1740,22 @@ function downloadRecommendationMarkdown() {
     URL.revokeObjectURL(a.href);
     a.remove();
   }, 0);
+  confirmExportDownload();
   if (typeof clarity === 'function') clarity('set', 'export_md', 'true');
+}
+
+// Browser download chrome is unreliable (hidden shelves, mobile share sheets),
+// so confirm the export on the control the user actually pressed.
+function confirmExportDownload() {
+  const btn = document.getElementById('export-md-btn');
+  if (!btn || btn.dataset.confirming === 'true') return;
+  const original = btn.textContent;
+  btn.dataset.confirming = 'true';
+  btn.textContent = 'Downloaded ✓';
+  setTimeout(() => {
+    btn.textContent = original;
+    delete btn.dataset.confirming;
+  }, 2000);
 }
 
 // === SHARE & DOWNLOAD ===

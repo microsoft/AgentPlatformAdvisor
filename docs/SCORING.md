@@ -285,7 +285,9 @@ Legacy share params unchanged: `ft=1`, `dt=copilot_chat`, `q*`, `dt`, `st`, `r`,
 
 ## Guidance version (P2.2)
 
-`meta.version` and `meta.guidance_verified` (YYYY-MM) render on welcome, results, and footer with a Changelog link.
+`meta.version` and `meta.guidance_verified` (YYYY-MM) render once, on the recommendation card, where freshness can change a decision. The footer carries the Changelog link. (Design review round 3 removed the duplicate welcome and footer strips — the last two rendered within one viewport of each other on the result page.)
+
+`meta.last_updated` (YYYY-MM-DD) is separate and renders in the footer, below the Created by credit: `guidance_verified` answers "when was this checked against Microsoft Learn," `last_updated` answers "when did this site last change." Bump it whenever content changes.
 
 ## Runtime / orchestrator signal (no Q6)
 

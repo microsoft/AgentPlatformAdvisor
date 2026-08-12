@@ -33,7 +33,7 @@ async function answerWizard(page, answers) {
   }
   // Optional constraints step before results
   await expect(page.locator('#constraints-section')).toBeVisible();
-  await page.locator('#constraints-skip-btn').click();
+  await page.locator('#constraints-continue-btn').click();
   await expect(page.locator('#recommendation-section')).toBeVisible();
 }
 
@@ -161,7 +161,12 @@ test.describe('Golden paths — entry point', () => {
     await page.goto('/');
     await page.locator('#start-btn').click();
     await page.locator('#prescreen-delegate').click();
-    await expect(page.locator('#involvement-tip')).toContainText(/Copilot Chat/i);
+    // Chat is a surface of Microsoft 365 Copilot, not a sibling destination, so the
+    // tip must name the parent product — an unqualified "Copilot Chat" here reads as
+    // a fourth entry point (and collides with the separate M365 Copilot Chat SKU).
+    await expect(page.locator('#involvement-tip')).toContainText(/Microsoft 365 Copilot chat/i);
     await expect(page.locator('#involvement-tip')).toContainText(/Cowork/i);
+    // The handoff goes to Cowork unfinished; "finished" describes what comes back.
+    await expect(page.locator('#involvement-tip')).toContainText(/hand off the whole multi-step job/i);
   });
 });

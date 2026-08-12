@@ -139,12 +139,11 @@
       Agent Platform Advisor
     </h1>
     <p class="welcome-description">
-      Use ready-made agents to get work done, or build a custom agent — answer a few questions and we'll recommend the best Microsoft path for your scenario.
+      Answer a few questions about what you want from agents, and we'll recommend the best Microsoft platform for your agent needs.
     </p>
     <p class="platform-preview-intro">
-      Two lanes: <strong>Use agents</strong> (Microsoft 365 Copilot, Cowork, Scout) and <strong>Build agents</strong> (Agent Builder, Copilot Studio, Foundry). Select <strong>Get Started</strong> to choose a lane and find your fit.
+      Here's what the advisor chooses between — select Get Started below to find your fit.
     </p>
-    <p id="welcome-guidance-meta" class="guidance-meta hidden" aria-label="Guidance version"></p>
     <div class="delegate-group">
       <div class="delegate-group-label">Use agents</div>
       <div class="platform-grid platform-grid--delegate">
@@ -153,21 +152,21 @@
             <img src="images/m365-copilot-logo.png" alt="Microsoft 365 Copilot" class="platform-preview-img">
           </div>
           <h3 class="platform-preview-title">Microsoft 365 Copilot</h3>
-          <p class="platform-preview-desc">Chat, Search, app-native help, and built-in agents / Agent Store — not chat only</p>
+          <p class="platform-preview-desc">Get answers, draft content, and surface insights with AI chat and built-in agents</p>
         </div>
         <div class="platform-preview">
           <div class="platform-preview-icon">
             <img src="images/cowork.png" alt="Cowork" class="platform-preview-img">
           </div>
           <h3 class="platform-preview-title">Cowork</h3>
-          <p class="platform-preview-desc">Delegate multi-step Microsoft 365 work — including schedules, event triggers, and approvals</p>
+          <p class="platform-preview-desc">Delegate multi-step Microsoft 365 work, including schedules, event triggers, and approvals</p>
         </div>
         <div class="platform-preview">
           <div class="platform-preview-icon">
             <img src="images/scout.svg" alt="Scout" class="platform-preview-img">
           </div>
           <h3 class="platform-preview-title">Scout</h3>
-          <p class="platform-preview-desc">Always-on personal Autopilot across desktop, browser, local files, and Microsoft 365 (Frontier preview)</p>
+          <p class="platform-preview-desc">Leverage your always-on personal Autopilot across desktop, browser, local files, and Microsoft 365</p>
         </div>
       </div>
     </div>
@@ -178,21 +177,21 @@
           <img src="images/copilot.png" alt="Agent Builder" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Agent Builder</h3>
-        <p class="platform-preview-desc">No-code declarative agents inside Microsoft 365 Copilot — knowledge helpers, not actions or workflows</p>
+        <p class="platform-preview-desc">Build declarative agents inside Microsoft 365 Copilot using natural language</p>
       </div>
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/copilot-studio.png" alt="Copilot Studio" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Copilot Studio</h3>
-        <p class="platform-preview-desc">Governed low-code agents with actions, triggers, connectors, evaluation, and multi-channel publish</p>
+        <p class="platform-preview-desc">Create custom agents with natural language or a graphical interface</p>
       </div>
       <div class="platform-preview">
         <div class="platform-preview-icon">
           <img src="images/foundry.svg" alt="Microsoft Foundry" class="platform-preview-img">
         </div>
         <h3 class="platform-preview-title">Microsoft Foundry</h3>
-        <p class="platform-preview-desc">Pro-code managed runtime for custom engines, models, retrieval, and Azure-scale controls</p>
+        <p class="platform-preview-desc">Develop agents on a pro-code platform with full control over engines, models, and Azure-scale infrastructure</p>
       </div>
     </div>
     <button class="btn btn-primary btn-lg" id="start-btn">
@@ -272,7 +271,7 @@
         </div>
       </div>
       <p class="delegate-tip" id="involvement-tip">
-        Tip: many people start hands-on in Copilot Chat, then hand the finished multi-step job to Cowork when they want a deliverable run for them.
+        Tip: a common pattern is to stay hands-on in Microsoft 365 Copilot chat for drafting and Q&amp;A, then hand off the whole multi-step job to Cowork when you'd rather come back to a finished deliverable.
       </p>
     </div>
     <div id="interactive-followup" class="delegate-followup" aria-hidden="true">
@@ -323,7 +322,7 @@
           <div class="option-content"><div class="option-label">Inside Microsoft 365 — email, meetings, files, Teams</div></div>
         </div>
         <div class="option-card delegate-option" data-group="reach" data-value="cross" role="button" tabindex="0" onclick="selectDelegateOption(this,'reach','cross')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'reach','cross')}">
-          <div class="option-content"><div class="option-label">Also my desktop, browser, local files, and command line</div></div>
+          <div class="option-content"><div class="option-label">Microsoft 356 plus my desktop, browser, local files, and command line</div></div>
         </div>
         <div class="option-card delegate-option" data-group="reach" data-value="unsure" role="button" tabindex="0" onclick="selectDelegateOption(this,'reach','unsure')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDelegateOption(this,'reach','unsure')}">
           <div class="option-content"><div class="option-label">Not sure yet</div></div>
@@ -377,9 +376,6 @@
       <button class="btn btn-ghost" type="button" onclick="backFromConstraints()">
         <span class="icon icon-chevron-left"></span> Back
       </button>
-      <button class="btn btn-ghost" type="button" id="constraints-skip-btn" onclick="skipConstraints()">
-        None of these — continue
-      </button>
       <button class="btn btn-primary" type="button" id="constraints-continue-btn" onclick="continueFromConstraints()">
         See recommendation <span class="icon icon-chevron-right"></span>
       </button>
@@ -429,7 +425,7 @@
               <button type="button" class="btn btn-ghost btn-feedback" onclick="submitFeedback(true)">Yes</button>
               <button type="button" class="btn btn-ghost btn-feedback" onclick="submitFeedback(false)">No</button>
             </div>
-            <p id="feedback-thanks" class="feedback-thanks hidden"></p>
+            <p id="feedback-thanks" class="feedback-thanks hidden" role="status" tabindex="-1"></p>
           </div>
           <div class="center rec-actions">
             <button class="btn btn-secondary" type="button" id="export-md-btn" onclick="downloadRecommendationMarkdown()">
@@ -446,7 +442,7 @@
     <div class="footer">
       Created by
       <a href="https://www.linkedin.com/in/rstandefer/">Robert Standefer</a>
-      <p id="footer-guidance-meta" class="guidance-meta footer-guidance-meta hidden" aria-label="Guidance version"></p>
+      <p class="footer-last-updated hidden" id="footer-last-updated"></p>
       <div class="footer-doc-links" aria-label="Project documentation">
         <a class="footer-changelog" href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
         <a href="https://github.com/microsoft/AgentPlatformAdvisor/blob/main/README.md" target="_blank" rel="noopener">README</a>
