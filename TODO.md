@@ -394,6 +394,7 @@ From `.github/improvements.md` and productization notes:
 - [ ] **P3.4** Admin/IT persona path (“I govern agents others build”) — separate wizard branch
 - [ ] **P3.5** Revisit AB action hard-zero if Microsoft ships Actions inside Agent Builder UI (re-verify Learn; today Actions → CS)
 - [ ] **P3.6** Full 1,920-combo snapshot job in CI — expensive; golden paths (P1.7) preferred
+- [ ] **P3.7** Drift guard for `meta.last_updated` — the footer date is hand-maintained, so editing content without bumping it silently misstates freshness. Add a CI check (or a `scripts/` step) that fails when `apa.yaml`/`index.html` content changes in a commit that leaves `meta.last_updated` untouched. Raised by the maintainability specialist during `/ship` of v3; deferred as non-blocking.
 
 ---
 
