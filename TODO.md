@@ -357,7 +357,7 @@ Add automated or documented fixtures for expected primaries:
 
 ### P2.5 — Stakeholder export / durable result
 
-From `.github/improvements.md` and productization notes:
+From productization notes (originally `.github/improvements.md`, removed once every item below shipped):
 
 - [x] Print-friendly or PDF/markdown export of recommendation + key factors + score comparison
 - [x] Ensure share URL remains canonical machine-readable form
