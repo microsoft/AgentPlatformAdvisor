@@ -39,8 +39,10 @@ The custom agent assessment asks about:
 - Who is building the agent: business user, low-code maker, professional developer, or data scientist/AI engineer
 - Who will use it: small internal team, broad internal audience, external users, or undecided
 - Where users will interact with it: Microsoft 365 Copilot chat, custom app, background/event-triggered runtime, or multiple places
-- What the agent should do: Q&A, multi-turn conversation, content/data analysis, multi-step action workflows, low-code multi-agent / business orchestration, or code-first multi-agent / custom runtime
+- What the agent should do: Q&A, multi-turn conversation, content/data analysis, multi-step action workflows, or complex multi-agent / long-running orchestration
 - What information it needs: Microsoft 365 content, connector-backed systems, Dataverse/custom APIs, public web/uploaded files, or custom retrieval architecture
+
+When Copilot Studio and Foundry are the top two viable results within 2 points, the wizard asks one final, non-scored distinction: whether Microsoft should operate the managed runtime or engineering must own the code runtime, framework, endpoints, networking, identity, memory, or retrieval architecture.
 
 After completing a path, users get:
 
@@ -89,6 +91,7 @@ There are two recommendation modes:
 2. **Custom agent assessment** is scored across Agent Builder, Copilot Studio, and Foundry:
    - Hard rules zero out platforms for disqualifying combinations before scoring.
    - Raw scores sum across 5 questions, with a maximum of 15 points per platform.
+   - A conditional runtime-ownership question appears only when Copilot Studio and Foundry are the top two viable platforms within 2 points. Managed runtime prefers Copilot Studio without changing scores; engineering-owned runtime disqualifies Agent Builder and Copilot Studio.
    - Persona preferences and tiebreakers adjust ranking when scores are tied or misleading for the selected builder persona.
    - Thresholds map scores to fit labels: Strong fit (12-15), Good fit (8-11), Partial fit (4-7), Not recommended (0-3).
 
@@ -109,8 +112,9 @@ The advisor reflects the current split between Microsoft agent options:
 Share links encode the recommendation path:
 
 - Wizard results include selected answers, the recommended platform, and the recommendation date.
+- Conditional runtime answers are encoded as `q9=q9a|q9d` only when the distinction was asked. Older links without `q9` remain valid.
 - Entry-point results include `dt=m365_copilot`, `dt=cowork`, `dt=scout`, or `dt=both`, plus `st=chat` or `st=agents` for the Microsoft 365 Copilot starting surface.
-- Older links keep working: `ft=1` and `dt=copilot_chat` both resolve to the Microsoft 365 Copilot card.
+- Older links keep working: `ft=1` and `dt=copilot_chat` resolve to Microsoft 365 Copilot; legacy `q9b`/`q9c` normalize to managed runtime; temporary `q4f` links resolve to complex orchestration plus engineering ownership.
 - Recipients can view the recommendation directly or retake the assessment with answers pre-filled.
 
 When `apa.yaml` changes after a link is shared, the app can show a temporal-change banner if the recommendation changed. If the question schema changes, a schema drift note explains that the criteria have been updated.
@@ -125,7 +129,7 @@ npm test              # headless
 npm run test:headed   # with browser visible
 ```
 
-There are 98 Playwright tests across 16 spec files (including P2 constraints/export/feedback, share-link integrity, temporal-banner XSS, and social/SEO metadata), plus a scored golden-path script (`scripts/golden_paths.py`, which needs `PyYAML` — install with `python3 -m pip install -r requirements.txt`). `npm test` runs the golden script first, then Playwright. Coverage includes wizard completion, optional governance constraints, shared links, temporal change, legacy fast-track, entry-point routing, share buttons, G01–G12 golden paths, share-link parameter validation, temporal-banner injection guards, social/SEO metadata, and export/feedback. Single file: `npx playwright test tests/e2e/p2-features.spec.js`.
+The suite includes Playwright coverage across 16 spec files plus a scored golden-path script (`scripts/golden_paths.py`, which needs `PyYAML` — install with `python3 -m pip install -r requirements.txt`). `npm test` runs the golden script first, then Playwright. Coverage includes conditional runtime ownership, shared-link compatibility, temporal change, legacy fast-track, entry-point routing, share buttons, G01–G12 golden paths, share-link parameter validation, temporal-banner injection guards, social/SEO metadata, and export/feedback. Single file: `npx playwright test tests/e2e/p2-features.spec.js`.
 
 ## Contributing
 

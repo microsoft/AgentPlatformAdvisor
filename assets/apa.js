@@ -1,8 +1,6 @@
 // === STATE ===
 let apa = null; // populated from YAML
 let answers = {}; // { q1: 'q1a', q2: 'q2b', ... }
-// Optional multi-select governance constraint ids (soft boosts only), e.g. ['c_private_net']
-let selectedConstraints = [];
 let fastTrack = false;
 let delegateResult = null; // 'm365_copilot' | 'cowork' | 'scout' | 'both' — set on the entry-point path
 let delegateStart = null;  // 'chat' | 'agents' — which surface inside Microsoft 365 Copilot to start with
@@ -14,11 +12,12 @@ let isURLLoaded = false; // true when loaded from shared URL params
 let originalPlatformId = null; // from &r= URL param for temporal comparison
 let originalDate = null; // from &d= URL param
 let feedbackSubmitted = false;
+let runtimeTieBreakerActive = false;
 
 // === UTILITIES ===
 function showSection(id) {
   ['loading-section','error-section','welcome-section','prescreen-section',
-   'delegate-section','exploration-section','assessment-section','constraints-section',
+   'delegate-section','exploration-section','assessment-section',
    'recommendation-section'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.toggle('hidden', s !== id);
@@ -27,8 +26,8 @@ function showSection(id) {
 }
 
 // === HISTORY NAVIGATION ===
-function pushState(section, questionIndex) {
-  const state = { section, questionIndex: questionIndex ?? null };
+function pushState(section, questionIndex, runtimeTieBreaker = false) {
+  const state = { section, questionIndex: questionIndex ?? null, runtimeTieBreaker };
   history.pushState(state, '', '');
 }
 
@@ -39,10 +38,12 @@ window.addEventListener('popstate', (e) => {
     return;
   }
   if (state.section === 'assessment-section' && state.questionIndex != null) {
-    currentQuestionIndex = state.questionIndex;
-    renderQuestion();
-  } else if (state.section === 'constraints-section') {
-    renderConstraintsStep();
+    if (state.runtimeTieBreaker) {
+      renderRuntimeTieBreaker();
+    } else {
+      currentQuestionIndex = state.questionIndex;
+      renderQuestion();
+    }
   } else if (state.section === 'recommendation-section') {
     renderRecommendation();
   } else if (state.section === 'exploration-section') {
@@ -60,7 +61,6 @@ function updateProgressBar(sectionId) {
     'prescreen-section': 0,
     'delegate-section': 1,
     'assessment-section': 1,
-    'constraints-section': 1,
     'recommendation-section': 2,
   }[sectionId] ?? 0;
 
@@ -132,39 +132,6 @@ function sumRawScores(answersMap, questions, zeroed) {
   return totals;
 }
 
-// Soft boosts from optional governance constraints (never hard-zero).
-// constraintIds defaults to session selectedConstraints.
-function applyConstraintBoosts(totals, zeroed, constraintIds) {
-  const ids = constraintIds || selectedConstraints || [];
-  const opts = (apa.optional_constraints && apa.optional_constraints.options) || [];
-  const byId = Object.fromEntries(opts.map(o => [o.id, o]));
-  const cap = apa.scoring.constraint_boost_cap ?? 2;
-  const boosts = Object.fromEntries(Object.keys(totals).map(k => [k, 0]));
-
-  ids.forEach(cid => {
-    const opt = byId[cid];
-    if (!opt || !opt.boosts) return;
-    Object.entries(opt.boosts).forEach(([pid, amt]) => {
-      if (zeroed[pid]) return;
-      if (boosts[pid] == null) boosts[pid] = 0;
-      boosts[pid] += amt;
-    });
-  });
-
-  Object.keys(totals).forEach(pid => {
-    const b = Math.min(boosts[pid] || 0, cap);
-    totals[pid] += b;
-  });
-  return boosts;
-}
-
-function getConstraintLabels(constraintIds) {
-  const ids = constraintIds || selectedConstraints || [];
-  const opts = (apa.optional_constraints && apa.optional_constraints.options) || [];
-  const byId = Object.fromEntries(opts.map(o => [o.id, o]));
-  return ids.map(id => byId[id]?.label).filter(Boolean);
-}
-
 function getThresholdLabel(score, thresholds) {
   const rounded = Math.round(score);
   const t = thresholds.find(t => rounded >= t.min && rounded <= t.max);
@@ -172,11 +139,10 @@ function getThresholdLabel(score, thresholds) {
 }
 
 // Returns platforms sorted by final score descending: [{id, score, label}, ...]
-function rankPlatforms(answersMap, constraintIds) {
+function rankPlatforms(answersMap) {
   const zeroed = getZeroedPlatforms(answersMap);
   const questions = apa.questions.filter(q => answersMap[q.id]); // only answered
   const final = sumRawScores(answersMap, questions, zeroed);
-  applyConstraintBoosts(final, zeroed, constraintIds);
 
   const tiebreakers = apa.scoring.tie_handling.tiebreakers || [];
 
@@ -251,14 +217,6 @@ function getKeyFactors(platformId, answersMap) {
       ([qId, optId]) => answersMap[qId] === optId
     );
     if (match) factors.push(`💡 ${pref.rationale.trim()}`);
-  });
-
-  // 0b. Governance constraint soft boosts that helped this platform
-  const cOpts = (apa.optional_constraints && apa.optional_constraints.options) || [];
-  selectedConstraints.forEach(cid => {
-    const opt = cOpts.find(o => o.id === cid);
-    const amt = opt && opt.boosts ? opt.boosts[platformId] : 0;
-    if (amt) factors.push(`🔒 Constraint soft boost (+${amt}): ${opt.label}`);
   });
 
   // 1. All hard rules that zeroed this platform
@@ -363,7 +321,37 @@ function badgeClass(label) {
   return 'badge-not';
 }
 
+function normalizeRuntimeOptionId(optionId) {
+  const runtime = apa.runtime_tiebreaker;
+  if (!runtime || !optionId) return null;
+  if ((runtime.legacy_managed_option_ids || []).includes(optionId)) return 'q9a';
+  return runtime.options.some(option => option.id === optionId) ? optionId : null;
+}
+
+function shouldAskRuntimeTieBreaker(answersMap) {
+  const runtime = apa.runtime_tiebreaker;
+  if (!runtime) return false;
+
+  const baseAnswers = { ...answersMap };
+  delete baseAnswers[runtime.id];
+  const zeroed = getZeroedPlatforms(baseAnswers);
+  const ranked = rankPlatforms(baseAnswers);
+  const [firstId, secondId] = runtime.compare;
+  const first = ranked.find(platform => platform.id === firstId);
+  const second = ranked.find(platform => platform.id === secondId);
+  const topTwoIds = new Set(ranked.slice(0, 2).map(platform => platform.id));
+
+  return !!(
+    first && second &&
+    topTwoIds.has(firstId) && topTwoIds.has(secondId) &&
+    !zeroed[firstId] && !zeroed[secondId] &&
+    first.score > 0 && second.score > 0 &&
+    Math.abs(first.score - second.score) <= runtime.threshold_points
+  );
+}
+
 function resolveCopilotStudioHarness(answersMap) {
+  if (answersMap.q9 === 'q9d') return null;
   if (answersMap.q4 === 'q4d' || answersMap.q4 === 'q4e') return 'github_copilot';
   if (answersMap.q2 === 'q2c' || answersMap.q4 === 'q4c') return 'workflow';
   if (answersMap.q2 === 'q2a' && answersMap.q4 === 'q4a') return 'copilot_chat';
@@ -541,14 +529,27 @@ function restoreAnswersFromStorage() {
     const stored = sessionStorage.getItem('apa-answers');
     if (!stored) return null;
     const parsed = JSON.parse(stored);
+    const normalized = {};
     // Schema drift check: validate every key/value against current YAML
     const validQuestionIds = new Set(apa.questions.map(q => q.id));
     for (const [qId, optId] of Object.entries(parsed)) {
+      if (qId === apa.runtime_tiebreaker?.id) {
+        const normalizedRuntime = normalizeRuntimeOptionId(optId);
+        if (!normalizedRuntime) { clearAnswersFromStorage(); return null; }
+        normalized[qId] = normalizedRuntime;
+        continue;
+      }
+      if (qId === 'q4' && optId === 'q4f') {
+        normalized.q4 = 'q4d';
+        normalized[apa.runtime_tiebreaker.id] = 'q9d';
+        continue;
+      }
       if (!validQuestionIds.has(qId)) { clearAnswersFromStorage(); return null; }
       const question = apa.questions.find(q => q.id === qId);
       if (!question.options.some(o => o.id === optId)) { clearAnswersFromStorage(); return null; }
+      normalized[qId] = optId;
     }
-    return parsed;
+    return normalized;
   } catch (e) { return null; }
 }
 
@@ -597,10 +598,22 @@ async function boot() {
       const restored = restoreAnswersFromStorage();
       if (restored && Object.keys(restored).length > 0) {
         answers = restored;
-        currentQuestionIndex = Math.min(Object.keys(restored).length, apa.questions.length - 1);
-        renderQuestion();
+        const answeredCore = apa.questions.filter(question => answers[question.id]).length;
+        currentQuestionIndex = Math.min(answeredCore, apa.questions.length - 1);
+        const resumeRuntimeTieBreaker =
+          answeredCore === apa.questions.length &&
+          shouldAskRuntimeTieBreaker(answers);
+        if (resumeRuntimeTieBreaker) {
+          renderRuntimeTieBreaker();
+        } else {
+          renderQuestion();
+        }
         showSection('assessment-section');
-        history.replaceState({ section: 'assessment-section', questionIndex: currentQuestionIndex }, '', '');
+        history.replaceState({
+          section: 'assessment-section',
+          questionIndex: currentQuestionIndex,
+          runtimeTieBreaker: resumeRuntimeTieBreaker,
+        }, '', '');
       } else {
         showSection('welcome-section');
         history.replaceState({ section: 'welcome-section' }, '', '');
@@ -632,6 +645,7 @@ function setupListeners() {
 function handlePrescreenNo() {
   fastTrack = false;
   delegateResult = null;
+  runtimeTieBreakerActive = false;
   if (Object.keys(answers).length === 0) {
     currentQuestionIndex = 0;
   }
@@ -811,6 +825,7 @@ function renderExploration() {
 }
 
 function renderQuestion() {
+  runtimeTieBreakerActive = false;
   const question = apa.questions[currentQuestionIndex];
   const total = apa.questions.length;
 
@@ -856,20 +871,84 @@ function renderQuestion() {
   document.getElementById('prev-btn').disabled = false;
 }
 
+function renderRuntimeTieBreaker() {
+  const runtime = apa.runtime_tiebreaker;
+  if (!runtime) return;
+  runtimeTieBreakerActive = true;
+
+  document.getElementById('question-counter').textContent = 'One final distinction';
+  document.getElementById('question-title').textContent = runtime.label;
+  document.getElementById('question-subtitle').textContent = runtime.prompt;
+
+  const optionsList = document.getElementById('options-list');
+  optionsList.innerHTML = '';
+  runtime.options.forEach(option => {
+    const isSelected = answers[runtime.id] === option.id;
+    const div = document.createElement('div');
+    div.className = 'option-card' + (isSelected ? ' selected' : '');
+    div.setAttribute('role', 'button');
+    div.setAttribute('tabindex', '0');
+    div.setAttribute('aria-pressed', String(isSelected));
+    div.innerHTML = `
+      <div class="option-radio-indicator" aria-hidden="true">
+        <div class="option-radio-outer">${isSelected ? '<div class="option-radio-inner"></div>' : ''}</div>
+      </div>
+      <div class="option-content">
+        <div class="option-label">${option.label}</div>
+      </div>`;
+    const select = () => {
+      answers[runtime.id] = option.id;
+      saveAnswersToStorage();
+      renderRuntimeTieBreaker();
+    };
+    div.addEventListener('click', select);
+    div.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        select();
+      }
+    });
+    optionsList.appendChild(div);
+  });
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = !answers[runtime.id];
+  nextBtn.textContent = 'Get Recommendation ▶';
+  document.getElementById('prev-btn').disabled = false;
+}
+
 function handleNext() {
+  if (runtimeTieBreakerActive) {
+    renderRecommendation();
+    showSection('recommendation-section');
+    pushState('recommendation-section');
+    return;
+  }
   if (currentQuestionIndex < apa.questions.length - 1) {
     currentQuestionIndex++;
     renderQuestion();
     pushState('assessment-section', currentQuestionIndex);
   } else {
-    // Optional governance constraints step (skippable) before results
-    renderConstraintsStep();
-    showSection('constraints-section');
-    pushState('constraints-section');
+    if (!answers[apa.runtime_tiebreaker?.id] && shouldAskRuntimeTieBreaker(answers)) {
+      renderRuntimeTieBreaker();
+      pushState('assessment-section', currentQuestionIndex, true);
+    } else {
+      renderRecommendation();
+      showSection('recommendation-section');
+      pushState('recommendation-section');
+    }
   }
 }
 
 function handlePrev() {
+  if (runtimeTieBreakerActive) {
+    delete answers[apa.runtime_tiebreaker?.id];
+    saveAnswersToStorage();
+    currentQuestionIndex = apa.questions.length - 1;
+    renderQuestion();
+    pushState('assessment-section', currentQuestionIndex);
+    return;
+  }
   if (currentQuestionIndex > 0) {
     currentQuestionIndex--;
     renderQuestion();
@@ -878,75 +957,6 @@ function handlePrev() {
     showSection('prescreen-section');
     pushState('prescreen-section');
   }
-}
-
-// === OPTIONAL GOVERNANCE CONSTRAINTS ===
-function renderConstraintsStep() {
-  const cfg = apa.optional_constraints;
-  if (!cfg) {
-    finishConstraintsAndRecommend();
-    return;
-  }
-  document.getElementById('constraints-title').textContent = cfg.label;
-  document.getElementById('constraints-subtitle').textContent = cfg.prompt || '';
-  const list = document.getElementById('constraints-list');
-  list.innerHTML = '';
-  cfg.options.forEach(opt => {
-    const selected = selectedConstraints.includes(opt.id);
-    const div = document.createElement('div');
-    div.className = 'option-card' + (selected ? ' selected' : '');
-    div.dataset.constraintId = opt.id;
-    div.setAttribute('role', 'checkbox');
-    div.setAttribute('tabindex', '0');
-    div.setAttribute('aria-checked', String(selected));
-    div.innerHTML = `
-      <div class="option-radio-indicator" aria-hidden="true">
-        <div class="option-radio-outer">${selected ? '<div class="option-radio-inner"></div>' : ''}</div>
-      </div>
-      <div class="option-content">
-        <div class="option-label">${opt.label}</div>
-      </div>`;
-    const toggle = () => {
-      if (selectedConstraints.includes(opt.id)) {
-        selectedConstraints = selectedConstraints.filter(id => id !== opt.id);
-      } else {
-        selectedConstraints = [...selectedConstraints, opt.id];
-      }
-      renderConstraintsStep();
-    };
-    div.addEventListener('click', toggle);
-    div.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-    });
-    list.appendChild(div);
-  });
-  // One CTA, labelled for what will actually happen. Two buttons with the same
-  // effect made the user weigh a choice that has no consequence.
-  const cta = document.getElementById('constraints-continue-btn');
-  if (cta) {
-    cta.innerHTML = selectedConstraints.length
-      ? 'See recommendation <span class="icon icon-chevron-right"></span>'
-      : `${cfg.skip_label || 'None of these — continue'} <span class="icon icon-chevron-right"></span>`;
-  }
-}
-
-function finishConstraintsAndRecommend() {
-  renderRecommendation();
-  showSection('recommendation-section');
-  pushState('recommendation-section');
-}
-
-// Single CTA continues in both states; nothing is selected when the label
-// still reads "None of these", so no explicit clear is needed here.
-function continueFromConstraints() {
-  finishConstraintsAndRecommend();
-}
-
-function backFromConstraints() {
-  currentQuestionIndex = apa.questions.length - 1;
-  renderQuestion();
-  showSection('assessment-section');
-  pushState('assessment-section', currentQuestionIndex);
 }
 
 // === SCORE COMPARISON ===
@@ -1080,7 +1090,7 @@ function buildPerQuestionGrid(answersMap) {
 }
 
 function buildScoreComparison(ranked, answersMap) {
-  const maxScore = (apa.scoring.raw_score_max || 15) + (apa.scoring.constraint_boost_cap || 0);
+  const maxScore = apa.scoring.raw_score_max || 15;
   const zeroed = getZeroedPlatforms(answersMap);
 
   const rows = apa.meta.platforms
@@ -1342,7 +1352,7 @@ function updateTabTitle() {
 
 function restart() {
   answers = {};
-  selectedConstraints = [];
+  runtimeTieBreakerActive = false;
   feedbackSubmitted = false;
   fastTrack = false;
   delegateResult = null;
@@ -1368,7 +1378,7 @@ function startFullAssessment() {
   delegateResult = null;
   delegateStart = null;
   answers = {};
-  selectedConstraints = [];
+  runtimeTieBreakerActive = false;
   feedbackSubmitted = false;
   currentQuestionIndex = 0;
   renderQuestion();
@@ -1410,7 +1420,6 @@ function parseURLParams() {
   if (params.get('ft') === '1') {
     fastTrack = true;
     answers = {};
-    selectedConstraints = [];
     return { mode: 'card' };
   }
 
@@ -1423,22 +1432,17 @@ function parseURLParams() {
     apa.questions.map(q => [q.id, new Set(q.options.map(o => o.id))])
   );
 
-  // Optional governance constraints: c=c_private_net,c_alm
-  const validConstraintIds = new Set(
-    ((apa.optional_constraints && apa.optional_constraints.options) || []).map(o => o.id)
-  );
-  const cParam = params.get('c');
-  if (cParam) {
-    selectedConstraints = cParam.split(',').map(s => s.trim()).filter(id => validConstraintIds.has(id));
-  } else {
-    selectedConstraints = [];
-  }
-
   let hasValidAnswer = false;
   let hasDrift = false;
 
   validOptionIdsByQuestion.forEach((validForQuestion, qId) => {
     const value = params.get(qId);
+    if (qId === 'q4' && value === 'q4f') {
+      answers.q4 = 'q4d';
+      answers[apa.runtime_tiebreaker.id] = 'q9d';
+      hasValidAnswer = true;
+      return;
+    }
     if (value && validForQuestion.has(value)) {
       answers[qId] = value;
       hasValidAnswer = true;
@@ -1448,6 +1452,17 @@ function parseURLParams() {
       hasDrift = true;
     }
   });
+
+  const runtimeId = apa.runtime_tiebreaker?.id;
+  const runtimeValue = runtimeId ? params.get(runtimeId) : null;
+  if (runtimeValue) {
+    const normalizedRuntime = normalizeRuntimeOptionId(runtimeValue);
+    if (normalizedRuntime) {
+      answers[runtimeId] = normalizedRuntime;
+    } else {
+      hasDrift = true;
+    }
+  }
 
   // Check for questions in YAML not present in URL
   apa.questions.forEach(q => {
@@ -1477,9 +1492,8 @@ function buildShareableURL() {
     apa.questions.forEach(q => {
       if (answers[q.id]) params.set(q.id, answers[q.id]);
     });
-    if (selectedConstraints.length) {
-      params.set('c', selectedConstraints.join(','));
-    }
+    const runtimeId = apa.runtime_tiebreaker?.id;
+    if (runtimeId && answers[runtimeId]) params.set(runtimeId, answers[runtimeId]);
   }
 
   params.set('r', recommendedPlatformId || '');
@@ -1726,9 +1740,6 @@ function buildFeedbackIssueURL() {
     if (delegateStart) lines.push(`- Start surface: ${delegateStart}`);
   } else {
     Object.entries(answers).forEach(([k, v]) => lines.push(`- ${k}: ${v}`));
-    if (selectedConstraints.length) {
-      lines.push(`- Constraints: ${selectedConstraints.join(', ')}`);
-    }
   }
   lines.push('', '### What was wrong?', '', '(please describe)', '', `Share URL: ${buildShareableURL()}`);
   const body = encodeURIComponent(lines.join('\n'));
@@ -1769,12 +1780,6 @@ function downloadRecommendationMarkdown() {
       factors.forEach(f => lines.push(`- ${stripHtmlTags(f)}`));
       lines.push('');
     }
-  }
-
-  if (selectedConstraints.length) {
-    lines.push('### Enterprise constraints selected', '');
-    getConstraintLabels().forEach(l => lines.push(`- ${l}`));
-    lines.push('');
   }
 
   if (rec?.best_for?.length) {

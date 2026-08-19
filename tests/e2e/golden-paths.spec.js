@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const QUESTION_ORDER = ['q1', 'q8', 'q2', 'q4', 'q3'];
 
 /** Click option by data-value / option id rendered as data-option-id if present, else by index. */
-async function answerWizard(page, answers) {
+async function answerWizard(page, answers, runtimeAnswer = 'q9a') {
   await page.goto('/');
   await expect(page.locator('#welcome-section')).toBeVisible();
   await page.locator('#start-btn').click();
@@ -31,9 +31,10 @@ async function answerWizard(page, answers) {
     }
     await page.locator('#next-btn').click();
   }
-  // Optional constraints step before results
-  await expect(page.locator('#constraints-section')).toBeVisible();
-  await page.locator('#constraints-continue-btn').click();
+  if (await page.locator('#question-counter', { hasText: 'One final distinction' }).count()) {
+    await page.locator('#options-list .option-card').filter({ hasText: runtimeAnswer === 'q9d' ? 'engineering team' : 'Microsoft should manage' }).click();
+    await page.locator('#next-btn').click();
+  }
   await expect(page.locator('#recommendation-section')).toBeVisible();
 }
 
@@ -90,8 +91,8 @@ test.describe('Golden paths — scored', () => {
 
   test('G05 Foundry for custom app + custom RAG', async ({ page }) => {
     await answerWizard(page, {
-      q1: 'q1c', q8: 'q8a', q2: 'q2b', q4: 'q4f', q3: 'q3f',
-    });
+      q1: 'q1c', q8: 'q8a', q2: 'q2b', q4: 'q4d', q3: 'q3f',
+    }, 'q9d');
     await expectPrimaryName(page, 'Microsoft Foundry');
   });
 
