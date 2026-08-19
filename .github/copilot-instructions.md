@@ -53,6 +53,8 @@ Copilot Chat and the built-in agents (Researcher, Analyst, Facilitator, Interpre
 
 **Agent Builder** is the no-code declarative path inside Microsoft 365 Copilot only — not SharePoint agents, not Agents Toolkit, not custom engine. Adjacent paths live in `apa.adjacent_build_paths` and per-card `adjacent_paths`. Q4 splits multi-agent: `q4d` low-code/business → CS strong; `q4f` code-first/custom runtime → Foundry strong.
 
+When Copilot Studio is the primary recommendation, `resolveCopilotStudioHarness()` derives a non-scored starting point from the existing answers: `q4d` or `q4e` → GitHub Copilot harness; `q2c` or `q4c` → Copilot Studio workflow; `q2a` + `q4a` → Copilot chat harness; otherwise → standard harness. Keep this post-score guidance independent from the platform ranking.
+
 ## Scoring pipeline
 
 Documented in `docs/SCORING.md` and `docs/FLOWCHART.md`:

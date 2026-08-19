@@ -363,6 +363,12 @@ function badgeClass(label) {
   return 'badge-not';
 }
 
+function resolveCopilotStudioHarness(answersMap) {
+  if (answersMap.q4 === 'q4d' || answersMap.q4 === 'q4e') return 'github_copilot';
+  if (answersMap.q2 === 'q2c' || answersMap.q4 === 'q4c') return 'workflow';
+  if (answersMap.q2 === 'q2a' && answersMap.q4 === 'q4a') return 'copilot_chat';
+  return 'standard';
+}
 
 function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge, startKey) {
   const rec = apa.recommendations[platformId];
@@ -423,6 +429,23 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
     </div>`;
   })() : '';
 
+  const harnessKey = isPrimary && platformId === 'copilot_studio'
+    ? resolveCopilotStudioHarness(answersMap)
+    : null;
+  const harness = harnessKey && rec.harnesses ? rec.harnesses[harnessKey] : null;
+  const harnessHtml = harness ? `
+    <div class="rec-spotlight rec-harness-guidance" data-harness="${harnessKey}">
+      <div class="rec-spotlight-eyebrow">Start with this harness</div>
+      <div class="rec-spotlight-name">
+        <a href="${harness.url}" target="_blank" rel="noopener noreferrer">${harness.label}</a>
+      </div>
+      <div class="rec-spotlight-tagline">${harness.tagline}</div>
+      <p class="rec-spotlight-description">${harness.description}</p>
+      ${(harness.considerations || []).length > 0
+        ? `<ul class="rec-list rec-harness-considerations">${harness.considerations.map(item => `<li>${item}</li>`).join('')}</ul>`
+        : ''}
+    </div>` : '';
+
   const firstPartyHtml = (rec.first_party_agents || []).length > 0 ? `
     <details class="rec-accordion"${detailsOpen}>
       <summary class="rec-accordion-trigger">
@@ -468,6 +491,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
       ${descriptionHtml}
       <p class="rec-summary">${rec.summary}</p>
       ${spotlightHtml}
+      ${harnessHtml}
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
         : ''}

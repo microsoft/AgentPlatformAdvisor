@@ -12,7 +12,7 @@ meta:
   # Shown in UI footer / results stewardship strip
   guidance_verified: "2026-08"
   # ISO date shown as "Last updated" in the footer. Bump when content changes.
-  last_updated: "2026-08-12"
+  last_updated: "2026-08-19"
   platforms:
     - id: agent_builder
       label: Agent Builder
@@ -785,6 +785,8 @@ recommendations:
       - Internal and external-facing deployment
       - Built-in evaluation test sets, activity maps, analytics, monitoring, and tenant-wide agent inventory
     watch_out_for:
+      - Choose the harness when you create the agent — GitHub Copilot, standard, and Copilot chat harness agents can't be transferred between harnesses
+      - GitHub Copilot harness agents and workflows consume Copilot Credits while building, previewing, testing, evaluating, and running in production
       - Complex ML pipelines or custom model training require Foundry
       - Code-first multi-agent systems, custom protocols, high-scale hosted agents, or bring-your-own orchestrator belong in Foundry — not because "multi-agent" alone requires it
       - Supports curated GA, preview, and experimental models, including deep reasoning models; use Foundry for arbitrary bring-your-own model hosting, custom model training, model routing, private networking, and full runtime control
@@ -793,6 +795,48 @@ recommendations:
       - Computer use (GA) still needs credential, supervision, access-control, observability, and cost governance
       - Copilot Credits scale with generative answers, agent actions, tenant graph grounding, workflows, reasoning models, voice, and computer use — budget before wide rollout
       - Pro-dev building API plugins or CI/CD declarative agents for Microsoft 365 Copilot should also evaluate Microsoft 365 Agents Toolkit before defaulting to Foundry
+    harnesses:
+      github_copilot:
+        label: GitHub Copilot harness
+        url: https://learn.microsoft.com/microsoft-copilot-studio/agents-experience/overview
+        tagline: Managed adaptive execution for reasoning-heavy, multi-step work
+        description: >
+          Start here when the agent should take a goal, plan the steps, use several tools
+          or agents, create or edit Office and PDF files, adapt when conditions change,
+          and recover when a step fails. Tasks run in a secure Copilot Studio sandbox.
+        considerations:
+          - Harness choice is fixed for the agent; it can't later transfer to the standard or Copilot chat harness
+          - Copilot Credits apply during building, previewing, testing, evaluating, and production use
+      standard:
+        label: Standard harness
+        url: https://learn.microsoft.com/microsoft-copilot-studio/harnesses-overview
+        tagline: Predictable topic-driven conversations and explicit rules
+        description: >
+          Start here when the agent should follow defined topics, branches, prompts, and
+          repeatable conversation paths rather than decide its own plan dynamically.
+        considerations:
+          - Prefer the workflow experience instead when the primary requirement is scheduled or event-triggered deterministic automation
+          - Harness choice is fixed for the agent and should be validated before implementation
+      copilot_chat:
+        label: Copilot chat harness
+        url: https://learn.microsoft.com/microsoft-copilot-studio/microsoft-365-copilot-extend-with-agents
+        tagline: Internal knowledge extensions inside Microsoft 365 Copilot Chat
+        description: >
+          Start here when employees need Microsoft 365 Copilot Chat grounded in your
+          organization's knowledge without leaving their everyday Microsoft 365 experience.
+        considerations:
+          - Publishes to internal teams rather than external customers
+          - Agent Builder remains the faster option for the simplest small-team no-code scenario
+      workflow:
+        label: Copilot Studio workflow
+        url: https://learn.microsoft.com/microsoft-copilot-studio/workflows-experience/flows-overview
+        tagline: Deterministic automation with triggers, branching, AI actions, and agent handoffs
+        description: >
+          Start with a workflow when a schedule, event, user, or agent should trigger a
+          predictable sequence of connector actions, control logic, human input, and AI steps.
+        considerations:
+          - Each production action consumes Copilot Studio capacity, so monitor environment allocation and enforcement
+          - Use an adaptive GitHub Copilot harness agent when the process must decide and re-plan rather than follow a defined path
     adjacent_paths:
       - label: Use Microsoft 365 Agents Toolkit instead when…
         summary: You are a pro developer shipping declarative agents or API plugins into Microsoft 365 Copilot with source control and CI/CD — still on Copilot's orchestrator.

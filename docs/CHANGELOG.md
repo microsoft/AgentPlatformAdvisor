@@ -4,6 +4,20 @@ All notable changes to Agent Platform Advisor are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), organized by repository commit date.
 
+## 2026-08-19
+
+### Added
+
+- **Copilot Studio harness starting guidance.** When Copilot Studio wins the existing five-question assessment, the recommendation card now identifies the most relevant implementation starting point without changing scores: GitHub Copilot harness for adaptive multi-step orchestration and content creation, Copilot Studio workflow for deterministic triggered automation, Copilot chat harness for internal Microsoft 365 Copilot knowledge extensions, and standard harness for predictable topic-driven conversations. The guidance includes harness immutability, preview/lifecycle, and Copilot Credit cautions and is covered by Playwright tests.
+
+### Changed
+
+- **Reconciled the harness guidance with the v1.4 scoring model.** Runtime ownership remains represented by the scored q4f code-first/custom-runtime option rather than adding a second conditional governance question. This preserves the current 2,304-combination calibration while sharpening the recommendation after Copilot Studio wins.
+
+### Fixed
+
+- **Stabilized the markdown export end-to-end test under full-suite concurrency.** The test waited for and read the downloaded file before checking a two-second confirmation label, so a busy parallel run could correctly complete the download but inspect the label after it had reset. It now verifies the immediate click feedback before doing slower file I/O.
+
 ## 2026-08-12 (later)
 
 ### Changed

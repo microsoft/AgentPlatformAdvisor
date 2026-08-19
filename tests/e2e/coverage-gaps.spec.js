@@ -130,6 +130,7 @@ test.describe('Coverage gaps for v3 result extras and constraints', () => {
 
     const downloadPromise = page.waitForEvent('download');
     await page.locator('#export-md-btn').click();
+    await expect(page.locator('#export-md-btn')).toContainText('Downloaded');
     const text = await readDownloadText(await downloadPromise);
 
     expect(text).toContain('# Agent Platform Advisor');
@@ -137,7 +138,6 @@ test.describe('Coverage gaps for v3 result extras and constraints', () => {
     expect(text).toMatch(/### Enterprise constraints selected\s+- Private networking, VNet isolation, or private endpoints required/);
     expect(text).toContain('### Share link (canonical)');
     expect(text).toContain('c=c_private_net');
-    await expect(page.locator('#export-md-btn')).toContainText('Downloaded');
   });
 
   test('negative feedback issue link carries answers, constraints, and share URL', async ({ page }) => {

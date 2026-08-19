@@ -66,6 +66,13 @@ flowchart TD
     PREF --> RESULT["**Recommendation Thresholds**\n12–15: Strong fit\n8–11: Good fit\n4–7: Partial fit\n0–3: Not recommended"]
 
     RESULT --> NOTES["**Post-processing**\nCross-question contradiction notes\nWinner-persona mismatch warnings\nTie handling → complementary pairs\nAdjacent-path footnotes (Toolkit, SharePoint, custom engine)"]
+    NOTES --> HARNESS{"**Copilot Studio wins?**"}
+    HARNESS -->|"q4d or q4e"| GITHUBHARNESS["**GitHub Copilot harness**\nAdaptive, reasoning-heavy multi-step work"]
+    HARNESS -->|"q2c or q4c"| WORKFLOW["**Copilot Studio workflow**\nDeterministic triggered automation"]
+    HARNESS -->|"q2a + q4a"| CHATHARNESS["**Copilot chat harness**\nInternal M365 Copilot knowledge extension"]
+    HARNESS -->|"Otherwise"| STANDARDHARNESS["**Standard harness**\nPredictable topic-driven conversation"]
+    HARNESS -->|"No"| DONE([Recommendation complete])
+    GITHUBHARNESS & WORKFLOW & CHATHARNESS & STANDARDHARNESS --> DONE
 
     style Q1C fill:#e8f0fe,stroke:#4a86e8
     style Q1D fill:#e8f0fe,stroke:#4a86e8
@@ -89,6 +96,7 @@ flowchart TD
     style PREF fill:#e8f0fe,stroke:#4a86e8
     style RESULT fill:#d4edda,stroke:#28a745
     style NOTES fill:#f8f0fb,stroke:#6f42c1
+    style HARNESS fill:#e8f4fd,stroke:#0078D4
 ```
 
 ## Optional constraints (scored path only)
