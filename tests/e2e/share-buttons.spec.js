@@ -22,8 +22,9 @@ async function completeWizard(page) {
     await page.locator('#next-btn').click();
   }
 
-  await expect(page.locator('#constraints-section')).toBeVisible();
-  await page.locator('#constraints-continue-btn').click();
+  await expect(page.locator('#question-counter')).toContainText('One final distinction');
+  await page.locator('#options-list .option-card').filter({ hasText: 'Microsoft should manage' }).click();
+  await page.locator('#next-btn').click();
   await expect(page.locator('#recommendation-section')).toBeVisible();
 }
 
@@ -47,6 +48,7 @@ test.describe('Share Button', () => {
     const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
     expect(clipboardText).toContain('q1=q1c');
     expect(clipboardText).toContain('q8=q8a');
+    expect(clipboardText).toContain('q9=q9a');
     expect(clipboardText).toContain('mode=card');
     expect(clipboardText).toContain('r=');
     expect(clipboardText).toContain('d=');
@@ -67,7 +69,7 @@ test.describe('Share Button', () => {
   });
 
   test('share link from URL-loaded results contains all answers', async ({ page }) => {
-    const params = 'q1=q1c&q8=q8a&q2=q2d&q4=q4b&q3=q3b&r=copilot_studio&d=20260401&mode=card';
+    const params = 'q1=q1c&q8=q8a&q2=q2d&q4=q4b&q3=q3b&q9=q9a&r=copilot_studio&d=20260401&mode=card';
     await page.goto(`/?${params}`);
     await expect(page.locator('#recommendation-section')).toBeVisible();
 
@@ -82,6 +84,7 @@ test.describe('Share Button', () => {
     expect(shareUrl).toContain('q2=q2d');
     expect(shareUrl).toContain('q4=q4b');
     expect(shareUrl).toContain('q3=q3b');
+    expect(shareUrl).toContain('q9=q9a');
     expect(shareUrl).toContain('mode=card');
   });
 });

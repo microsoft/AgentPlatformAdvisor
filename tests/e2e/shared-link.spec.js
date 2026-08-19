@@ -52,4 +52,27 @@ test.describe('Shared Link Loading', () => {
     // Drift note should be visible
     await expect(page.locator('#decision-card-drift')).toBeVisible();
   });
+
+  test('preserves pre-q9 links without treating the conditional question as schema drift', async ({ page }) => {
+    await page.goto(`/?${SHARED_PARAMS}`);
+    await expect(page.locator('#recommendation-section')).toBeVisible();
+    await expect(page.locator('#decision-card-drift')).toBeHidden();
+  });
+
+  test('maps previous managed q9 options to the new runtime distinction', async ({ page }) => {
+    const params = `${SHARED_PARAMS}&q9=q9b`;
+    await page.goto(`/?${params}`);
+    const shareUrl = await page.evaluate(() => buildShareableURL());
+    expect(shareUrl).toContain('q9=q9a');
+  });
+
+  test('maps temporary q4f links to complex orchestration plus engineering ownership', async ({ page }) => {
+    const params = 'q1=q1c&q8=q8a&q2=q2b&q4=q4f&q3=q3f&r=foundry&d=20260812&mode=card';
+    await page.goto(`/?${params}`);
+    await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText(/^Microsoft Foundry/);
+    const shareUrl = await page.evaluate(() => buildShareableURL());
+    expect(shareUrl).toContain('q4=q4d');
+    expect(shareUrl).toContain('q9=q9d');
+    expect(shareUrl).not.toContain('q4=q4f');
+  });
 });

@@ -12,8 +12,7 @@ test.describe('P2 features', () => {
     await expect(page.locator('.guidance-meta:visible')).toHaveCount(0);
   });
 
-  test('optional constraints soft-boost Foundry for private networking', async ({ page }) => {
-    // Pro-dev path that is close CS vs Foundry; private net should favor Foundry
+  test('conditional runtime distinction favors Foundry for engineering ownership', async ({ page }) => {
     await page.goto('/');
     await page.locator('#start-btn').click();
     await page.locator('#prescreen-no').click();
@@ -30,22 +29,19 @@ test.describe('P2 features', () => {
       await page.locator('#next-btn').click();
     }
 
-    await expect(page.locator('#constraints-section')).toBeVisible();
-    await page.locator('.option-card[data-constraint-id="c_private_net"]').click();
-    await page.locator('#constraints-continue-btn').click();
+    await expect(page.locator('#question-counter')).toContainText('One final distinction');
+    await page.locator('#options-list .option-card').filter({ hasText: 'engineering team' }).click();
+    await page.locator('#next-btn').click();
 
     await expect(page.locator('#recommendation-section')).toBeVisible();
     await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText(/^Microsoft Foundry/);
-    await expect(page.locator('#rec-primary-card')).toContainText(/Constraint soft boost/i);
   });
 
-  test('share URL includes constraint ids', async ({ page }) => {
-    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4f&q3=q3f&c=c_private_net,c_airgap&r=foundry&d=20260810&mode=card');
+  test('share URL includes the conditional runtime answer', async ({ page }) => {
+    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4d&q3=q3f&q9=q9d&r=foundry&d=20260819&mode=card');
     await expect(page.locator('#recommendation-section')).toBeVisible();
     const shareUrl = await page.evaluate(() => buildShareableURL());
-    expect(shareUrl).toContain('c=');
-    const roundTripped = new URL(shareUrl).searchParams.get('c').split(',').sort();
-    expect(roundTripped).toEqual(['c_airgap', 'c_private_net']);
+    expect(shareUrl).toContain('q9=q9d');
   });
 
   test('results show feedback, export, and version strip', async ({ page }) => {

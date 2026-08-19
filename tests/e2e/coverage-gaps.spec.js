@@ -3,25 +3,6 @@ const { test, expect } = require('@playwright/test');
 
 const QUESTION_ORDER = ['q1', 'q8', 'q2', 'q4', 'q3'];
 
-async function answerToConstraints(page, answers = {
-  q1: 'q1c',
-  q8: 'q8a',
-  q2: 'q2b',
-  q4: 'q4f',
-  q3: 'q3f',
-}) {
-  await page.goto('/');
-  await page.locator('#start-btn').click();
-  await page.locator('#prescreen-no').click();
-
-  for (const qId of QUESTION_ORDER) {
-    await page.locator(`#options-list .option-card[data-option-id="${answers[qId]}"]`).click();
-    await page.locator('#next-btn').click();
-  }
-
-  await expect(page.locator('#constraints-section')).toBeVisible();
-}
-
 async function readDownloadText(download) {
   const stream = await download.createReadStream();
   const chunks = [];
@@ -29,61 +10,7 @@ async function readDownloadText(download) {
   return Buffer.concat(chunks).toString('utf8');
 }
 
-test.describe('Coverage gaps for v3 result extras and constraints', () => {
-  test('constraints support keyboard multi-select, clear, and back navigation', async ({ page }) => {
-    await answerToConstraints(page);
-
-    const privateNet = page.locator('.option-card[data-constraint-id="c_private_net"]');
-    await expect(privateNet).toHaveAttribute('role', 'checkbox');
-    await expect(privateNet).toHaveAttribute('aria-checked', 'false');
-
-    await privateNet.focus();
-    await page.keyboard.press('Space');
-    await expect(privateNet).toHaveAttribute('aria-checked', 'true');
-    await expect(page.locator('#constraints-continue-btn')).toContainText('See recommendation');
-
-    const alm = page.locator('.option-card[data-constraint-id="c_alm"]');
-    await alm.focus();
-    await page.keyboard.press('Enter');
-    await expect(alm).toHaveAttribute('aria-checked', 'true');
-
-    await privateNet.focus();
-    await page.keyboard.press('Space');
-    await expect(privateNet).toHaveAttribute('aria-checked', 'false');
-
-    await page.getByRole('button', { name: /back/i }).click();
-    await expect(page.locator('#assessment-section')).toBeVisible();
-    await expect(page.locator('#question-counter')).toContainText('Question 5');
-
-    await page.locator('#next-btn').click();
-    await expect(page.locator('#constraints-section')).toBeVisible();
-    await expect(page.locator('.option-card[data-constraint-id="c_alm"]')).toHaveAttribute('aria-checked', 'true');
-    await expect(page.locator('.option-card[data-constraint-id="c_private_net"]')).toHaveAttribute('aria-checked', 'false');
-  });
-
-  test('constraint URL parsing ignores unknown ids while preserving valid ids', async ({ page }) => {
-    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4f&q3=q3f&c=c_private_net,unknown,c_alm&r=foundry&d=20260810&mode=card');
-    await expect(page.locator('#recommendation-section')).toBeVisible();
-
-    const shareUrl = await page.evaluate(() => buildShareableURL());
-    expect(shareUrl).toContain('c_private_net');
-    expect(shareUrl).toContain('c_alm');
-    expect(shareUrl).not.toContain('unknown');
-  });
-
-  test('constraint boosts are capped at the configured maximum', async ({ page }) => {
-    await page.goto('/');
-    const scores = await page.evaluate(() => {
-      const answers = { q1: 'q1c', q8: 'q8a', q2: 'q2b', q4: 'q4f', q3: 'q3f' };
-      const base = rankPlatforms(answers, []).find(r => r.id === 'foundry').score;
-      const boosted = rankPlatforms(answers, ['c_private_net', 'c_airgap', 'c_alm', 'c_regulated'])
-        .find(r => r.id === 'foundry').score;
-      return { base, boosted };
-    });
-
-    expect(scores.boosted - scores.base).toBe(2);
-  });
-
+test.describe('Coverage gaps for v3 result extras', () => {
   test('legacy delegate cadence aliases still route through the current reach-first rules', async ({ page }) => {
     await page.goto('/');
     const routes = await page.evaluate(() => ({
@@ -124,8 +51,8 @@ test.describe('Coverage gaps for v3 result extras and constraints', () => {
     expect(misspellings).toEqual([]);
   });
 
-  test('downloaded markdown includes constraints and the canonical share link', async ({ page }) => {
-    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4f&q3=q3f&c=c_private_net&r=foundry&d=20260810&mode=card');
+  test('downloaded markdown includes the runtime distinction and canonical share link', async ({ page }) => {
+    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4d&q3=q3f&q9=q9d&r=foundry&d=20260819&mode=card');
     await expect(page.locator('#recommendation-section')).toBeVisible();
 
     const downloadPromise = page.waitForEvent('download');
@@ -134,14 +61,12 @@ test.describe('Coverage gaps for v3 result extras and constraints', () => {
     const text = await readDownloadText(await downloadPromise);
 
     expect(text).toContain('# Agent Platform Advisor');
-    expect(text).toContain('### Enterprise constraints selected');
-    expect(text).toMatch(/### Enterprise constraints selected\s+- Private networking, VNet isolation, or private endpoints required/);
     expect(text).toContain('### Share link (canonical)');
-    expect(text).toContain('c=c_private_net');
+    expect(text).toContain('q9=q9d');
   });
 
-  test('negative feedback issue link carries answers, constraints, and share URL', async ({ page }) => {
-    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4f&q3=q3f&c=c_private_net&r=foundry&d=20260810&mode=card');
+  test('negative feedback issue link carries answers, runtime distinction, and share URL', async ({ page }) => {
+    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4d&q3=q3f&q9=q9d&r=foundry&d=20260819&mode=card');
     await expect(page.locator('#rec-feedback')).toBeVisible();
 
     await page.locator('.btn-feedback', { hasText: 'No' }).click();
@@ -150,9 +75,9 @@ test.describe('Coverage gaps for v3 result extras and constraints', () => {
     const decoded = decodeURIComponent(href || '');
     expect(decoded).toContain('- Recommended: foundry');
     expect(decoded).toContain('- q1: q1c');
-    expect(decoded).toContain('- Constraints: c_private_net');
+    expect(decoded).toContain('- q9: q9d');
     expect(decoded).toContain('Share URL:');
-    expect(decoded).toContain('c=c_private_net');
+    expect(decoded).toContain('q9=q9d');
   });
 
   test('feedback ignores duplicate submissions after the confirmation appears', async ({ page }) => {

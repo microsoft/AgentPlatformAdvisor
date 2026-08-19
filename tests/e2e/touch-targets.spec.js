@@ -41,24 +41,25 @@ test.describe('Touch targets meet the 44px minimum', () => {
     expect(await shortTargets(page)).toEqual([]);
   });
 
-  test('scored wizard, constraints step, and results', async ({ page }) => {
+  test('scored wizard, conditional runtime distinction, and results', async ({ page }) => {
     await page.goto('/');
     await page.locator('#start-btn').click();
     await page.locator('#prescreen-no').click();
     await expect(page.locator('#assessment-section')).toBeVisible();
     expect(await shortTargets(page)).toEqual([]);
 
-    for (const optionId of ['q1a', 'q8a', 'q2a', 'q4a', 'q3a']) {
+    for (const optionId of ['q1c', 'q8a', 'q2b', 'q4d', 'q3f']) {
       const byId = page.locator(`#options-list .option-card[data-option-id="${optionId}"]`);
       if (await byId.count()) await byId.click();
       else await page.locator('#options-list .option-card').first().click();
       await page.locator('#next-btn').click();
     }
 
-    await expect(page.locator('#constraints-section')).toBeVisible();
+    await expect(page.locator('#question-counter')).toContainText('One final distinction');
     expect(await shortTargets(page)).toEqual([]);
 
-    await page.locator('#constraints-continue-btn').click();
+    await page.locator('#options-list .option-card').filter({ hasText: 'Microsoft should manage' }).click();
+    await page.locator('#next-btn').click();
     await expect(page.locator('#recommendation-section')).toBeVisible();
     expect(await shortTargets(page)).toEqual([]);
   });

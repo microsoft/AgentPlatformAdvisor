@@ -38,7 +38,7 @@ questions:
         label: Business user or subject matter expert — no coding experience
         scores:
           agent_builder: 3
-          copilot_studio: 1
+          copilot_studio: 2
           foundry: 0
 
       - id: q1b
@@ -59,7 +59,7 @@ questions:
         label: Data scientist or AI/ML engineer — works with AI models and data infrastructure
         scores:
           agent_builder: 0
-          copilot_studio: 1
+          copilot_studio: 2
           foundry: 3
 
   - id: q8
@@ -137,19 +137,13 @@ questions:
 
   - id: q4
     label: What should this agent do?
-    purpose: >
-      Strongest task/runtime discriminator — low-code multi-agent (q4d) vs code-first /
-      custom runtime ownership (q4f), plus Q&A through action workflows
+    purpose: Task complexity separates lightweight agents from enterprise platforms; runtime ownership is resolved conditionally
     prompt: What type of work do you want this agent to handle? Choose the option that best represents the most advanced task you expect it to perform.
     hard_rules:
       - condition: option == q4d
         effect: >
           Cap agent_builder and m365_copilot at 0 regardless of other answers.
-          Low-code multi-agent / business orchestration favors Copilot Studio (score 3).
-      - condition: option == q4f
-        effect: >
-          Cap agent_builder and m365_copilot at 0 regardless of other answers.
-          Code-first multi-agent / custom runtime favors Foundry (score 3).
+          Copilot Studio and Foundry can both support complex orchestration.
     options:
       - id: q4a
         label: Answer questions in a single exchange — Q&A, lookups, or summaries
@@ -169,7 +163,7 @@ questions:
         label: Create or analyze content inside Copilot — documents, charts, images, or lightweight data analysis
         scores:
           agent_builder: 3
-          copilot_studio: 2
+          copilot_studio: 3
           foundry: 2
 
       - id: q4c
@@ -180,18 +174,10 @@ questions:
           foundry: 3
 
       - id: q4d
-        label: Coordinate multiple agents or long-running business processes — child agents, A2A, department workflows (low-code / maker orchestration)
+        label: Manage complex workflows — coordinate multiple agents or handle long-running processes
         scores:
           agent_builder: 0
           copilot_studio: 3
-          foundry: 2
-        hard_rule_trigger: true
-
-      - id: q4f
-        label: Code-first multi-agent systems — custom protocols, high-scale hosted agents, or your own orchestrator/runtime
-        scores:
-          agent_builder: 0
-          copilot_studio: 1
           foundry: 3
         hard_rule_trigger: true
 
@@ -243,39 +229,25 @@ questions:
           foundry: 3
 
 ################################################################################
-# OPTIONAL GOVERNANCE CONSTRAINTS (scored-path only)
-# Multi-select soft boosts — never hard-zero. Share link: c=id1,id2
+# CONDITIONAL RUNTIME DISTINCTION (non-scored)
 ################################################################################
 
-optional_constraints:
-  label: Any enterprise constraints that should influence the recommendation?
-  prompt: >
-    Optional. Select all that apply, or skip. These add small soft boosts only —
-    they never disqualify a platform by themselves.
-  skip_label: None of these — continue
+runtime_tiebreaker:
+  id: q9
+  label: Who should operate the agent runtime?
+  prompt: Copilot Studio and Microsoft Foundry both fit your functional requirements. Choose who should own the execution environment.
+  threshold_points: 2
+  compare: [copilot_studio, foundry]
+  legacy_managed_option_ids: [q9b, q9c]
   options:
-    - id: c_private_net
-      label: Private networking, VNet isolation, or private endpoints required
-      boosts:
-        foundry: 2
-    - id: c_airgap
-      label: Air-gapped, disconnected, or on-premises control plane required
-      boosts:
-        foundry: 2
-    - id: c_inventory
-      label: Tenant-wide agent inventory, DLP, or admin controls required
-      boosts:
-        copilot_studio: 2
-    - id: c_alm
-      label: ALM, environments, versioning, or CI/CD required
-      boosts:
-        copilot_studio: 1
-        foundry: 1
-    - id: c_regulated
-      label: Regulated data, strict residency, or heightened compliance
-      boosts:
-        foundry: 1
-        copilot_studio: 1
+    - id: q9a
+      label: Microsoft should manage the agent runtime, sandbox, tools, and Power Platform governance
+      prefer: copilot_studio
+      over: foundry
+
+    - id: q9d
+      label: Our engineering team should own the code runtime, framework, endpoints, networking, identity, memory, or retrieval
+      zero: [agent_builder, copilot_studio]
 
 ################################################################################
 # SCORING ENGINE
@@ -290,10 +262,7 @@ scoring:
   hard_rules:
     q4d:
       zero: [agent_builder, m365_copilot]
-      label: "Multi-agent / long-running business orchestration — Agent Builder and M365 Copilot are not suitable; Copilot Studio is the low-code default, Foundry when you need code-first runtime ownership"
-    q4f:
-      zero: [agent_builder, m365_copilot]
-      label: "Code-first multi-agent / custom runtime — Agent Builder and M365 Copilot are not suitable; Foundry owns custom engines, protocols, and hosted scale"
+      label: "Complex agent orchestration — Agent Builder and M365 Copilot are not suitable for multi-agent or long-running orchestration"
     q4c:
       zero: [agent_builder]
       label: "Multi-step action workflows — Agent Builder cannot submit forms, update records, or take actions across systems"
@@ -312,11 +281,11 @@ scoring:
     q3f:
       zero: [agent_builder]
       label: "Custom retrieval architecture — Agent Builder cannot directly use custom RAG, Azure AI Search, private indexes, Foundry IQ, or engineering-managed retrieval systems"
+    q9d:
+      zero: [agent_builder, copilot_studio]
+      label: "Developer-owned runtime — Agent Builder and Copilot Studio do not provide an engineering-owned code runtime, framework, endpoint, network, identity, memory, or retrieval architecture"
   # Step 2 — Sum raw scores across all answered questions.
   raw_score_max: 15  # 5 questions × max score of 3
-  # Optional governance constraints may add soft boosts (never hard-zero). Cap keeps
-  # Strong fit meaningful when boosts stack.
-  constraint_boost_cap: 2
 
   # Step 2.5 — Persona preferences: soft overrides that force one platform
   # above another when a specific persona is selected. Unlike hard rules,
@@ -331,15 +300,22 @@ scoring:
       rationale: >
         Copilot Studio is recommended over Agent Builder for data scientists and AI/ML engineers
         because it supports curated model selection, agent evaluations, Foundry IQ integration,
-        code-first development via the VS Code extension, and more flexible orchestration —
-        capabilities that Agent Builder does not offer. Foundry still ranks above when answers
-        show runtime ownership (custom RAG, private networking, hosted code, q4f).
+        managed reasoning, portable skills, and more flexible orchestration — capabilities
+        that Agent Builder does not offer. Use Foundry when the scenario requires a custom
+        model or developer-owned runtime.
+    - when:
+        q9: q9a
+      prefer: copilot_studio
+      over: foundry
+      rationale: >
+        Copilot Studio is recommended because you want Microsoft to manage the reasoning
+        harness, sandbox, tools, and Power Platform governance. Choose Foundry when your
+        engineering team needs to own the runtime and infrastructure.
 
   # Step 3 — Map raw scores to recommendation strength.
-  # Upper bound 17 allows optional constraint boosts (+0–2) on top of max 15 raw.
   recommendation_thresholds:
     - min: 12
-      max: 17
+      max: 15
       label: Strong fit
       description: This platform is well-aligned with your requirements across all dimensions.
     - min: 8
@@ -376,17 +352,16 @@ scoring:
         prefer: copilot_studio
         rationale: >
           When the builder is a data scientist or AI/ML engineer and scores are equal,
-          Copilot Studio is preferred for time-to-value. Foundry still wins when answers
-          show runtime ownership needs (custom RAG, private networking, hosted code agents,
-          or code-first multi-agent via q3f / q4f / custom app).
+          Copilot Studio is preferred for time-to-value. Foundry still wins when the
+          conditional runtime distinction requires engineering ownership.
     # Scored-path pairs only. m365_copilot is always zeroed in the full wizard, so
     # pairs that include it never fire on the scored path and are omitted here.
     valid_pairs:
       - platforms: [copilot_studio, foundry]
         rationale: >
-          Close scores often mean a split — Copilot Studio for channels, connectors,
-          makers, and governed multi-agent business orchestration; Foundry for custom
-          retrieval, hosted code agents, private networking, and full runtime ownership.
+          Choose Copilot Studio when Microsoft should manage the reasoning harness, sandbox,
+          tools, and Power Platform governance. Choose Foundry when your team must own the
+          code runtime, framework, endpoint, network, identity, memory, or retrieval architecture.
         why_not: >
           Prefer <strong>{winner}</strong> when its strengths match your answers;
           keep <strong>{runner}</strong> for the complementary lane rather than forcing one platform to do both.
@@ -423,13 +398,6 @@ scoring:
         child agents, A2A connections, and long-running processes still benefits from
         maker or IT partnership. For code-first multi-agent systems, partner with
         professional developers on Foundry.
-    - when:
-        q1: q1a
-        q4: q4f
-      note: >
-        Code-first multi-agent systems and custom runtimes require professional
-        development skills. Consider partnering with your development team, or choosing
-        low-code multi-agent orchestration in Copilot Studio if that matches the need.
     - when:
         q1: q1a
         q3: q3c
@@ -489,7 +457,7 @@ scoring:
     - winner: copilot_studio
       when:
         q1: q1a
-        q4: [q4c, q4d, q4f]
+        q4: [q4c, q4d]
       note: >
         Copilot Studio is the right low-code home for actions and multi-agent business
         processes, but complex workflows still benefit from IT or maker partnership for

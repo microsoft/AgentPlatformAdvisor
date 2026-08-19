@@ -4,6 +4,14 @@ All notable changes to Agent Platform Advisor are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), organized by repository commit date.
 
+## 2026-08-19 (later)
+
+### Changed
+
+- **Restored the approved conditional runtime-ownership experience.** The custom-agent path remains five scored questions with a 15-point maximum. Only when Copilot Studio and Foundry are the top two viable platforms within 2 points does the advisor ask who should operate the runtime. Microsoft-managed operation prefers Copilot Studio without changing raw scores; engineering-owned runtime hard-disqualifies Agent Builder and Copilot Studio. This replaces both the temporary scored `q4f` runtime option and the universal optional governance-constraints screen.
+- **Preserved shared-link compatibility.** Links without `q9` remain valid, legacy `q9b`/`q9c` normalize to the Microsoft-managed answer, and temporary `q4f` links normalize to complex orchestration plus engineering-owned runtime.
+- **Kept Copilot Studio harness guidance independent from platform scoring.** Copilot Studio winners still receive GitHub Copilot, workflow, Copilot chat, or standard harness starting guidance based on the five functional answers.
+
 ## 2026-08-19
 
 ### Added

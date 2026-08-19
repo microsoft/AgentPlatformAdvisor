@@ -75,16 +75,16 @@ The first question forks the flow:
 
 ## Questions and Scoring Matrix
 
-Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3). Q4 has six options (including the q4d / q4f multi-agent split); still one answer per question.
+Five questions, each scored 0–3 per platform. Max raw score: **15** (5 × 3). A conditional, non-scored runtime distinction may appear after Q3.
 
 ### Q1 — Who is building this agent?
 
 | Option | ID | Agent Builder | CS | Foundry |
 |---|---|---|---|---|
-| Business user / SME — no coding | q1a | **3** | 1 | 0 |
+| Business user / SME — no coding | q1a | **3** | 2 | 0 |
 | Low-code maker / IT pro | q1b | 1 | **3** | 0 |
 | Professional developer | q1c | 0 | 2 | **3** |
-| Data scientist / ML engineer | q1d | 0 | 1 | **3** |
+| Data scientist / ML engineer | q1d | 0 | 2 | **3** |
 
 CS gets 2 for q1c because it supports pro developers via YAML authoring and the VS Code extension. Pro-dev building **API-plugin declarative agents** for M365 Copilot should also see **Agents Toolkit** guidance (unscored) — Foundry is not the only answer.
 
@@ -114,16 +114,15 @@ Foundry scores higher for deployment flexibility because Foundry agents can publ
 
 ### Q4 — What should this agent do?
 
-Task complexity is the strongest discriminator between Agent Builder, Copilot Studio, and Foundry. **Multi-agent is split:** low-code business orchestration favors CS (GA); code-first / custom runtime favors Foundry. Foundry should win on **runtime ownership**, not the keyword “multi-agent.”
+Task complexity is the strongest discriminator between Agent Builder, Copilot Studio, and Foundry. Complex orchestration keeps both Copilot Studio and Foundry viable; runtime ownership is resolved only when they remain close after all five functional questions.
 
 | Option | ID | Agent Builder | CS | Foundry | Hard Rule |
 |---|---|---|---|---|---|
 | Simple Q&A / lookups | q4a | **3** | **3** | 1 | — |
 | Conversational (multi-turn) | q4b | 2 | **3** | 2 | — |
-| Create/analyze content in Copilot | q4e | **3** | 2 | 2 | — |
+| Create/analyze content in Copilot | q4e | **3** | **3** | 2 | — |
 | Multi-step tasks with actions | q4c | 0 | **3** | **3** | Zeros AB |
-| Low-code multi-agent / long-running **business** orchestration | q4d | 0 | **3** | 2 | Zeros AB, M365 |
-| Code-first multi-agent / custom protocols / high-scale hosted agents | q4f | 0 | 1 | **3** | Zeros AB, M365 |
+| Complex workflows — multiple agents or long-running processes | q4d | 0 | **3** | **3** | Zeros AB, M365 |
 
 ### Q3 — What information does this agent need to access?
 
@@ -147,8 +146,8 @@ Hard rules zero out platforms before scores are summed. They represent real plat
 | Trigger | Platforms zeroed | Reason |
 |---|---|---|
 | q8b (external users) | AB, M365 | Cannot publish externally |
-| q4d (low-code multi-agent / business orchestration) | AB, M365 | Requires Copilot Studio or Foundry |
-| q4f (code-first multi-agent / custom runtime) | AB, M365 | Requires Foundry-class runtime ownership |
+| q4d (complex multi-agent / long-running orchestration) | AB, M365 | Requires Copilot Studio or Foundry |
+| q9d (engineering-owned runtime) | AB, CS | Requires Foundry's developer-owned runtime and infrastructure |
 | q4c (multi-step action workflows) | AB | Cannot submit forms, update records, or take actions across systems |
 | q2b (custom app) | AB | Can only run inside Microsoft 365 Copilot surfaces |
 | q2c (background) | AB | No event-driven or autonomous background runtime |
@@ -161,13 +160,30 @@ Additionally, M365 Copilot is always zeroed in the full assessment (hard-coded i
 
 For each platform not zeroed: sum the scores from all answered questions. Range: 0–15.
 
-### Step 2.5 — Persona preferences (soft overrides)
+### Step 2.5 — Conditional runtime distinction
+
+After the fifth scored answer, `shouldAskRuntimeTieBreaker()` asks `q9` only when:
+
+- Copilot Studio and Foundry are the top two ranked platforms;
+- neither platform has been hard-zeroed;
+- both have positive scores; and
+- their raw scores are within 2 points.
+
+| Answer | Effect |
+|---|---|
+| `q9a` — Microsoft manages the runtime, sandbox, tools, and Power Platform governance | Prefer Copilot Studio over Foundry without changing either raw score |
+| `q9d` — Engineering owns the code runtime, framework, endpoints, networking, identity, memory, or retrieval | Hard-zero Agent Builder and Copilot Studio; Foundry wins |
+
+The question is skipped for clear results and for any path where either Copilot Studio or Foundry is already non-viable.
+
+### Step 2.6 — Persona preferences (soft overrides)
 
 Persona preferences force one platform above another in ranking regardless of scores. Unlike hard rules, all scores are preserved — the override only affects sort order. A rationale message is displayed as a key factor on the recommendation card.
 
 | Trigger | Prefer | Over | Rationale |
 |---|---|---|---|
 | q1d (data scientist / AI-ML) | Copilot Studio | Agent Builder | CS supports curated model selection, evaluations, Foundry IQ integration, code-first development, and flexible orchestration that AB lacks |
+| q9a (Microsoft-managed runtime) | Copilot Studio | Foundry | CS supplies the managed reasoning harness, sandbox, tools, and Power Platform governance |
 
 ### Step 3 — Threshold labels
 
@@ -190,16 +206,15 @@ When the top two platforms score within **2 points**, they're presented as a com
 
 | Pair | Rationale |
 |---|---|
-| Copilot Studio + Foundry | CS for channels/connectors/makers/multi-agent business orchestration; Foundry for custom retrieval, hosted code, private net, runtime ownership |
-| M365 Copilot + Copilot Studio | M365 Copilot for end users, CS for customization |
-| Agent Builder + M365 Copilot | AB for no-code M365 knowledge agents, M365 for day-to-day surfaces |
+| Copilot Studio + Foundry | CS for a Microsoft-managed reasoning harness and Power Platform governance; Foundry for engineering-owned runtime, endpoints, network, identity, memory, and retrieval |
+| Agent Builder + Copilot Studio | AB for quick no-code Microsoft 365 knowledge helpers; CS for actions, governance, broader audience, and multi-channel publishing |
 
 **Persona-based tiebreakers** — when two platforms score equally and a specific persona answer is selected, one platform is preferred:
 
 | Trigger | Platforms | Prefer | Rationale |
 |---|---|---|---|
 | q1c (professional developer) | AB, CS | CS | CS supports code-first authoring via VS Code extension |
-| q1d (data scientist / AI-ML) | CS, Foundry | CS | Faster path to production; Foundry still wins via q3f / q4f / custom app / private net signals |
+| q1d (data scientist / AI-ML) | CS, Foundry | CS | Faster path to production; `q9d` still selects Foundry when engineering ownership is required |
 
 ### Step 6 — Cross-question notes
 
@@ -210,7 +225,6 @@ Contextual warning banners when answer combinations are logically contradictory:
 | q2c + q4a | Background agent doing simple Q&A — contradictory |
 | q8b + q2a | External users in Microsoft 365 Copilot chat — external users can't access your tenant |
 | q1a + q4d | Business user wants multi-agent business orchestration — maker/IT partnership recommended |
-| q1a + q4f | Business user wants code-first multi-agent — requires pro-dev / Foundry partnership |
 | q1a + q3c | Business user needs direct business system integration — requires technical expertise |
 | q1a + q3f | Business user needs custom retrieval architecture — requires engineering expertise |
 
@@ -229,19 +243,19 @@ When Copilot Studio is the primary recommendation, the result derives a harness 
 | q2a + q4a (M365 Copilot chat + Q&A/lookups) | **Copilot chat harness** | Internal knowledge extension inside Microsoft 365 Copilot Chat |
 | Any other Copilot Studio result | **Standard harness** | Predictable topic-driven conversations and explicit rules |
 
-The q4 checks run before the workflow check so adaptive business orchestration and content creation remain harness scenarios even when another answer mentions background execution. Code-first runtime ownership remains part of the scored q4f path and normally recommends Foundry rather than a Copilot Studio harness.
+The q4 checks run before the workflow check so adaptive orchestration and content creation remain harness scenarios even when another answer mentions background execution. A `q9d` answer selects Foundry, so Copilot Studio harness guidance is not rendered.
 
 ## Distribution Analysis
 
-Across all **2,304** possible answer combinations (4 × 4 × 4 × 6 × 6 after adding q4f):
+Across all **1,920** possible scored answer combinations (4 × 4 × 4 × 5 × 6), before the conditional runtime answer:
 
 | Platform | Wins | % |
 |---|---:|---:|
-| Copilot Studio | 1,874 | 81.3% |
-| Foundry | 370 | 16.1% |
-| Agent Builder | 60 | 2.6% |
+| Copilot Studio | 1,758 | 91.6% |
+| Foundry | 122 | 6.4% |
+| Agent Builder | 40 | 2.1% |
 
-Compared with the prior 1,920-combo matrix (CS 82.8% / Foundry 14.1% / AB 3.1%), CS multi-agent GA (q4d → CS:3) plus a dedicated code-first option (q4f) slightly reduces CS “undecided multi-agent” dominance while giving Foundry a clearer runtime-ownership lane.
+The conditional runtime distinction appears for **847 combinations (44.1%)**. Those paths intentionally defer the final Copilot Studio-versus-Foundry decision until the user states who must operate the runtime.
 
 **Exact top-score ties and close (±2) cases** remain common on CS/Foundry pairs — intentional overlap between governed low-code and developer-controlled runtimes.
 
@@ -253,13 +267,13 @@ Agent Builder still loses whenever the user needs external publishing, custom ap
 
 ### When Foundry wins
 
-Foundry wins on **runtime ownership** signals: pro dev or ML persona (q1c/q1d), custom app or multi-surface deployment (q2b/q2d), **code-first multi-agent** (q4f), custom retrieval architecture (q3f), external-facing scenarios, or a need for managed endpoints, hosted code agents, private networking, tracing, evaluation, and full Azure control.
+Foundry wins on **runtime ownership** when `q9d` is selected, and on strong functional signals such as pro dev or ML persona (q1c/q1d), custom app or multi-surface deployment (q2b/q2d), custom retrieval architecture (q3f), external-facing scenarios, or a need for managed endpoints, hosted code agents, private networking, tracing, evaluation, and full Azure control.
 
-Foundry does **not** automatically win on “multi-agent” alone — low-code multi-agent / child agents / A2A business orchestration (q4d) strongly favors Copilot Studio.
+Foundry does **not** automatically win on “multi-agent” alone — q4d scores Copilot Studio and Foundry equally, then asks about runtime ownership only if the complete answer set leaves them close.
 
 ### When Copilot Studio wins multi-agent
 
-Coordinate multiple CS agents / A2A for a department process (q4d) can recommend CS as **Strong** without requiring Foundry. Example: maker + department + M365 chat + q4d + Dataverse → CS 15 / Foundry 8.
+Coordinating multiple Copilot Studio agents or A2A connections for a department process can recommend CS as **Strong** without requiring Foundry. The GitHub Copilot harness now gives Copilot Studio a managed adaptive-orchestration path; Foundry is reserved for engineering-owned runtime requirements.
 
 ### Copilot Studio dominance
 
@@ -269,32 +283,23 @@ CS remains the default recommendation for most combinations because it bridges A
 
 | Platform | Min | Max | Avg (approx.) |
 |---|---:|---:|---:|
-| Agent Builder | 11 | 15 | 12.7 |
-| Copilot Studio | 9 | 15 | 12.4 |
-| Foundry | 9 | 15 | 12.4 |
+| Agent Builder | 12 | 15 | 13.3 |
+| Copilot Studio | 11 | 15 | 13.2 |
+| Foundry | 12 | 15 | 13.2 |
 
 No combination produces a "best platform" below 8, so every user gets at least a "Good fit" recommendation.
 
 ## Cross-question note frequency
 
-Notes fire on the same logical combinations as before (background+simple Q&A, external+M365 chat, biz-user+orchestration/APIs/RAG). q1a+q4f is the new code-first orchestration note.
+Notes fire on the same logical combinations as before: background+simple Q&A, external+M365 chat, and business-user+orchestration/APIs/RAG.
 
+## Runtime share-link compatibility
 
-## Optional governance constraints (P2.1)
-
-After the five scored questions, the wizard shows an **optional multi-select** (`apa.optional_constraints`). Selections add **soft boosts** only (capped by `scoring.constraint_boost_cap`, default 2). They never hard-zero a platform.
-
-| ID | Soft boost |
-|---|---|
-| `c_private_net` | Foundry +2 |
-| `c_airgap` | Foundry +2 |
-| `c_inventory` | Copilot Studio +2 |
-| `c_alm` | CS +1, Foundry +1 |
-| `c_regulated` | Foundry +1, CS +1 |
-
-Share links carry selections as `c=c_private_net,c_alm` (comma-separated). Omitted `c` means no boosts. Strong fit threshold upper bound is **17** so boosted max scores still map to Strong.
-
-Legacy share params unchanged: `ft=1`, `dt=copilot_chat`, `q*`, `dt`, `st`, `r`, `d`, `mode`.
+- `q9` is included only when the conditional distinction was answered.
+- Missing `q9` is valid and does not produce schema drift.
+- Legacy `q9b` and `q9c` normalize to `q9a`.
+- Temporary `q4=q4f` links normalize to `q4=q4d` plus `q9=q9d`.
+- Old `c=` constraint parameters are ignored; they no longer affect ranking.
 
 ### Share links are untrusted input
 
@@ -313,7 +318,7 @@ Guarded by `tests/e2e/share-link-integrity.spec.js` and `tests/e2e/temporal-bann
 
 `meta.last_updated` (YYYY-MM-DD) is separate and renders in the footer, below the Created by credit: `guidance_verified` answers "when was this checked against Microsoft Learn," `last_updated` answers "when did this site last change." Bump it whenever content changes.
 
-## Runtime / orchestrator signal (no Q6)
+## Runtime / orchestrator signal
 
 Q2 option labels carry the runtime discriminator without a sixth scored question:
 
@@ -323,7 +328,7 @@ Q2 option labels carry the runtime discriminator without a sixth scored question
 | `q2b` | **Own endpoints, models, or runtime control** (custom app / hosted service) |
 | `q2c` / `q2d` | Background / multi-surface — still CS or Foundry by task+data |
 
-Q4 remains the strongest task discriminator (`q4d` low-code multi-agent vs `q4f` code-first / custom runtime).
+Q4 remains the strongest task discriminator for complexity. Conditional q9 owns the runtime decision rather than overloading a task-type answer.
 
 ## Conditional result callouts (unscored)
 

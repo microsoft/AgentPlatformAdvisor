@@ -39,7 +39,7 @@ def get_zeroed(apa, answers):
     return zeroed
 
 
-def sum_scores(apa, answers, zeroed, constraints=None):
+def sum_scores(apa, answers, zeroed):
     totals = {p["id"]: 0 for p in apa["meta"]["platforms"]}
     qmap = {q["id"]: q for q in apa["questions"]}
     for qid, oid in answers.items():
@@ -52,29 +52,12 @@ def sum_scores(apa, answers, zeroed, constraints=None):
         for pid in totals:
             base = (opt.get("scores") or {}).get(pid, 0) or 0
             totals[pid] += 0 if zeroed.get(pid) else base
-    # Soft boosts from optional governance constraints
-    cap = apa.get("scoring", {}).get("constraint_boost_cap", 2)
-    boosts = {pid: 0 for pid in totals}
-    opts = {
-        o["id"]: o
-        for o in (apa.get("optional_constraints") or {}).get("options") or []
-    }
-    for cid in constraints or []:
-        opt = opts.get(cid)
-        if not opt:
-            continue
-        for pid, amt in (opt.get("boosts") or {}).items():
-            if zeroed.get(pid):
-                continue
-            boosts[pid] = boosts.get(pid, 0) + amt
-    for pid in totals:
-        totals[pid] += min(boosts.get(pid, 0), cap)
     return totals
 
 
-def rank(apa, answers, constraints=None):
+def rank(apa, answers):
     zeroed = get_zeroed(apa, answers)
-    final = sum_scores(apa, answers, zeroed, constraints)
+    final = sum_scores(apa, answers, zeroed)
     tiebreakers = (
         apa.get("scoring", {}).get("tie_handling", {}).get("tiebreakers") or []
     )
@@ -178,7 +161,7 @@ GOLDEN = [
     {
         "id": "G05",
         "name": "Pro dev, custom app + custom RAG → Foundry",
-        "answers": {"q1": "q1c", "q8": "q8a", "q2": "q2b", "q4": "q4f", "q3": "q3f"},
+        "answers": {"q1": "q1c", "q8": "q8a", "q2": "q2b", "q4": "q4d", "q3": "q3f", "q9": "q9d"},
         "expect_winner": "foundry",
     },
     {

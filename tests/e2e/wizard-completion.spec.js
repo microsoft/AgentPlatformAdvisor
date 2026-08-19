@@ -59,9 +59,10 @@ test.describe('Wizard Completion', () => {
       await page.locator('#next-btn').click();
     }
 
-    // Optional governance constraints step — skip to results
-    await expect(page.locator('#constraints-section')).toBeVisible();
-    await page.locator('#constraints-continue-btn').click();
+    await expect(page.locator('#question-counter')).toContainText('One final distinction');
+    await expect(page.locator('#question-title')).toHaveText('Who should operate the agent runtime?');
+    await page.locator('#options-list .option-card').filter({ hasText: 'Microsoft should manage' }).click();
+    await page.locator('#next-btn').click();
 
     // Verify recommendation section is visible
     await expect(page.locator('#recommendation-section')).toBeVisible();
@@ -118,5 +119,43 @@ test.describe('Wizard Completion', () => {
 
     // Next button should now be enabled
     await expect(page.locator('#next-btn')).toBeEnabled();
+  });
+
+  test('developer-owned runtime requirement disqualifies Copilot Studio', async ({ page }) => {
+    await page.goto('/?q1=q1c&q8=q8a&q2=q2b&q4=q4d&q3=q3f&q9=q9d&r=foundry&d=20260819&mode=card');
+    await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText(/^Microsoft Foundry/);
+    await expect(page.locator('#rec-primary-card .rec-harness-guidance')).toHaveCount(0);
+  });
+
+  test('conditional engineering ownership recommends Foundry', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#start-btn').click();
+    await page.locator('#prescreen-no').click();
+
+    const answers = ['q1c', 'q8a', 'q2b', 'q4d', 'q3f'];
+    for (const optionId of answers) {
+      await page.locator(`#options-list .option-card[data-option-id="${optionId}"]`).click();
+      await page.locator('#next-btn').click();
+    }
+
+    await expect(page.locator('#question-counter')).toContainText('One final distinction');
+    await page.locator('#options-list .option-card').filter({ hasText: 'engineering team' }).click();
+    await page.locator('#next-btn').click();
+    await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText(/^Microsoft Foundry/);
+  });
+
+  test('skips the runtime distinction when Copilot Studio and Foundry are not close', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#start-btn').click();
+    await page.locator('#prescreen-no').click();
+
+    const answers = ['q1a', 'q8a', 'q2a', 'q4a', 'q3a'];
+    for (const optionId of answers) {
+      await page.locator(`#options-list .option-card[data-option-id="${optionId}"]`).click();
+      await page.locator('#next-btn').click();
+    }
+
+    await expect(page.locator('#recommendation-section')).toBeVisible();
+    await expect(page.locator('#rec-primary-card .rec-platform-name')).toHaveText(/^Agent Builder/);
   });
 });

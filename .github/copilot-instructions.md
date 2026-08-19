@@ -51,7 +51,7 @@ Cadence options: `oneshot` | `recurring` | `alwayson` | `unsure`. **Reach is pri
 
 Copilot Chat and the built-in agents (Researcher, Analyst, Facilitator, Interpreter) are **surfaces of** Microsoft 365 Copilot, not separate destinations. The task-type answer selects a `start_here` surface (`chat` or `agents`) rendered in the "Start Here" spotlight on the single `m365_copilot` card. Do not reintroduce them as sibling platforms.
 
-**Agent Builder** is the no-code declarative path inside Microsoft 365 Copilot only — not SharePoint agents, not Agents Toolkit, not custom engine. Adjacent paths live in `apa.adjacent_build_paths` and per-card `adjacent_paths`. Q4 splits multi-agent: `q4d` low-code/business → CS strong; `q4f` code-first/custom runtime → Foundry strong.
+**Agent Builder** is the no-code declarative path inside Microsoft 365 Copilot only — not SharePoint agents, not Agents Toolkit, not custom engine. Adjacent paths live in `apa.adjacent_build_paths` and per-card `adjacent_paths`. Q4 uses one complex-orchestration option (`q4d`) that keeps Copilot Studio and Foundry viable; conditional `q9` resolves runtime ownership only when those platforms are the close top two.
 
 When Copilot Studio is the primary recommendation, `resolveCopilotStudioHarness()` derives a non-scored starting point from the existing answers: `q4d` or `q4e` → GitHub Copilot harness; `q2c` or `q4c` → Copilot Studio workflow; `q2a` + `q4a` → Copilot chat harness; otherwise → standard harness. Keep this post-score guidance independent from the platform ranking.
 
@@ -61,8 +61,9 @@ Documented in `docs/SCORING.md` and `docs/FLOWCHART.md`:
 
 1. **Hard rules** zero out platforms for disqualifying answer combinations
 2. **Raw scores** sum across 5 questions (max 15 per platform)
-3. **Tiebreakers** in `apa.yaml` resolve equal scores using persona context
-4. **Thresholds** map scores to fit labels: Strong (12–15), Good (8–11), Partial (4–7), Not recommended (0–3)
+3. **Conditional runtime distinction** asks `q9` only when Copilot Studio and Foundry are the top two viable platforms within 2 points; `q9a` prefers Copilot Studio without changing scores, while `q9d` hard-zeros Agent Builder and Copilot Studio
+4. **Tiebreakers** in `apa.yaml` resolve equal scores using persona context
+5. **Thresholds** map scores to fit labels: Strong (12–15), Good (8–11), Partial (4–7), Not recommended (0–3)
 
 `meta.platforms` lists four platforms, but `m365_copilot` is always zeroed in the scored wizard (`if (!fastTrack) zeroed['m365_copilot'] = true`), so only three can actually win. M365 Copilot is reached through the entry-point wizard, or via the legacy `?ft=1` / `?dt=copilot_chat` share links.
 
@@ -73,7 +74,7 @@ Result links are shared externally, so **old parameter shapes must keep resolvin
 | Param | Meaning |
 |---|---|
 | `q1`, `q8`, `q2`, `q4`, `q3` | Scored-wizard answers (option IDs) |
-| `c=id1,id2` | Optional governance constraint soft boosts (e.g. `c_private_net`) |
+| `q9=q9a\|q9d` | Conditional runtime ownership; omitted when it was not asked |
 | `dt=m365_copilot\|cowork\|scout\|both` | Entry-point destination |
 | `st=chat\|agents` | Which M365 Copilot surface to feature |
 | `r=<platform>` + `d=YYYYMMDD` | Original recommendation + date; drive the temporal-change banner |
@@ -81,6 +82,7 @@ Result links are shared externally, so **old parameter shapes must keep resolvin
 | `ft=1` (legacy), `dt=copilot_chat` (legacy) | Resolve to the M365 Copilot card |
 
 Answers also persist in `sessionStorage` under `apa-answers`; URL params always win over stored answers.
+Legacy `q9b`/`q9c` normalize to `q9a`. Temporary `q4=q4f` links normalize to `q4=q4d` plus `q9=q9d`. Missing `q9` is not schema drift.
 
 ### Share links are untrusted input
 
