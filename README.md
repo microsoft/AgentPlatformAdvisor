@@ -99,7 +99,7 @@ Microsoft 365 Copilot, Cowork, and Scout are not part of the 0-15 scored wizard.
 The advisor reflects the current split between Microsoft agent options:
 
 - **Agent Builder** has expanded beyond SharePoint/OneDrive-only scenarios. It now covers no-code agents grounded in Microsoft 365 content, scoped web, uploaded files, and admin-enabled Microsoft 365 Copilot connectors, including lightweight content and data-analysis helpers.
-- **Copilot Studio** is the default governed low-code path for enterprise agents that need actions, workflows, triggers, connectors, MCP tools, computer use, connected agents, evaluation, monitoring, and multi-channel deployment.
+- **Copilot Studio** is the default governed low-code path for enterprise agents that need actions, workflows, triggers, connectors, MCP tools, computer use, connected agents, evaluation, monitoring, and multi-channel deployment. When it wins, the result now identifies the most relevant starting point: GitHub Copilot harness, standard harness, Copilot chat harness, or Copilot Studio workflow.
 - **Microsoft Foundry** is the developer-controlled production runtime for prompt agents, hosted code agents, custom retrieval, managed endpoints, toolboxes, MCP, identity, private networking, tracing, evaluation, monitoring, and custom app/service integration.
 - **Microsoft 365 Copilot** is treated as the built-in productivity layer, and as one product rather than several: Copilot Chat, Copilot Search, app-native Copilot, Pages, Notebooks, and Microsoft-built agents are all surfaces within it.
 - **Copilot Cowork** and **Microsoft Scout** are personal agents you delegate work to, not platforms in the scored build assessment.

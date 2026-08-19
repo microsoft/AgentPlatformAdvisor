@@ -1846,6 +1846,12 @@ body {
   line-height: 1.5;
   margin: 0;
 }
+.rec-harness-considerations {
+  margin: 12px 0 0;
+}
+.rec-harness-considerations li {
+  color: var(--muted-foreground);
+}
 
 /* Recommendation section navigation */
 .rec-nav {

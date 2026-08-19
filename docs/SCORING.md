@@ -218,6 +218,19 @@ Contextual warning banners when answer combinations are logically contradictory:
 
 When Foundry wins but the builder is a business user (q1a), a banner advises partnering with a development team.
 
+### Step 8 — Copilot Studio starting point (non-scored)
+
+When Copilot Studio is the primary recommendation, the result derives a harness or workflow starting point from the existing answers. This does not change platform scores or ranking.
+
+| Answer signal | Starting point | Why |
+|---|---|---|
+| q4d (low-code multi-agent / long-running business orchestration) or q4e (create/analyze content in Copilot) | **GitHub Copilot harness** | Managed adaptive planning, tool use, file creation, and recovery |
+| q2c (background/event-driven) or q4c (multi-step action workflow) | **Copilot Studio workflow** | Deterministic triggers, control logic, connector actions, and handoffs |
+| q2a + q4a (M365 Copilot chat + Q&A/lookups) | **Copilot chat harness** | Internal knowledge extension inside Microsoft 365 Copilot Chat |
+| Any other Copilot Studio result | **Standard harness** | Predictable topic-driven conversations and explicit rules |
+
+The q4 checks run before the workflow check so adaptive business orchestration and content creation remain harness scenarios even when another answer mentions background execution. Code-first runtime ownership remains part of the scored q4f path and normally recommends Foundry rather than a Copilot Studio harness.
+
 ## Distribution Analysis
 
 Across all **2,304** possible answer combinations (4 × 4 × 4 × 6 × 6 after adding q4f):
