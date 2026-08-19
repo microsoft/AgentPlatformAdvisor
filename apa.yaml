@@ -34,7 +34,7 @@ questions:
         label: Business user or subject matter expert — no coding experience
         scores:
           agent_builder: 3
-          copilot_studio: 1
+          copilot_studio: 2
           foundry: 0
 
       - id: q1b
@@ -55,7 +55,7 @@ questions:
         label: Data scientist or AI/ML engineer — works with AI models and data infrastructure
         scores:
           agent_builder: 0
-          copilot_studio: 1
+          copilot_studio: 2
           foundry: 3
 
   - id: q8
@@ -159,7 +159,7 @@ questions:
         label: Create or analyze content inside Copilot — documents, charts, images, or lightweight data analysis
         scores:
           agent_builder: 3
-          copilot_studio: 2
+          copilot_studio: 3
           foundry: 2
 
       - id: q4c
@@ -173,7 +173,7 @@ questions:
         label: Manage complex workflows — coordinate multiple agents or handle long-running processes
         scores:
           agent_builder: 0
-          copilot_studio: 2
+          copilot_studio: 3
           foundry: 3
         hard_rule_trigger: true
 
@@ -225,6 +225,27 @@ questions:
           foundry: 3
 
 ################################################################################
+# CONDITIONAL RUNTIME TIE-BREAKER
+################################################################################
+
+runtime_tiebreaker:
+  id: q9
+  label: Who should operate the agent runtime?
+  prompt: Copilot Studio and Microsoft Foundry both fit your functional requirements. Choose who should own the execution environment.
+  threshold_points: 2
+  compare: [copilot_studio, foundry]
+  legacy_managed_option_ids: [q9b, q9c]
+  options:
+    - id: q9a
+      label: Microsoft should manage the agent runtime, sandbox, tools, and Power Platform governance
+      prefer: copilot_studio
+      over: foundry
+
+    - id: q9d
+      label: Our engineering team should own the code runtime, framework, endpoints, networking, identity, memory, or retrieval
+      zero: [agent_builder, copilot_studio]
+
+################################################################################
 # SCORING ENGINE
 ################################################################################
 
@@ -256,6 +277,9 @@ scoring:
     q3f:
       zero: [agent_builder]
       label: "Custom retrieval architecture — Agent Builder cannot directly use custom RAG, Azure AI Search, private indexes, Foundry IQ, or engineering-managed retrieval systems"
+    q9d:
+      zero: [agent_builder, copilot_studio]
+      label: "Developer-owned runtime — Agent Builder and Copilot Studio do not provide an engineering-owned code runtime, framework, endpoint, network, identity, memory, or retrieval architecture"
   # Step 2 — Sum raw scores across all answered questions.
   raw_score_max: 15  # 5 questions × max score of 3
 
@@ -270,8 +294,17 @@ scoring:
       rationale: >
         Copilot Studio is recommended over Agent Builder for data scientists and AI/ML engineers
         because it supports curated model selection, agent evaluations, Foundry IQ integration,
-        code-first development via the VS Code extension, and more flexible orchestration —
-        capabilities that Agent Builder does not offer.
+        managed reasoning, portable skills, and more flexible orchestration — capabilities
+        that Agent Builder does not offer. Use Foundry when the scenario requires a custom
+        model or developer-owned runtime.
+    - when:
+        q9: q9a
+      prefer: copilot_studio
+      over: foundry
+      rationale: >
+        Copilot Studio is recommended because you want Microsoft to manage the reasoning
+        harness, sandbox, tools, and Power Platform governance. Choose Foundry when your
+        engineering team needs to own the runtime and infrastructure.
 
   # Step 3 — Map raw scores to recommendation strength.
   recommendation_thresholds:
@@ -305,8 +338,9 @@ scoring:
         prefer: copilot_studio
         rationale: >
           When the builder is a professional developer and scores are equal,
-          Copilot Studio is the better fit — it supports code-first authoring
-          via the VS Code extension while Agent Builder is no-code only.
+          Copilot Studio is the better fit — it supports managed enterprise
+          orchestration, evaluation, governance, and developer authoring workflows
+          while Agent Builder is designed for lightweight no-code agents.
       - when:
           q1: q1d
         platforms: [copilot_studio, foundry]
@@ -317,7 +351,7 @@ scoring:
           agents while Foundry is reserved for deeper custom orchestration.
     valid_pairs:
       - platforms: [copilot_studio, foundry]
-        rationale: Build in Copilot Studio, extend with custom code in Foundry.
+        rationale: Choose Copilot Studio when Microsoft should manage the reasoning harness, sandbox, tools, and Power Platform governance. Choose Foundry when your team must own the code runtime, framework, endpoint, network, identity, memory, or retrieval architecture.
       - platforms: [m365_copilot, copilot_studio]
         rationale: Microsoft 365 Copilot for end users, Copilot Studio for customization and extension.
       - platforms: [agent_builder, m365_copilot]
@@ -344,9 +378,10 @@ scoring:
         q1: q1a
         q4: q4d
       note: >
-        Complex multi-agent orchestration typically requires professional development
-        skills. Consider partnering with your development team, or selecting a simpler
-        task type that matches your experience level.
+        Copilot Studio can now author reasoning-heavy, multi-step agents through natural
+        language, but production use still requires careful tool permissions, evaluation,
+        monitoring, human review, and Copilot Credit governance. Consider involving your
+        IT or platform team before deployment.
     - when:
         q1: q1a
         q3: q3c
@@ -550,21 +585,27 @@ recommendations:
 
   copilot_studio:
     headline: Copilot Studio
-    description: Build governed enterprise agents that combine knowledge, tools, workflows, event triggers, human review, connected agents, evaluation, monitoring, and multi-channel deployment
+    description: Build governed enterprise agents with managed reasoning harnesses, natural-language authoring, knowledge, tools, workflows, triggers, human review, evaluation, monitoring, and multi-channel deployment
     resources_url: https://microsoft.github.io/agent-resources/copilot-studio/
-    scoring_summary: The governed low-code platform for enterprise agents that need actions, workflows, connectors, evaluation, monitoring, and broad deployment.
-    exploration_best_for: Build governed enterprise agents and workflows
+    scoring_summary: The managed enterprise agent platform for adaptive agents, predictable conversations, deterministic workflows, Microsoft 365 Copilot extensions, and broad deployment.
+    exploration_best_for: Build managed, governed enterprise agents and workflows
     exploration_summary: >
       Choose Copilot Studio when you need agents that go beyond quick knowledge lookup —
       connecting to CRMs, databases, APIs, MCP servers, workflows, Microsoft 365 context,
-      and other agents. Great for makers and IT teams building governed agents that can
-      reason, take actions, evaluate quality, and deploy across channels.
+      files, and other agents. Choose among the GitHub Copilot, standard, and Copilot chat
+      harnesses based on whether the work should adapt, follow explicit rules, or extend
+      Microsoft 365 Copilot. Great for makers, IT teams, and developers building governed
+      agents that can reason, take actions, evaluate quality, and deploy across channels.
     summary: >
-      The best low-code platform for governed enterprise agents — connect to outside
-      systems, automate business processes, use generative orchestration, evaluate
-      quality, monitor behavior, and deploy to websites, Teams, Microsoft 365, and more.
+      The managed platform for governed enterprise agents — use natural-language-first
+      adaptive orchestration, predictable topic-driven agents, or deterministic workflows;
+      connect to outside systems, evaluate quality, monitor behavior, and deploy broadly.
     best_for:
-      - Low-code makers and IT pros
+      - Business users, low-code makers, IT pros, and developers who want a Microsoft-managed agent runtime
+      - Reasoning-heavy, multi-step business processes that plan, adapt, recover from failures, and work across several tools
+      - Native creation, editing, and reasoning over Word, Excel, PowerPoint, and PDF files
+      - Predictable topic-driven conversations and deterministic triggered or scheduled workflows
+      - Internal Microsoft 365 Copilot knowledge extensions through the Copilot chat harness
       - Agents connecting to external APIs, CRM, ERP, Dataverse, databases, MCP servers, or custom connectors
       - Event-triggered, scheduled, or user-triggered workflows with actions, branching, human review, and approvals
       - Multi-agent orchestration (now generally available) — child agents, connected Copilot Studio agents, and A2A integrations
@@ -573,16 +614,62 @@ recommendations:
       - Internal and external-facing deployment
       - Built-in evaluation test sets, activity maps, analytics, monitoring, and tenant-wide agent inventory
     watch_out_for:
+      - Choose the harness when you create the agent — GitHub Copilot, standard, and Copilot chat harness agents can't be transferred between harnesses
+      - GitHub Copilot harness agents and workflows consume Copilot Credits while building, previewing, testing, evaluating, and running in production
       - Complex ML pipelines or custom model training require Foundry
-      - Highly custom, high-scale, or code-first multi-agent orchestration is better served by Foundry
+      - Use Foundry when your team must own the code runtime, custom framework, stable endpoint, private network, dedicated identity, custom memory, or retrieval architecture
       - Supports curated GA, preview, and experimental models, including deep reasoning models; use Foundry for arbitrary bring-your-own model hosting, custom model training, model routing, and full runtime control
-      - Memory is available in the new experience preview with per-user/per-agent storage and lifecycle limits; use Foundry when you need custom memory architecture, longer retention, or application-controlled memory
+      - Memory is preview, stored separately per user, deleted after 28 days without interaction, unavailable in group chats and Teams channels, and not visible to makers
       - Computer use requires careful credential, supervision, access-control, observability, and cost governance
       - Copilot Credits can scale quickly with generative answers, agent actions, tenant graph grounding, workflows, reasoning models, voice, and computer use
+    harnesses:
+      github_copilot:
+        label: GitHub Copilot harness
+        url: https://learn.microsoft.com/microsoft-copilot-studio/agents-experience/overview
+        tagline: Managed adaptive execution for reasoning-heavy, multi-step work
+        description: >
+          Start here when the agent should take a goal, plan the steps, use several tools
+          or agents, create or edit Office and PDF files, adapt when conditions change,
+          and recover when a step fails. Tasks run in a secure Copilot Studio sandbox.
+        considerations:
+          - Harness choice is fixed for the agent; it can't later transfer to the standard or Copilot chat harness
+          - Copilot Credits apply during building, previewing, testing, evaluating, and production use
+      standard:
+        label: Standard harness
+        url: https://learn.microsoft.com/microsoft-copilot-studio/harnesses-overview
+        tagline: Predictable topic-driven conversations and explicit rules
+        description: >
+          Start here when the agent should follow defined topics, branches, prompts, and
+          repeatable conversation paths rather than decide its own plan dynamically.
+        considerations:
+          - Prefer the workflow experience instead when the primary requirement is scheduled or event-triggered deterministic automation
+          - Harness choice is fixed for the agent and should be validated before implementation
+      copilot_chat:
+        label: Copilot chat harness
+        url: https://learn.microsoft.com/microsoft-copilot-studio/microsoft-365-copilot-extend-with-agents
+        tagline: Internal knowledge extensions inside Microsoft 365 Copilot Chat
+        description: >
+          Start here when employees need Microsoft 365 Copilot Chat grounded in your
+          organization's knowledge without leaving their everyday Microsoft 365 experience.
+        considerations:
+          - Publishes to internal teams rather than external customers
+          - Agent Builder remains the faster option for the simplest small-team no-code scenario
+      workflow:
+        label: Copilot Studio workflow
+        url: https://learn.microsoft.com/microsoft-copilot-studio/workflows-experience/flows-overview
+        tagline: Deterministic automation with triggers, branching, AI actions, and agent handoffs
+        description: >
+          Start with a workflow when a schedule, event, user, or agent should trigger a
+          predictable sequence of connector actions, control logic, human input, and AI steps.
+        considerations:
+          - Each production action consumes Copilot Studio capacity, so monitor environment allocation and enforcement
+          - Use an adaptive GitHub Copilot harness agent when the process must decide and re-plan rather than follow a defined path
     persona_tips:
       q1c: >
-        🛠️ <strong>Developer tip:</strong> You can build Copilot Studio agents in YAML using the
+        🛠️ <strong>Developer tip:</strong> You can author Copilot Studio components in YAML using the
         <a href="https://learn.microsoft.com/microsoft-copilot-studio/authoring-overview" target="_blank" rel="noopener noreferrer">Copilot Studio extension for VS Code</a>
+        for source-controlled collaboration. This improves the development workflow but does
+        not provide a developer-owned code runtime; use Foundry when you need that control.
 
   foundry:
     headline: Microsoft Foundry

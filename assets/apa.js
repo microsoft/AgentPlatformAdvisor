@@ -6,6 +6,7 @@ let delegateResult = null; // 'm365_copilot' | 'cowork' | 'scout' | 'both' — s
 let delegateStart = null;  // 'chat' | 'agents' — which surface inside Microsoft 365 Copilot to start with
 let delegateAnswers = {}; // { involvement: 'interactive'|'delegate', taskType: 'general'|'specialized', cadence: 'ondemand'|'continuous'|'unsure', reach: 'm365'|'cross'|'unsure' }
 let currentQuestionIndex = 0;
+let runtimeTieBreakerActive = false;
 let listenersReady = false;
 let recommendedPlatformId = null;
 let isURLLoaded = false; // true when loaded from shared URL params
@@ -23,8 +24,8 @@ function showSection(id) {
 }
 
 // === HISTORY NAVIGATION ===
-function pushState(section, questionIndex) {
-  const state = { section, questionIndex: questionIndex ?? null };
+function pushState(section, questionIndex, runtimeTieBreaker = false) {
+  const state = { section, questionIndex: questionIndex ?? null, runtimeTieBreaker };
   history.pushState(state, '', '');
 }
 
@@ -35,8 +36,12 @@ window.addEventListener('popstate', (e) => {
     return;
   }
   if (state.section === 'assessment-section' && state.questionIndex != null) {
-    currentQuestionIndex = state.questionIndex;
-    renderQuestion();
+    if (state.runtimeTieBreaker) {
+      renderRuntimeTieBreaker();
+    } else {
+      currentQuestionIndex = state.questionIndex;
+      renderQuestion();
+    }
   } else if (state.section === 'recommendation-section') {
     renderRecommendation();
   } else if (state.section === 'exploration-section') {
@@ -262,6 +267,43 @@ function badgeClass(label) {
   return 'badge-not';
 }
 
+function normalizeRuntimeOptionId(optionId) {
+  const runtime = apa.runtime_tiebreaker;
+  if (!runtime || !optionId) return null;
+  if ((runtime.legacy_managed_option_ids || []).includes(optionId)) return 'q9a';
+  return runtime.options.some(option => option.id === optionId) ? optionId : null;
+}
+
+function shouldAskRuntimeTieBreaker(answersMap) {
+  const runtime = apa.runtime_tiebreaker;
+  if (!runtime) return false;
+
+  const baseAnswers = { ...answersMap };
+  delete baseAnswers[runtime.id];
+  const zeroed = getZeroedPlatforms(baseAnswers);
+  const ranked = rankPlatforms(baseAnswers);
+  const [firstId, secondId] = runtime.compare;
+  const first = ranked.find(platform => platform.id === firstId);
+  const second = ranked.find(platform => platform.id === secondId);
+  const topTwoIds = new Set(ranked.slice(0, 2).map(platform => platform.id));
+
+  return !!(
+    first && second &&
+    topTwoIds.has(firstId) && topTwoIds.has(secondId) &&
+    !zeroed[firstId] && !zeroed[secondId] &&
+    first.score > 0 && second.score > 0 &&
+    Math.abs(first.score - second.score) <= runtime.threshold_points
+  );
+}
+
+function resolveCopilotStudioHarness(answersMap) {
+  if (answersMap.q9 === 'q9d') return null;
+  if (answersMap.q4 === 'q4d' || answersMap.q4 === 'q4e') return 'github_copilot';
+  if (answersMap.q2 === 'q2c' || answersMap.q4 === 'q4c') return 'workflow';
+  if (answersMap.q2 === 'q2a' && answersMap.q4 === 'q4a') return 'copilot_chat';
+  return 'standard';
+}
+
 
 function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge, startKey) {
   const rec = apa.recommendations[platformId];
@@ -308,6 +350,23 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
     </div>`;
   })() : '';
 
+  const harnessKey = isPrimary && platformId === 'copilot_studio'
+    ? resolveCopilotStudioHarness(answersMap)
+    : null;
+  const harness = harnessKey && rec.harnesses ? rec.harnesses[harnessKey] : null;
+  const harnessHtml = harness ? `
+    <div class="rec-spotlight rec-harness-guidance" data-harness="${harnessKey}">
+      <div class="rec-spotlight-eyebrow">Start with this harness</div>
+      <div class="rec-spotlight-name">
+        <a href="${harness.url}" target="_blank" rel="noopener noreferrer">${harness.label}</a>
+      </div>
+      <div class="rec-spotlight-tagline">${harness.tagline}</div>
+      <p class="rec-spotlight-description">${harness.description}</p>
+      ${(harness.considerations || []).length > 0
+        ? `<ul class="rec-list rec-harness-considerations">${harness.considerations.map(item => `<li>${item}</li>`).join('')}</ul>`
+        : ''}
+    </div>` : '';
+
   const firstPartyHtml = (rec.first_party_agents || []).length > 0 ? `
     <details class="rec-accordion"${detailsOpen}>
       <summary class="rec-accordion-trigger">
@@ -352,6 +411,7 @@ function buildPlatformCard(platformId, ranked, answersMap, isPrimary, showBadge,
       </div>
       ${descriptionHtml}
       <p class="rec-summary">${rec.summary}</p>
+      ${harnessHtml}
       ${spotlightHtml}
       ${rec.persona_tips && rec.persona_tips[answersMap.q1]
         ? `<div class="rec-dev-note">${rec.persona_tips[answersMap.q1]}</div>`
@@ -400,14 +460,22 @@ function restoreAnswersFromStorage() {
     const stored = sessionStorage.getItem('apa-answers');
     if (!stored) return null;
     const parsed = JSON.parse(stored);
+    const normalized = {};
     // Schema drift check: validate every key/value against current YAML
     const validQuestionIds = new Set(apa.questions.map(q => q.id));
     for (const [qId, optId] of Object.entries(parsed)) {
+      if (qId === apa.runtime_tiebreaker?.id) {
+        const normalizedRuntime = normalizeRuntimeOptionId(optId);
+        if (!normalizedRuntime) { clearAnswersFromStorage(); return null; }
+        normalized[qId] = normalizedRuntime;
+        continue;
+      }
       if (!validQuestionIds.has(qId)) { clearAnswersFromStorage(); return null; }
       const question = apa.questions.find(q => q.id === qId);
       if (!question.options.some(o => o.id === optId)) { clearAnswersFromStorage(); return null; }
+      normalized[qId] = optId;
     }
-    return parsed;
+    return normalized;
   } catch (e) { return null; }
 }
 
@@ -455,10 +523,22 @@ async function boot() {
       const restored = restoreAnswersFromStorage();
       if (restored && Object.keys(restored).length > 0) {
         answers = restored;
-        currentQuestionIndex = Math.min(Object.keys(restored).length, apa.questions.length - 1);
-        renderQuestion();
+        const answeredCore = apa.questions.filter(question => answers[question.id]).length;
+        currentQuestionIndex = Math.min(answeredCore, apa.questions.length - 1);
+        const resumeRuntimeTieBreaker =
+          answeredCore === apa.questions.length &&
+          shouldAskRuntimeTieBreaker(answers);
+        if (resumeRuntimeTieBreaker) {
+          renderRuntimeTieBreaker();
+        } else {
+          renderQuestion();
+        }
         showSection('assessment-section');
-        history.replaceState({ section: 'assessment-section', questionIndex: currentQuestionIndex }, '', '');
+        history.replaceState({
+          section: 'assessment-section',
+          questionIndex: currentQuestionIndex,
+          runtimeTieBreaker: resumeRuntimeTieBreaker,
+        }, '', '');
       } else {
         showSection('welcome-section');
         history.replaceState({ section: 'welcome-section' }, '', '');
@@ -490,6 +570,7 @@ function setupListeners() {
 function handlePrescreenNo() {
   fastTrack = false;
   delegateResult = null;
+  runtimeTieBreakerActive = false;
   if (Object.keys(answers).length === 0) {
     currentQuestionIndex = 0;
   }
@@ -656,6 +737,7 @@ function renderExploration() {
 }
 
 function renderQuestion() {
+  runtimeTieBreakerActive = false;
   const question = apa.questions[currentQuestionIndex];
   const total = apa.questions.length;
 
@@ -682,6 +764,7 @@ function renderQuestion() {
       </div>`;
     const select = () => {
       answers[question.id] = opt.id;
+      delete answers[apa.runtime_tiebreaker?.id];
       saveAnswersToStorage();
       renderQuestion();
     };
@@ -700,21 +783,85 @@ function renderQuestion() {
   document.getElementById('prev-btn').disabled = false;
 }
 
+function renderRuntimeTieBreaker() {
+  const runtime = apa.runtime_tiebreaker;
+  if (!runtime) return;
+  runtimeTieBreakerActive = true;
+
+  document.getElementById('question-counter').textContent = 'One final distinction';
+  document.getElementById('question-title').textContent = runtime.label;
+  document.getElementById('question-subtitle').textContent = runtime.prompt;
+
+  const optionsList = document.getElementById('options-list');
+  optionsList.innerHTML = '';
+  runtime.options.forEach(option => {
+    const isSelected = answers[runtime.id] === option.id;
+    const div = document.createElement('div');
+    div.className = 'option-card' + (isSelected ? ' selected' : '');
+    div.setAttribute('role', 'button');
+    div.setAttribute('tabindex', '0');
+    div.setAttribute('aria-pressed', String(isSelected));
+    div.innerHTML = `
+      <div class="option-radio-indicator" aria-hidden="true">
+        <div class="option-radio-outer">${isSelected ? '<div class="option-radio-inner"></div>' : ''}</div>
+      </div>
+      <div class="option-content">
+        <div class="option-label">${option.label}</div>
+      </div>`;
+    const select = () => {
+      answers[runtime.id] = option.id;
+      saveAnswersToStorage();
+      renderRuntimeTieBreaker();
+    };
+    div.addEventListener('click', select);
+    div.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        select();
+      }
+    });
+    optionsList.appendChild(div);
+  });
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = !answers[runtime.id];
+  nextBtn.textContent = 'Get Recommendation ▶';
+  document.getElementById('prev-btn').disabled = false;
+}
+
 function handleNext() {
-  const question = apa.questions[currentQuestionIndex];
+  if (runtimeTieBreakerActive) {
+    renderRecommendation();
+    showSection('recommendation-section');
+    pushState('recommendation-section');
+    return;
+  }
 
   if (currentQuestionIndex < apa.questions.length - 1) {
     currentQuestionIndex++;
     renderQuestion();
     pushState('assessment-section', currentQuestionIndex);
   } else {
-    renderRecommendation();
-    showSection('recommendation-section');
-    pushState('recommendation-section');
+    if (!answers[apa.runtime_tiebreaker?.id] && shouldAskRuntimeTieBreaker(answers)) {
+      renderRuntimeTieBreaker();
+      pushState('assessment-section', currentQuestionIndex, true);
+    } else {
+      renderRecommendation();
+      showSection('recommendation-section');
+      pushState('recommendation-section');
+    }
   }
 }
 
 function handlePrev() {
+  if (runtimeTieBreakerActive) {
+    delete answers[apa.runtime_tiebreaker?.id];
+    saveAnswersToStorage();
+    currentQuestionIndex = apa.questions.length - 1;
+    renderQuestion();
+    pushState('assessment-section', currentQuestionIndex);
+    return;
+  }
   if (currentQuestionIndex > 0) {
     currentQuestionIndex--;
     renderQuestion();
@@ -780,12 +927,17 @@ function getScoreReason(platformId, ranked, answersMap) {
   const isWinner = winner && winner.id === platformId;
   const contribs = getContributions(platformId, answersMap);
   const perQ = getPerQuestionScores(platformId, answersMap);
+  const answeredCount = perQ.filter(q => answersMap[q.qId]).length;
   const perfectCount = perQ.filter(q => q.score === 3).length;
   const zeroCount = perQ.filter(q => q.score === 0).length;
 
   if (isWinner) {
-    if (perfectCount === 5) return 'Perfect fit — scored highest on every dimension.';
-    if (perfectCount >= 4) return 'Strong match across nearly all dimensions.';
+    if (answeredCount > 0 && perfectCount === answeredCount) {
+      return 'Perfect fit — scored highest on every dimension.';
+    }
+    if (answeredCount > 1 && perfectCount >= answeredCount - 1) {
+      return 'Strong match across nearly all dimensions.';
+    }
     const tops = contribs.slice(0, 2).map(c => `<em>${c.questionLabel.replace(/\?$/, '')}</em>`);
     return `Strongest on ${tops.join(' and ')}.`;
   }
@@ -1117,6 +1269,7 @@ function restart() {
   delegateStart = null;
   delegateAnswers = {};
   currentQuestionIndex = 0;
+  runtimeTieBreakerActive = false;
   recommendedPlatformId = null;
   isURLLoaded = false;
   originalPlatformId = null;
@@ -1137,6 +1290,7 @@ function startFullAssessment() {
   delegateStart = null;
   answers = {};
   currentQuestionIndex = 0;
+  runtimeTieBreakerActive = false;
   renderQuestion();
   showSection('assessment-section');
   pushState('assessment-section', 0);
@@ -1192,7 +1346,19 @@ function parseURLParams() {
     }
   });
 
-  // Check for questions in YAML not present in URL
+  const runtimeId = apa.runtime_tiebreaker?.id;
+  const runtimeValue = runtimeId ? params.get(runtimeId) : null;
+  if (runtimeValue) {
+    const normalizedRuntime = normalizeRuntimeOptionId(runtimeValue);
+    if (normalizedRuntime) {
+      answers[runtimeId] = normalizedRuntime;
+    } else {
+      hasDrift = true;
+    }
+  }
+
+  // Check for scored questions in YAML not present in URL. The runtime
+  // distinction is conditional, so its absence is not schema drift.
   apa.questions.forEach(q => {
     if (!answers[q.id]) hasDrift = true;
   });
@@ -1220,6 +1386,8 @@ function buildShareableURL() {
     apa.questions.forEach(q => {
       if (answers[q.id]) params.set(q.id, answers[q.id]);
     });
+    const runtimeId = apa.runtime_tiebreaker?.id;
+    if (runtimeId && answers[runtimeId]) params.set(runtimeId, answers[runtimeId]);
   }
 
   params.set('r', recommendedPlatformId || '');

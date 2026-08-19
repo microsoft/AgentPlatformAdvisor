@@ -49,7 +49,8 @@ Documented in `docs/SCORING.md` and `docs/FLOWCHART.md`:
 1. **Hard rules** zero out platforms for disqualifying answer combinations
 2. **Raw scores** sum across 5 questions (max 15 per platform)
 3. **Tiebreakers** in `apa.yaml` resolve equal scores using persona context
-4. **Thresholds** map scores to fit labels: Strong (12–15), Good (8–11), Partial (4–7), Not recommended (0–3)
+4. **Conditional runtime distinction** asks who should operate the runtime only when Copilot Studio and Foundry are the top two platforms within 2 points
+5. **Thresholds** map scores to fit labels: Strong (12–15), Good (8–11), Partial (4–7), Not recommended (0–3)
 
 `meta.platforms` lists four platforms, but `m365_copilot` is always zeroed in the scored wizard (`if (!fastTrack) zeroed['m365_copilot'] = true`), so only three can actually win. M365 Copilot is reached through the entry-point wizard, or via the legacy `?ft=1` / `?dt=copilot_chat` share links.
 
@@ -60,6 +61,7 @@ Result links are shared externally, so **old parameter shapes must keep resolvin
 | Param | Meaning |
 |---|---|
 | `q1`, `q8`, `q2`, `q4`, `q3` | Scored-wizard answers (option IDs) |
+| `q9=q9a|q9d` | Conditional runtime ownership tie-breaker |
 | `dt=m365_copilot\|cowork\|scout\|both` | Entry-point destination |
 | `st=chat\|agents` | Which M365 Copilot surface to feature |
 | `r=<platform>` + `d=YYYYMMDD` | Original recommendation + date; drive the temporal-change banner |
@@ -81,8 +83,8 @@ Key constraints:
 
 ## Conventions
 
-- Always update `docs/CHANGELOG.md` after making changes. Sections are dated by commit date (`## 2026-07-24`); work in progress sits under `## Unreleased` until it's committed.
+- Always update `docs/CHANGELOG.md` after making changes. Sections are dated by commit date (`## 2026-07-24`).
 - Always update `docs/FLOWCHART.md` and `docs/SCORING.md` after changes that affect user flow or scoring logic.
-- Question IDs in `apa.yaml` are not sequential (e.g., `q1, q8, q2, q4, q3`) — they preserve identity across schema changes. Display order is the array order in `apa.yaml`, not the numeric ID.
+- Question IDs in `apa.yaml` are not sequential (e.g., `q1, q8, q2, q4, q3`) — they preserve identity across schema changes. Display order is the array order in `apa.yaml`, not the numeric ID. `q9` is a conditional, non-scored runtime distinction.
 - Entry-point cards (`ENTRY_POINT_PLATFORMS` in `apa.js`) render their accordions expanded; scored comparison cards stay collapsed.
 - In tests, don't identify a recommendation card by a headline substring alone — several destinations share "Microsoft 365 Copilot" wording. Assert exact `.rec-platform-name` text plus something distinguishing.

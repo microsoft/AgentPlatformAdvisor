@@ -2,7 +2,9 @@
 const { test, expect } = require('@playwright/test');
 
 // Answers that produce a clear Copilot Studio winner:
-// q1c (pro dev), q8a (internal), q2d (multiple places), q4b (conversation), q3b (other systems)
+// q1c (pro dev), q8a (internal), q2d (multiple places), q4b (conversation),
+// q3b (other systems). Copilot Studio and Foundry finish within two points,
+// so the conditional runtime distinction appears.
 const WIZARD_ANSWERS = {
   q1: 'q1c', // Professional developer
   q8: 'q8a', // Internal employees
@@ -11,7 +13,7 @@ const WIZARD_ANSWERS = {
   q3: 'q3b', // Other business systems
 };
 
-// The YAML question order is: q1, q8, q2, q4, q3
+// The scored YAML question order is: q1, q8, q2, q4, q3
 const QUESTION_ORDER = ['q1', 'q8', 'q2', 'q4', 'q3'];
 
 // Map question IDs to option indices (0-based) for clicking
@@ -38,7 +40,7 @@ test.describe('Wizard Completion', () => {
     await page.locator('#prescreen-no').click();
     await expect(page.locator('#assessment-section')).toBeVisible();
 
-    // Answer all 5 questions
+    // Answer all questions
     for (let i = 0; i < QUESTION_ORDER.length; i++) {
       const qId = QUESTION_ORDER[i];
       const optIdx = OPTION_INDEX[qId];
@@ -59,11 +61,17 @@ test.describe('Wizard Completion', () => {
       await page.locator('#next-btn').click();
     }
 
+    await expect(page.locator('#question-counter')).toHaveText('One final distinction');
+    await expect(page.locator('#question-title')).toHaveText('Who should operate the agent runtime?');
+    await page.locator('#options-list .option-card').first().click();
+    await page.locator('#next-btn').click();
+
     // Verify recommendation section is visible
     await expect(page.locator('#recommendation-section')).toBeVisible();
 
     // Verify a platform card is rendered
     await expect(page.locator('#rec-primary-card .rec-card')).toBeVisible();
+    await expect(page.locator('#rec-primary-card .rec-harness-guidance')).toContainText('Standard harness');
 
     // Verify score breakdown exists
     await expect(page.locator('#rec-score-comparison')).toBeVisible();
@@ -114,5 +122,55 @@ test.describe('Wizard Completion', () => {
 
     // Next button should now be enabled
     await expect(page.locator('#next-btn')).toBeEnabled();
+  });
+
+  test('developer-owned runtime requirement disqualifies Copilot Studio', async ({ page }) => {
+    const params = [
+      'q1=q1c',
+      'q8=q8a',
+      'q2=q2d',
+      'q4=q4d',
+      'q9=q9d',
+      'q3=q3f',
+      'r=foundry',
+      'd=20260819',
+      'mode=card',
+    ].join('&');
+
+    await page.goto(`/?${params}`);
+
+    await expect(page.locator('#rec-primary-card .rec-platform-name')).toContainText('Microsoft Foundry');
+    await expect(page.locator('#rec-score-comparison')).toContainText('Developer-owned runtime');
+  });
+
+  test('conditional engineering ownership recommends Foundry', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#start-btn').click();
+    await page.locator('#prescreen-no').click();
+
+    for (const questionId of QUESTION_ORDER) {
+      await page.locator('#options-list .option-card').nth(OPTION_INDEX[questionId]).click();
+      await page.locator('#next-btn').click();
+    }
+
+    await expect(page.locator('#question-counter')).toHaveText('One final distinction');
+    await page.locator('#options-list .option-card').nth(1).click();
+    await page.locator('#next-btn').click();
+
+    await expect(page.locator('#rec-primary-card .rec-platform-name')).toContainText('Microsoft Foundry');
+  });
+
+  test('skips the runtime distinction when Copilot Studio and Foundry are not close', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#start-btn').click();
+    await page.locator('#prescreen-no').click();
+
+    for (const optionIndex of [0, 0, 0, 0, 0]) {
+      await page.locator('#options-list .option-card').nth(optionIndex).click();
+      await page.locator('#next-btn').click();
+    }
+
+    await expect(page.locator('#recommendation-section')).toBeVisible();
+    await expect(page.locator('#question-title')).not.toHaveText('Who should operate the agent runtime?');
   });
 });

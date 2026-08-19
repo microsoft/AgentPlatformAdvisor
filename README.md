@@ -29,7 +29,7 @@ The start page presents ways to use or build agents:
 From **Get Started**, users choose one of three paths:
 
 1. **Entry-point wizard** ("Help me find the right place to get work done") — asks how hands-on you want to be, then routes to Microsoft 365 Copilot (featuring either Copilot Chat or its built-in agents), Cowork, Scout, or a Cowork+Scout pair. Non-scored.
-2. **Custom agent assessment** — runs the scored 5-question wizard for Agent Builder, Copilot Studio, and Foundry.
+2. **Custom agent assessment** — runs the scored 5-question wizard for Agent Builder, Copilot Studio, and Foundry, with a conditional runtime tie-breaker when the two enterprise platforms remain close.
 3. **Explore what's possible** — compares ways to use or build agents before deciding whether to take the assessment.
 
 The custom agent assessment asks about:
@@ -40,9 +40,12 @@ The custom agent assessment asks about:
 - What the agent should do: Q&A, multi-turn conversation, content/data analysis, multi-step action workflows, or complex orchestration
 - What information it needs: Microsoft 365 content, connector-backed systems, Dataverse/custom APIs, public web/uploaded files, or custom retrieval architecture
 
+When Copilot Studio and Foundry are the top two platforms within 2 points, the wizard asks one final non-scored distinction: whether Microsoft or the user's engineering team should operate the agent runtime.
+
 After completing a path, users get:
 
 - A primary recommendation with fit badge, key factors, and platform-specific guidance
+- A "Start with this harness" callout when Copilot Studio wins
 - A "Start Here" callout on entry-point results naming the surface to open first
 - A secondary "Also Consider" card when another option is close or complementary
 - A score comparison panel for the scored wizard
@@ -88,6 +91,7 @@ There are two recommendation modes:
    - Hard rules zero out platforms for disqualifying combinations before scoring.
    - Raw scores sum across 5 questions, with a maximum of 15 points per platform.
    - Persona preferences and tiebreakers adjust ranking when scores are tied or misleading for the selected builder persona.
+   - A conditional runtime distinction resolves close Copilot Studio/Foundry cases without changing their scores.
    - Thresholds map scores to fit labels: Strong fit (12-15), Good fit (8-11), Partial fit (4-7), Not recommended (0-3).
 
 Microsoft 365 Copilot, Cowork, and Scout are not part of the 0-15 scored wizard. They are reached only through the entry-point wizard.
@@ -97,7 +101,7 @@ Microsoft 365 Copilot, Cowork, and Scout are not part of the 0-15 scored wizard.
 The advisor reflects the current split between Microsoft agent options:
 
 - **Agent Builder** has expanded beyond SharePoint/OneDrive-only scenarios. It now covers no-code agents grounded in Microsoft 365 content, scoped web, uploaded files, and admin-enabled Microsoft 365 Copilot connectors, including lightweight content and data-analysis helpers.
-- **Copilot Studio** is the default governed low-code path for enterprise agents that need actions, workflows, triggers, connectors, MCP tools, computer use, connected agents, evaluation, monitoring, and multi-channel deployment.
+- **Copilot Studio** is the managed enterprise agent platform spanning GitHub Copilot harness agents for adaptive work, standard harness agents for predictable conversations, Copilot chat harness agents for Microsoft 365 knowledge extensions, and deterministic workflows.
 - **Microsoft Foundry** is the developer-controlled production runtime for prompt agents, hosted code agents, custom retrieval, managed endpoints, toolboxes, MCP, identity, private networking, tracing, evaluation, monitoring, and custom app/service integration.
 - **Microsoft 365 Copilot** is treated as the built-in productivity layer, and as one product rather than several: Copilot Chat, Copilot Search, app-native Copilot, Pages, Notebooks, and Microsoft-built agents are all surfaces within it.
 - **Copilot Cowork** and **Microsoft Scout** are personal agents you delegate work to, not platforms in the scored build assessment.
@@ -106,7 +110,7 @@ The advisor reflects the current split between Microsoft agent options:
 
 Share links encode the recommendation path:
 
-- Wizard results include selected answers, the recommended platform, and the recommendation date.
+- Wizard results include selected scored answers (`q1`, `q8`, `q2`, `q4`, and `q3`), the optional runtime distinction (`q9`) when asked, the recommended platform, and the recommendation date.
 - Entry-point results include `dt=m365_copilot`, `dt=cowork`, `dt=scout`, or `dt=both`, plus `st=chat` or `st=agents` for the Microsoft 365 Copilot starting surface.
 - Older links keep working: `ft=1` and `dt=copilot_chat` both resolve to the Microsoft 365 Copilot card.
 - Recipients can view the recommendation directly or retake the assessment with answers pre-filled.
@@ -123,7 +127,7 @@ npm test              # headless
 npm run test:headed   # with browser visible
 ```
 
-There are 39 tests across 6 spec files covering wizard completion, shared link loading, temporal change detection, legacy fast-track links, entry-point wizard routing, and share button behavior. To run a single file or test: `npx playwright test tests/e2e/delegate-path.spec.js` or `npx playwright test -g "completes full wizard"`. CI runs automatically on push and pull request via GitHub Actions.
+There are 48 tests across 7 spec files covering wizard completion, the conditional runtime distinction, Copilot Studio harness guidance, shared link loading, temporal change detection, legacy fast-track links, entry-point wizard routing, and share button behavior. To run a single file or test: `npx playwright test tests/e2e/delegate-path.spec.js` or `npx playwright test -g "completes full wizard"`. CI runs automatically on push and pull request via GitHub Actions.
 
 ## Contributing
 

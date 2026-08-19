@@ -4,10 +4,15 @@ All notable changes to Agent Platform Advisor are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), organized by repository commit date.
 
-## Unreleased
+## 2026-08-19
 
 ### Changed
 
+- **Reframed Copilot Studio guidance around its three harnesses and workflow experience.** The assessment remains five scored questions, but now asks a conditional final distinction (`q9`) only when Copilot Studio and Foundry are the top two platforms within 2 points: should Microsoft manage the runtime, or should the user's engineering team own it? Copilot Studio results include a **Start with this harness** callout for the GitHub Copilot harness, standard harness, Copilot chat harness, or workflow experience.
+- **Updated the Copilot Studio/Foundry boundary from task complexity to runtime ownership.** Copilot Studio now scores 3 for file/content work and complex orchestration because the GitHub Copilot harness supports adaptive multi-step execution, failure recovery, native Office/PDF file work, skills, memory, tools, connected agents, and secure sandboxing. Foundry remains the required path when the team must own the code runtime, framework, endpoint, network, identity, memory, or retrieval architecture.
+- **Added harness-specific cautions.** Copilot Studio guidance now calls out fixed harness selection, Copilot Credit consumption during building/testing/evaluation as well as production, and memory's preview lifecycle and channel limitations. The core scoring model remains five questions, 1,920 combinations, and a 15-point maximum.
+- **Preserved runtime-question share links across the schema refinement.** Links without `q9` remain valid; the previous `q9b` and `q9c` managed-platform values normalize to `q9a`; harness guidance is derived from task and deployment answers.
+- **Expanded Playwright coverage to 48 tests across 7 spec files.** New tests cover showing and skipping the conditional distinction, both runtime-ownership outcomes, all four Copilot Studio starting points, `q9` sharing, and previous `q9` URL aliases.
 - **Refreshed platform guidance in `apa.yaml` for mid-2026 product updates** (content only — the scoring matrix is unchanged, so `docs/SCORING.md` distribution figures still hold). Verified against Microsoft Learn and June 2026 release notes that two constraints are still accurate and left them in place: the no-code **Agent Builder is still reactive Q&A/retrieval only** (no action execution or event triggers — MCP Apps add UI, not actions), and **Cowork is still Microsoft 365-only** (no desktop/shell/browser/local runtime), so its reach split with Scout is unchanged.
   - **Copilot Cowork now runs scheduled prompts.** Added a *Best For* line for scheduling recurring Microsoft 365 tasks (daily briefings, status roundups, inbox triage), and rewrote the "on demand and user-initiated" caution to distinguish Cowork's *scheduled/recurring* runs from Scout's *always-on, condition-monitoring* autonomy. Sourced from the Cowork overview (Learn, updated 2026-07-27).
   - **Microsoft Foundry:** called out the **Agent Optimizer** evaluate-and-optimize loop in the lifecycle bullet and added a *Best For* line for **Foundry Local on Azure Local** (air-gapped, disconnected, or on-premises deployment).
